@@ -1,34 +1,19 @@
-<Query Kind="Statements" />
+<Query Kind="Statements">
+  <NuGetReference>System.Interactive</NuGetReference>
+</Query>
 
 var inputPath = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "input.txt");
 
-var input = Repeat(File
+var input = File
 	.ReadLines(inputPath)
 	.Select(int.Parse)
-	.ToList());
+	.ToList()
+	.Repeat();
 
-var dups = FindDupFreqs(input);
+var found = new HashSet<int>();
+var result = input
+	.Scan((freq, offset) => freq + offset)
+	.Where(i => !found.Add(i))
+	.First();
 
-var result = dups.First();
 result.Dump();
-
-IEnumerable<int> FindDupFreqs(IEnumerable<int> list)
-{
-	var freqs = new HashSet<int>();
-	var freq = 0;
-	foreach (var i in Repeat(input))
-	{
-		freq += i;
-		if (!freqs.Add(freq))
-			yield return freq;
-	}
-}
-
-IEnumerable<int> Repeat(IEnumerable<int> list)
-{
-	for (;;)
-	{
-		foreach (var i in list)
-			yield return i;
-	}
-}
