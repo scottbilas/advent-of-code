@@ -13,8 +13,7 @@ sampleChecksum.ShouldBe(12);
 var inputPath = Path.Combine(Path.GetDirectoryName(Util.CurrentQueryPath), "input.txt");
 
 var result = Checksum(File.ReadLines(inputPath));
-result.Dump();
-
+result.ShouldBe(4693);
 
 int Checksum(IEnumerable<string> ids)
 {
@@ -44,3 +43,6 @@ int Checksum(IEnumerable<string> ids)
 	
 	return doubles * triples;
 }
+
+// the obligatory 'one-liner'...
+File.ReadLines(inputPath).SelectMany(id => id.GroupBy(_ => _).GroupBy(g => g.Count())).GroupBy(c => c.Key).Where(c => c.Key > 1).Aggregate(1, (x, y) => x * y.Count()).ShouldBe(4693);
