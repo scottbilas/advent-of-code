@@ -98,30 +98,24 @@ static class Extensions
 
     public static (int strategy1, int strategy2) FindSleepiestGuard(this IEnumerable<SleepLog> sleepLogs)
     {
-        // run start->stop and count all minutes
-        var counts = sleepLogs
-            .GroupBy(guard => guard.GuardId)
-            .Select(guard =>
-            {
-                // count all minutes
-                var minutes = new int[60];
-                guard
-                    .SelectMany(sleepLog => Enumerable.Range(sleepLog.StartMinute, sleepLog.MinuteCount))
-                    .ForEach(i => ++minutes[i]);
-
-                // associate minute with count, and find most common minute
-                var maxMinute = minutes
-                    .Select((count, index) => (count, index))
-                    .MaxBy(v => v.count);
-                return (id: guard.Key, total: minutes.Sum(), maxMinute: maxMinute.First());
-            });
+        var counts =
+            from sleepLog in sleepLogs
+            group sleepLog by sleepLog.GuardId into guard
+            let minutes =
+                from guardLog in guard
+                from index in Enumerable.Range(guardLog.StartMinute, guardLog.MinuteCount)
+                group index by index
+            select (
+                id: guard.Key,
+                total: minutes.Sum(minute => minute.Count()),
+                maxMinute: minutes.MaxBy(minute => minute.Count()).First());
 
         var maxByTotalSleep = counts.MaxBy(guard => guard.total).First();
-        var maxByTotalMinute = counts.MaxBy(guard => guard.maxMinute.count).First();
+        var maxByTotalMinute = counts.MaxBy(guard => guard.maxMinute.Count()).First();
 
         return (
-            strategy1: maxByTotalSleep.id * maxByTotalSleep.maxMinute.index,
-            strategy2: maxByTotalMinute.id * maxByTotalMinute.maxMinute.index);
+            strategy1: maxByTotalSleep.id * maxByTotalSleep.maxMinute.Key,
+            strategy2: maxByTotalMinute.id * maxByTotalMinute.maxMinute.Key);
     }
 
     public static void RenderSleep(this IEnumerable<SleepLog> sleepLogs, string outputPath)
@@ -136,9 +130,8 @@ static class Extensions
             {
                 f.Write($"{day.Key.Month:00}-{day.Key.Day:00}  #{day.First().GuardId.ToString().PadLeft(4)}  ");
                 var minutes = Enumerable.Repeat('.', 60).ToArray();
-                day
-                    .SelectMany(sleepLog => Enumerable.Range(sleepLog.StartMinute, sleepLog.MinuteCount))
-                    .ForEach(i => minutes[i] = '#');
+                foreach (var i in day.SelectMany(sleepLog => Enumerable.Range(sleepLog.StartMinute, sleepLog.MinuteCount)))
+                    minutes[i] = '#';
                 f.WriteLine(minutes);
             }
             f.WriteLine($"");
