@@ -1,88 +1,147 @@
-<Query Kind="Statements">
+<Query Kind="Program">
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
   <Namespace>MoreLinq.Extensions</Namespace>
   <Namespace>Shouldly</Namespace>
 </Query>
 
-// sample
-
-FindSleepiestGuard(ParseAndExtractSleepLogs(new[] {
-    "[1518-11-05 00:45] falls asleep",
-    "[1518-11-01 00:00] Guard #10 begins shift",
-    "[1518-11-03 00:29] wakes up",
-    "[1518-11-01 00:30] falls asleep",
-    "[1518-11-01 23:58] Guard #99 begins shift",
-    "[1518-11-02 00:50] wakes up",
-    "[1518-11-05 00:03] Guard #99 begins shift",
-    "[1518-11-02 00:40] falls asleep",
-    "[1518-11-05 00:55] wakes up",
-    "[1518-11-04 00:46] wakes up",
-    "[1518-11-01 00:05] falls asleep",
-    "[1518-11-01 00:25] wakes up",
-    "[1518-11-04 00:36] falls asleep",
-    "[1518-11-03 00:24] falls asleep",
-    "[1518-11-03 00:05] Guard #10 begins shift",
-    "[1518-11-04 00:02] Guard #99 begins shift",
-    "[1518-11-01 00:55] wakes up",
-    }))
-    .ShouldBe((240, 4455));
-
-// problem
-
-var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
-
-var problemSleepLogs = ParseAndExtractSleepLogs(File.ReadLines($"{scriptDir}/input.txt"));
-
-FindSleepiestGuard(problemSleepLogs)
-    .Dump()
-    .ShouldBe((8421, 83359));
-
-IEnumerable<(int id, int start, int stop)> ParseAndExtractSleepLogs(IEnumerable<string> textLogs)
+void Main()
 {
-    var lastGuardId = 0;
-    return textLogs
-        .OrderBy(_ => _)
-        .Select(textLog =>
-        {
-            var groups = Regex.Match(textLog, @"(\d+)].*(?:#(\d+) begins|(asleep)|wakes)").Groups;
+    // sample
 
-            var id = 0;
-            if (groups[2].Success)
-                lastGuardId = int.Parse(groups[2].Value);
-            else
-                id = lastGuardId;
+    new[] {
+            "[1518-11-05 00:45] falls asleep",
+            "[1518-11-01 00:00] Guard #10 begins shift",
+            "[1518-11-03 00:29] wakes up",
+            "[1518-11-01 00:30] falls asleep",
+            "[1518-11-01 23:58] Guard #99 begins shift",
+            "[1518-11-02 00:50] wakes up",
+            "[1518-11-05 00:03] Guard #99 begins shift",
+            "[1518-11-02 00:40] falls asleep",
+            "[1518-11-05 00:55] wakes up",
+            "[1518-11-04 00:46] wakes up",
+            "[1518-11-01 00:05] falls asleep",
+            "[1518-11-01 00:25] wakes up",
+            "[1518-11-04 00:36] falls asleep",
+            "[1518-11-03 00:24] falls asleep",
+            "[1518-11-03 00:05] Guard #10 begins shift",
+            "[1518-11-04 00:02] Guard #99 begins shift",
+            "[1518-11-01 00:55] wakes up",
+        }
+        .ParseAndExtractSleepLogs()
+        .FindSleepiestGuard()
+        .ShouldBe((240, 4455));
 
-            return (id, min: int.Parse(groups[1].Value), asleep: groups[3].Success);
-        })
-        .Where(log => log.id != 0) // skip "begins shift"
-        .Batch(2, batch => (id: batch.First().id, start: batch.First().min, stop: batch.Last().min));
+    // problem
+
+    var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
+
+    var problemSleepLogs = File
+        .ReadLines($"{scriptDir}/input.txt")
+        .ParseAndExtractSleepLogs()
+        .ToList();
+
+    problemSleepLogs.RenderSleep($"{scriptDir}/timeline.txt");
+
+    problemSleepLogs
+        .FindSleepiestGuard()
+        .Dump()
+        .ShouldBe((8421, 83359));
 }
 
-(int strategy1, int strategy2) FindSleepiestGuard(IEnumerable<(int id, int start, int stop)> sleepLogs)
+struct SleepLog
 {
-    // run start->stop and count all minutes
-    var counts = sleepLogs
-        .GroupBy(guard => guard.id)
-        .Select(guard =>
+    public DateTime Date;
+    public int GuardId;
+    public int StartMinute;
+    public int MinuteCount;
+}
+
+static class Extensions
+{
+    public static IEnumerable<SleepLog> ParseAndExtractSleepLogs(this IEnumerable<string> textLogs)
+    {
+        var lastGuardId = 0;
+        return textLogs
+            .OrderBy(_ => _)
+            .Select(textLog =>
+            {
+                // [1518-11-05 00:03] Guard #99 begins shift
+                //    ^0 ^1 ^2 ^3 ^4         ^5
+                
+                var ints = Regex
+                    .Matches(textLog, @"\d+").Cast<Match>()
+                    .Select(m => int.Parse(m.Value))
+                    .ToList();
+
+                var id = 0;
+                if (ints.Count() == 6)
+                    lastGuardId = ints[5];
+                else
+                    id = lastGuardId;
+
+                return (id, ints);
+            })
+            .Where(log => log.id != 0) // skip "begins shift", was only needed to track id's for sleep/wake pairs
+            .Batch(2, batch =>
+            {
+                var (start, stop) = (batch.First(), batch.Last());
+                return new SleepLog
+                {
+                    Date = new DateTime(start.ints[0], start.ints[1], start.ints[2]),
+                    GuardId = start.id,
+                    StartMinute = start.ints[4],
+                    MinuteCount = stop.ints[4] - start.ints[4]
+                };
+            });
+    }
+
+    public static (int strategy1, int strategy2) FindSleepiestGuard(this IEnumerable<SleepLog> sleepLogs)
+    {
+        // run start->stop and count all minutes
+        var counts = sleepLogs
+            .GroupBy(guard => guard.GuardId)
+            .Select(guard =>
             {
                 // count all minutes
                 var minutes = new int[60];
                 guard
-                    .SelectMany(pair => Enumerable.Range(pair.start, pair.stop - pair.start))
+                    .SelectMany(sleepLog => Enumerable.Range(sleepLog.StartMinute, sleepLog.MinuteCount))
                     .ForEach(i => ++minutes[i]);
-                    
+
                 // associate minute with count, and find most common minute
                 var maxMinute = minutes
                     .Select((count, index) => (count, index))
                     .MaxBy(v => v.count);
                 return (id: guard.Key, total: minutes.Sum(), maxMinute: maxMinute.First());
             });
-            
-    var maxByTotalSleep = counts.MaxBy(guard => guard.total).First();
-    var maxByTotalMinute = counts.MaxBy(guard => guard.maxMinute.count).First();
 
-    return (
-        strategy1: maxByTotalSleep.id * maxByTotalSleep.maxMinute.index,
-        strategy2: maxByTotalMinute.id * maxByTotalMinute.maxMinute.index);
+        var maxByTotalSleep = counts.MaxBy(guard => guard.total).First();
+        var maxByTotalMinute = counts.MaxBy(guard => guard.maxMinute.count).First();
+
+        return (
+            strategy1: maxByTotalSleep.id * maxByTotalSleep.maxMinute.index,
+            strategy2: maxByTotalMinute.id * maxByTotalMinute.maxMinute.index);
+    }
+
+    public static void RenderSleep(this IEnumerable<SleepLog> sleepLogs, string outputPath)
+    {
+        using (var f = File.CreateText(outputPath))
+        {
+            f.WriteLine("Date   ID     Minute");
+            f.WriteLine("              000000000011111111112222222222333333333344444444445555555555");
+            f.WriteLine("              012345678901234567890123456789012345678901234567890123456789");
+            
+            foreach (var day in sleepLogs.GroupBy(l => l.Date))
+            {
+                f.Write($"{day.Key.Month:00}-{day.Key.Day:00}  #{day.First().GuardId.ToString().PadLeft(4)}  ");
+                var minutes = Enumerable.Repeat('.', 60).ToArray();
+                day
+                    .SelectMany(sleepLog => Enumerable.Range(sleepLog.StartMinute, sleepLog.MinuteCount))
+                    .ForEach(i => minutes[i] = '#');
+                f.WriteLine(minutes);
+            }
+            f.WriteLine($"");
+        }
+    }
 }
