@@ -7,48 +7,47 @@
 
 // sample
 
-React("dabAcCaCBAcCcaDA").ShouldBe(10);
-ReactMinimize("dabAcCaCBAcCcaDA").ShouldBe(4);
+React("dabAcCaCBAcCcaDA").Length.ShouldBe(10);
+ReactMinLength("dabAcCaCBAcCcaDA").ShouldBe(4);
 
 // problem
 
 var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 
-React(File.ReadLines($"{scriptDir}/input.txt").First()).Dump().ShouldBe(9370);
-ReactMinimize(File.ReadLines($"{scriptDir}/input.txt").First()).Dump().ShouldBe(6390);
+React(File.ReadLines($"{scriptDir}/input.txt").First()).Length.Dump().ShouldBe(9370);
+ReactMinLength(File.ReadLines($"{scriptDir}/input.txt").First()).Dump().ShouldBe(6390);
 
-// todo: well this is simple, but the slowest thing in the world. switch to a "deleted cell" method instead.
-int React(string input)
+string React(string input, char ignore = '\0')
 {
-    var chars = new LinkedList<char>(input);
-    
-    for (var i = chars.First; i != chars.Last;)
+    var output = new Stack<char>();
+
+    for (var i = 0; i < input.Length; ++i)
     {
-        var next = i.Next;
-        if (char.ToLower(i.Value) == char.ToLower(next.Value) && i.Value != next.Value)
+        var cur = input[i];
+        if ((cur & ~32) == ignore)
+            continue;
+        
+        if (output.Count > 0)
         {
-            chars.Remove(i);
-            chars.Remove(next);
-            i = chars.First;
+            var prv = output.Peek();
+            if (((int)cur & ~32) == ((int)prv & ~32) && cur != prv)
+            {
+                output.Pop();
+                continue;
+            }
         }
-        else
-            i = next;
+
+        output.Push(cur);
     }
-    
-    return chars.ToArray().Length;
+
+    return new string(output.ToArray());
 }
 
-int ReactMinimize(string input)
+int ReactMinLength(string input)
 {
-    // todo's:
-    // * react before doing char-specific reacting (test to see if would be faster..should be)
-    // * char-specific reacting gets new input string, rather than just seeding the delete cell array
-    // * parallelize
-    // * single simultaneous pass for all 26 (make deleted cell a bit array? nah)
+    input = React(input);
     return Enumerable.Range(0, 26)
-        .Select(i => (char)('a' + i))
-        .Select(c => $"[{c}{char.ToUpper(c)}]")
-        .Distinct()
-        .Select(pattern => React(Regex.Replace(input, pattern, "")))
+        .AsParallel()
+        .Select(i => React(input, (char)('A' + i)).Length)
         .Min();
 }
