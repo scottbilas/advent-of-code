@@ -7,19 +7,20 @@
 
 // sample
 
-React("dabAcCaCBAcCcaDA").Length.ShouldBe(10);
+ReactLength("dabAcCaCBAcCcaDA").ShouldBe(10);
 ReactMinLength("dabAcCaCBAcCcaDA").ShouldBe(4);
 
 // problem
 
 var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 
-React(File.ReadLines($"{scriptDir}/input.txt").First()).Length.Dump().ShouldBe(9370);
+ReactLength(File.ReadLines($"{scriptDir}/input.txt").First()).Dump().ShouldBe(9370);
 ReactMinLength(File.ReadLines($"{scriptDir}/input.txt").First()).Dump().ShouldBe(6390);
 
-string React(string input, char ignore = '\0')
+(char[] output, int outputLen) React(string input, char ignore = '\0')
 {
-    var output = new Stack<char>();
+    var output = new char[input.Length];
+    var outputLen = 0;
 
     for (var i = 0; i < input.Length; ++i)
     {
@@ -27,27 +28,33 @@ string React(string input, char ignore = '\0')
         if ((cur & ~32) == ignore)
             continue;
         
-        if (output.Count > 0)
+        if (outputLen > 0)
         {
-            var prv = output.Peek();
+            var prv = output[outputLen - 1];
             if (((int)cur & ~32) == ((int)prv & ~32) && cur != prv)
             {
-                output.Pop();
+                --outputLen;
                 continue;
             }
         }
 
-        output.Push(cur);
+        output[outputLen++] = cur;
     }
 
-    return new string(output.ToArray());
+    return (output, outputLen);
+}
+
+int ReactLength(string input)
+{
+    return React(input).outputLen;
 }
 
 int ReactMinLength(string input)
 {
-    input = React(input);
+    var simplify = React(input);
+    input = new string(simplify.output, 0, simplify.outputLen);
     return Enumerable.Range(0, 26)
         .AsParallel()
-        .Select(i => React(input, (char)('A' + i)).Length)
+        .Select(i => React(input, (char)('A' + i)).outputLen)
         .Min();
 }
