@@ -3,35 +3,51 @@
   <NuGetReference>Shouldly</NuGetReference>
   <Namespace>MoreLinq.Extensions</Namespace>
   <Namespace>Shouldly</Namespace>
+  <Namespace>System.Drawing</Namespace>
+  <Namespace>System.Drawing.Imaging</Namespace>
 </Query>
 
 // sample
 
-var sampleBoard = new[] {
+var sample = Parse(new[] {
     "1, 1",
     "1, 6",
     "8, 3",
     "3, 4",
     "5, 5",
     "8, 9",
-    };
+    }).ToList();
 
-LargestFiniteArea(sampleBoard).ShouldBe(17);
-SafeRegionSize(sampleBoard, 32).ShouldBe(16);
+LargestFiniteArea(DistanceGrids(sample)).ShouldBe(17);
+SafeRegionSize(sample, 32).ShouldBe(16);
 
 // problem
 
 var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
+var input = Parse(File.ReadLines($"{scriptDir}/input.txt")).ToList();
 
-LargestFiniteArea(File.ReadLines($"{scriptDir}/input.txt")).Dump().ShouldBe(3420);
-SafeRegionSize(File.ReadLines($"{scriptDir}/input.txt"), 10000).Dump().ShouldBe(46667);
+var distanceGrids = DistanceGrids(input);
+//LargestFiniteArea(distanceGrids).Dump().ShouldBe(3420);
+Render(distanceGrids, $"{scriptDir}/map.png");
+//SafeRegionSize(input, 10000).Dump().ShouldBe(46667);
 
-int LargestFiniteArea(IEnumerable<string> textCoords)
+IEnumerable<(int x, int y)> Parse(IEnumerable<string> textCoords)
 {
-    var coords = textCoords
+    return textCoords
         .Select(tc => tc.Split(','))
         .Select(ts => (x: int.Parse(ts[0]), y: int.Parse(ts[1]))).ToList();
+}
 
+int LargestFiniteArea((int[,] ids, int[,] dist, bool[] inf) grids)
+{
+    return grids.ids.Cast<int>()
+        .Where(i => i >= 0 && !grids.inf[i - 1])
+        .GroupBy(i => i)
+        .Max(g => g.Count());
+}
+
+(int[,] ids, int[,] dist, bool[] inf) DistanceGrids(IReadOnlyList<(int x, int y)> coords)
+{
     var bounds = (
         l: coords.Min(c => c.x), t: coords.Min(c => c.y),
         r: coords.Max(c => c.x) + 1, b: coords.Max(c => c.y) + 1);
@@ -87,18 +103,62 @@ int LargestFiniteArea(IEnumerable<string> textCoords)
             break;
     }
     
-    return grid.Cast<int>()
-        .Where(i => i >= 0 && !isInfinite[i-1])
-        .GroupBy(i => i)
-        .Max(g => g.Count());
+    return (grid, gridDist, isInfinite);
 }
 
-int SafeRegionSize(IEnumerable<string> textCoords, int max)
+void Render((int[,] ids, int[,] dist, bool[] inf) grids, string path)
 {
-    var coords = textCoords
-        .Select(tc => tc.Split(','))
-        .Select(ts => (x: int.Parse(ts[0]), y: int.Parse(ts[1]))).ToList();
+    var (cx, cy) = (grids.ids.GetLength(0), grids.ids.GetLength(1));
+    var maxId = grids.ids.Cast<int>().Max();
+    var maxDist = grids.dist.Cast<int>().Max();
 
+    /*var idColors = typeof(Color)
+        .GetProperties(BindingFlags.Static | BindingFlags.Public)
+        .Select(p => p.GetGetMethod().Invoke(null, null))
+        .Cast<Color>()
+        .Where(c => c.A == 255 && ((c.R + c.G + c.B) < (600) && (c.R + c.G + c.B) > 50))
+        .Dump()
+        .Repeat()
+        .Take(maxId + 1)
+        .RandomSubset(maxId + 1)
+        .ToList();*/
+        
+    var r = new Random();
+    var idColors = Enumerable
+        .Range(0, maxId + 1)
+        .Select(_ => Color.FromArgb(255, r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)))
+        .ToList();
+
+    using (var b = new Bitmap(cx, cy))
+    {
+        for (int y = 0; y < cy; ++y)
+        {
+            for (int x = 0; x < cx; ++x)
+            {
+                Color c;
+                
+                var id = grids.ids[x, y];
+                if (id < 0)
+                    c = Color.White;
+                else if (id == 0)
+                    c = Color.Black;
+                else
+                {
+                    var scale = 1.0 - ((double)(grids.dist[x, y]) / maxDist);
+                    c = idColors[id];
+                    c = Color.FromArgb(255, (int)(scale * c.R), (int)(scale * c.G), (int)(scale * c.B));
+                }
+
+                b.SetPixel(x, y, c);
+            }
+        }
+
+        b.Save(path, ImageFormat.Png);
+    }
+}
+
+int SafeRegionSize(IReadOnlyList<(int x, int y)> coords, int max)
+{
     var bounds = (
         l: coords.Min(c => c.x), t: coords.Min(c => c.y),
         r: coords.Max(c => c.x) + 1, b: coords.Max(c => c.y) + 1);
