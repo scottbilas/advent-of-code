@@ -31,6 +31,7 @@ void Main()
     LargestFiniteArea(input).Dump().ShouldBe(3420);
     Render(input, $"{scriptDir}/map.png");
     SafeRegionSize(input, 10000).Dump().ShouldBe(46667);
+    Render(input, $"{scriptDir}/safe.png", 10000);
 
     IEnumerable<(int x, int y)> Parse(IEnumerable<string> textCoords) => textCoords
         .Select(tc => tc.Split(','))
@@ -93,7 +94,19 @@ int LargestFiniteArea(IReadOnlyList<(int x, int y)> coords)
         .Max();
 }
 
-void Render(IReadOnlyList<(int x, int y)> coords, string path)
+int SafeRegionSize(IReadOnlyList<(int x, int y)> coords, int max)
+{
+    var bounds = GetBounds(coords);
+    return (
+        from y in Enumerable.Range(bounds.t, bounds.b - bounds.t)
+        from x in Enumerable.Range(bounds.l, bounds.r - bounds.l)
+        let dist = coords.Sum(c => Math.Abs(c.x - x) + Math.Abs(c.y - y))
+        where dist < max
+        select dist)
+        .Count();
+}
+
+void Render(IReadOnlyList<(int x, int y)> coords, string path, int safeAreasMax = 0)
 {
     var bounds = GetBounds(coords);
     var grid = new (int id, int dist)[bounds.cx, bounds.cy];
@@ -142,6 +155,8 @@ void Render(IReadOnlyList<(int x, int y)> coords, string path)
                 var id = grid[x, y].id;
                 if (id < 0)
                     c = Color.White;
+                else if (safeAreasMax != 0)
+                    c = Color.FromArgb(255, idColors[id].R, idColors[id].R, idColors[id].R);
                 else
                 {
                     var scale = 1.0 - ((double)(grid[x, y].dist) / maxDist);
@@ -153,18 +168,24 @@ void Render(IReadOnlyList<(int x, int y)> coords, string path)
             }
         }
 
+        if (safeAreasMax != 0)
+        {
+            foreach (var point in 
+                from y in Enumerable.Range(bounds.t, bounds.b - bounds.t)
+                from x in Enumerable.Range(bounds.l, bounds.r - bounds.l)
+                let dist = coords.Sum(c => Math.Abs(c.x - bounds.l - x) + Math.Abs(c.y - bounds.t - y))
+                where dist < safeAreasMax
+                select (x, y, dist))
+            {
+                b.SetPixel(point.x, point.y, Color.LawnGreen);
+            }
+        }
+        
+        foreach (var coord in coords)
+        {
+            b.SetPixel(coord.x - bounds.l, coord.y - bounds.t, Color.Red);
+        }
+
         b.Save(path, ImageFormat.Png);
     }
-}
-
-int SafeRegionSize(IReadOnlyList<(int x, int y)> coords, int max)
-{
-    var bounds = GetBounds(coords);
-    return (
-        from y in Enumerable.Range(bounds.t, bounds.b - bounds.t)
-        from x in Enumerable.Range(bounds.l, bounds.r - bounds.l)
-        let dist = coords.Sum(c => Math.Abs(c.x - x) + Math.Abs(c.y - y))
-        where dist < max
-        select dist)
-        .Count();
 }
