@@ -26,6 +26,8 @@ void Main()
     CalcOrder(sample).ShouldBe("CABDFE");
     CalcParallelCost(sample, 2, 1).ShouldBe(15);
 
+    BuildQuickGraph(sample);
+
     // problem
 
     var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
@@ -35,8 +37,10 @@ void Main()
     CalcParallelCost(input, 5, 61).Dump().ShouldBe(1053);
 }
 
-IEnumerable<(char l, char r)> Parse(string instrs) =>
-    Regex.Matches(instrs, " (.) ").Cast<Match>().Select(m => m.Groups[1].Value).Batch(2).Select(b => (b.First()[0], b.Last()[0]));
+IEnumerable<(char l, char r)> Parse(string instrs) => Regex
+    .Matches(instrs, @" (\w) ").Cast<Match>()
+    .Select(m => m.Groups[1].Value)
+    .Batch(2, b => (b.First()[0], b.Last()[0]));
 
 class Node
 {
@@ -70,23 +74,32 @@ Node BuildGraph(IEnumerable<(char l, char r)> instrs)
     return root;
 }
 
+IBidirectionalGraph<char, SEdge<char>> BuildQuickGraph(IEnumerable<(char l, char r)> instrs) => instrs
+    .Select(i => new SEdge<char>(i.l, i.r))
+    .ToBidirectionalGraph<char, SEdge<char>>();
+
 string CalcOrder(IEnumerable<(char l, char r)> instrs)
 {
-    var order = new StringBuilder();
-
-    var root = BuildGraph(instrs);
+    var output = new List<char>();
+    var graph = BuildQuickGraph(instrs);
+    var working = new SortedSet<char>(graph.Vertices.Where(graph.IsInEdgesEmpty));
     
-    var working = root.Children.ToList();
     while (working.Any())
     {
-        working.Sort((x, y) => x.C.CompareTo(y.C));
-        order.Append(working[0].C);
-        working[0].Used = true;
-        working.AddRange(working[0].Children.Where(c => c.Parents.All(p => p.Used)));
-        working.RemoveAt(0);
+        var current = working.First();
+        output.Add(current);
+        working.Remove(current);
+
+        graph
+            .OutEdges(current)
+            .Select(edge => edge.Target)
+            .Where(target => graph
+                .InEdges(target)
+                .All(edge => output.Contains(edge.Source)))
+            .ForEach(newWork => working.Add(newWork));
     }
 
-    return order.ToString();    
+    return new string(output.ToArray());
 }
 
 class Worker
