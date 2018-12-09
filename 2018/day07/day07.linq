@@ -40,10 +40,13 @@ IBidirectionalGraph<char, SEdge<char>> BuildGraph(string instrs) => Regex
     .Batch(2, b => new SEdge<char>(b.First(), b.Last()))
     .ToBidirectionalGraph<char, SEdge<char>>();
 
+IEnumerable<char> GetRoots(IBidirectionalGraph<char, SEdge<char>> graph) =>
+    graph.Vertices.Where(graph.IsInEdgesEmpty);
+
 string CalcOrder(IBidirectionalGraph<char, SEdge<char>> graph)
 {
     var output = new List<char>();
-    var working = new SortedSet<char>(graph.Vertices.Where(graph.IsInEdgesEmpty));
+    var working = new SortedSet<char>(GetRoots(graph));
     
     while (working.Any())
     {
@@ -74,12 +77,8 @@ int CalcParallelCost(IBidirectionalGraph<char, SEdge<char>> graph, int workerCou
     var time = -1;
 
     var workers = Enumerable.Range(0, workerCount).Select(_ => new Worker()).ToList();
+    var working = new SortedList<char, Worker>(GetRoots(graph).ToDictionary(v => v, v => (Worker)null));
     var used = new List<char>();
-
-    var working = new SortedList<char, Worker>(graph
-        .Vertices
-        .Where(graph.IsInEdgesEmpty)
-        .ToDictionary(v => v, v => (Worker)null));
 
     while (working.Any())
     {
