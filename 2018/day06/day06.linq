@@ -138,7 +138,7 @@ void Render(IReadOnlyList<(int x, int y)> coords, string path, int safeAreasMax 
         }
     }
 
-    var r = new Random();
+    var r = new Random(0);
     var idColors = Enumerable
         .Range(0, maxId + 1)
         .Select(_ => Color.FromArgb(255, r.Next(100, 255), r.Next(100, 255), r.Next(100, 255)))
