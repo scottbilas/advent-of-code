@@ -1,11 +1,6 @@
 <Query Kind="Statements">
-  <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
-  <NuGetReference>YC.QuickGraph</NuGetReference>
-  <Namespace>MoreLinq.Extensions</Namespace>
-  <Namespace>QuickGraph</Namespace>
   <Namespace>Shouldly</Namespace>
-  <Namespace>System.Linq</Namespace>
 </Query>
 
 var valuesStore = new int[10000000];

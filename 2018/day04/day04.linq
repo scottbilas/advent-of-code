@@ -43,10 +43,9 @@ void Main()
 
     problemSleepLogs.RenderSleep($"{scriptDir}/timeline.txt");
 
-    problemSleepLogs
-        .FindSleepiestGuard()
-        .Dump()
-        .ShouldBe((8421, 83359));
+    var sleepiest = problemSleepLogs.FindSleepiestGuard();
+    sleepiest.strategy1.Dump().ShouldBe(8421);
+    sleepiest.strategy2.Dump().ShouldBe(83359);
 }
 
 struct SleepLog

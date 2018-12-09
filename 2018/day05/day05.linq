@@ -1,7 +1,5 @@
 <Query Kind="Statements">
-  <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
-  <Namespace>MoreLinq.Extensions</Namespace>
   <Namespace>Shouldly</Namespace>
 </Query>
 

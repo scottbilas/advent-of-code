@@ -1,9 +1,5 @@
 <Query Kind="Program">
-  <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
-  <NuGetReference>YC.QuickGraph</NuGetReference>
-  <Namespace>MoreLinq.Extensions</Namespace>
-  <Namespace>QuickGraph</Namespace>
   <Namespace>Shouldly</Namespace>
   <Namespace>System.Linq</Namespace>
 </Query>
@@ -21,8 +17,8 @@ void Main()
     var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
     var input = BuildTree(File.ReadAllText($"{scriptDir}/input.txt"));
 
-    input.metaSum.ShouldBe(42146);
-    input.value.ShouldBe(26753);
+    input.metaSum.Dump().ShouldBe(42146);
+    input.value.Dump().ShouldBe(26753);
 }
 
 class Node

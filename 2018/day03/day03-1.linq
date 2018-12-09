@@ -1,6 +1,5 @@
 <Query Kind="Statements">
   <NuGetReference>Shouldly</NuGetReference>
-  <NuGetReference>System.Interactive</NuGetReference>
   <Namespace>Shouldly</Namespace>
 </Query>
 
