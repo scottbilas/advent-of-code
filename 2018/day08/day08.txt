@@ -36,6 +36,8 @@ The first check done on the license file is to simply add up all of the metadata
 
 What is the sum of all metadata entries?
 
+Your puzzle answer was 42146.
+
 --- Part Two ---
 
 The second check is slightly more complicated: you need to find the value of the root node (A in the example above).
@@ -54,3 +56,5 @@ For example, again using the above nodes:
 So, in this example, the value of the root node is 66.
 
 What is the value of the root node?
+
+Your puzzle answer was 26753.
