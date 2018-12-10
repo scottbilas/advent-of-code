@@ -1,29 +1,35 @@
 <Query Kind="Statements">
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
-  <NuGetReference>YC.QuickGraph</NuGetReference>
   <Namespace>MoreLinq.Extensions</Namespace>
-  <Namespace>QuickGraph</Namespace>
   <Namespace>Shouldly</Namespace>
+  <Namespace>System.Drawing</Namespace>
+  <Namespace>System.Drawing.Imaging</Namespace>
   <Namespace>System.Linq</Namespace>
+  <Namespace>System.Drawing.Drawing2D</Namespace>
 </Query>
 
 var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 
 // sample
 
-Render(File.ReadLines($"{scriptDir}/sample.txt"), 10);
+var sample = Solve($"{scriptDir}/sample.txt", 10);
+sample.letters.ShouldBe("HI");
+sample.time.ShouldBe(3);
 
 // problem
 
-Render(File.ReadLines($"{scriptDir}/input.txt"), 15);
+var problem = Solve($"{scriptDir}/input.txt", 15);
+problem.letters.Dump().ShouldBe("RGRKHKNA");
+problem.time.Dump().ShouldBe(10117);
 
-void Render(IEnumerable<string> lines, int windowHeight)
+(string letters, int time) Solve(string path, int windowHeight)
 {
     var positions = new List<(int x, int y)>();
     var velocities = new List<(int x, int y)>();
 
-    lines
+    File
+        .ReadLines(path)
         .Select(line => Regex
             .Matches(line, @"-?\d+").Cast<Match>()
             .Select(m => int.Parse(m.Value))
@@ -34,7 +40,6 @@ void Render(IEnumerable<string> lines, int windowHeight)
             velocities.Add((ints[2], ints[3]));
         });
 
-    var rendering = false;
     for (var time = 0;; ++time)
     {
         var bounds = (
@@ -43,29 +48,41 @@ void Render(IEnumerable<string> lines, int windowHeight)
         var dims = (w: bounds.r - bounds.l, h: bounds.b - bounds.t);
         if (dims.h < windowHeight)
         {
-            rendering = true;
-
-            var grid = new char[bounds.r - bounds.l, bounds.b - bounds.t];
-            for (int y = 0; y < dims.h; ++y)
-                for (int x = 0; x < dims.w; ++x)
-                    grid[x, y] = ' ';
-
-            foreach (var pos in positions)
-                grid[pos.x - bounds.l, pos.y - bounds.t] = '#';
-
-            var sb = new StringBuilder();
-            for (int y = 0; y < dims.h; ++y)
+            // to detect text this small, tesseract needs black on white with a border and scaled up 400%
+            
+            var renderPath = path.Replace(".txt", ".png");
+            var border = 10;
+            using (var image = new Bitmap(dims.w + border * 2, dims.h + border * 2, PixelFormat.Format24bppRgb))
             {
-                for (int x = 0; x < dims.w; ++x)
-                    sb.Append(grid[x, y]);
-                sb.Append('\n');
+                using (var gr = Graphics.FromImage(image))
+                {
+                    gr.Clear(Color.White);
+                    foreach (var p in positions)
+                        image.SetPixel(p.x - bounds.l + border, p.y - bounds.t + border, Color.Black);
+                }
+
+                var scaled = new Bitmap(image.Width * 4, image.Height * 4);
+                using (var gr = Graphics.FromImage(scaled))
+                    gr.DrawImage(image, 0, 0, scaled.Width, scaled.Height);
+                scaled.Save(renderPath, ImageFormat.Png);
             }
 
-            Console.WriteLine(time);
-            Console.WriteLine(sb.ToString());
+            var ocrName = Path.GetFileNameWithoutExtension(path) + "_ocr";
+            using (var process = Process.Start(new ProcessStartInfo
+            {
+                FileName = "tesseract",
+                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+                Arguments = $"{renderPath} {ocrName}",
+                WorkingDirectory = scriptDir,
+            }))
+            {
+                process.WaitForExit();
+            }
+
+            var letters = File.ReadAllText($"{scriptDir}/{ocrName}.txt").Trim();
+
+            return (letters, time);
         }
-        else if (rendering)
-            return;
 
         for (int i = 0; i < positions.Count; ++i)
         {
