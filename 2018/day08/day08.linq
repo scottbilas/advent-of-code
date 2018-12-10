@@ -1,8 +1,13 @@
 <Query Kind="Program">
   <NuGetReference>Shouldly</NuGetReference>
+  <NuGetReference>YC.QuickGraph</NuGetReference>
   <Namespace>Shouldly</Namespace>
   <Namespace>System.Linq</Namespace>
+  <Namespace>QuickGraph</Namespace>
+  <Namespace>QuickGraph.Graphviz</Namespace>
 </Query>
+
+string scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 
 void Main()
 {
@@ -11,14 +16,14 @@ void Main()
     var sample = BuildTree(@"2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2");
     sample.metaSum.ShouldBe(138);
     sample.value.ShouldBe(66);
+    Render(sample.root, "sample");
 
     // problem
 
-    var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
     var input = BuildTree(File.ReadAllText($"{scriptDir}/input.txt"));
-
     input.metaSum.Dump().ShouldBe(42146);
     input.value.Dump().ShouldBe(26753);
+    Render(input.root, "input");
 }
 
 class Node
@@ -80,4 +85,37 @@ class Node
     }
     
     return (metaSum, value: GetValue(root), root);
+}
+
+void Render(Node root, string name)
+{
+    var graph = Walk(root).ToBidirectionalGraph<Node, Edge<Node>>();
+
+    IEnumerable<Edge<Node>> Walk(Node node)
+    {
+        foreach (var i in node.Children)
+        {
+            yield return new Edge<Node>(node, i);
+            foreach (var j in Walk(i))
+                yield return j;
+        }
+    }
+
+    var dotName = $"{name}.dot";
+    var svgName = $"{name}.svg";
+
+    var graphviz = new GraphvizAlgorithm<Node, Edge<Node>>(graph);
+    graphviz.FormatVertex += (sender, args) => args.VertexFormatter.Label = string.Join(",", args.Vertex.Metadata);
+    graphviz.Generate(new FileDotEngine(), $"{scriptDir}/{dotName}");
+
+    using (var process = Process.Start(new ProcessStartInfo
+    {
+        FileName = "dot",
+        Arguments = $"-Tsvg {dotName} -o {svgName}", // part 2 is insane as a png, use svg instead
+        WorkingDirectory = scriptDir,
+        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+    }))
+    {
+        process.WaitForExit();
+    }
 }

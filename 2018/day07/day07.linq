@@ -6,7 +6,10 @@
   <Namespace>QuickGraph</Namespace>
   <Namespace>Shouldly</Namespace>
   <Namespace>System.Linq</Namespace>
+  <Namespace>QuickGraph.Graphviz</Namespace>
 </Query>
+
+string scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 
 void Main()
 {
@@ -24,14 +27,15 @@ void Main()
 
     CalcOrder(sample).ShouldBe("CABDFE");
     CalcParallelCost(sample, 2, 1).ShouldBe(15);
+    Render(sample, "sample");
 
     // problem
 
-    var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
     var input = BuildGraph(File.ReadAllText($"{scriptDir}/input.txt"));
 
     CalcOrder(input).Dump().ShouldBe("FMOXCDGJRAUIHKNYZTESWLPBQV");
     CalcParallelCost(input, 5, 61).Dump().ShouldBe(1053);
+    Render(input, "input");
 }
 
 IBidirectionalGraph<char, SEdge<char>> BuildGraph(string instrs) => Regex
@@ -72,6 +76,7 @@ class Worker
     public int TimeRemain;
 }
 
+// TODO: feed part1 into this, should simplify the code
 int CalcParallelCost(IBidirectionalGraph<char, SEdge<char>> graph, int workerCount, int baseStepCost)
 {
     var time = -1;
@@ -121,4 +126,25 @@ int CalcParallelCost(IBidirectionalGraph<char, SEdge<char>> graph, int workerCou
     }
 
     return time;
+}
+
+void Render(IBidirectionalGraph<char, SEdge<char>> graph, string name)
+{
+    var dotName = $"{name}.dot";
+    var pngName = $"{name}.png";
+
+    var graphviz = new GraphvizAlgorithm<char, SEdge<char>>(graph);
+    graphviz.FormatVertex += (sender, args) => args.VertexFormatter.Comment = args.Vertex.ToString();
+    graphviz.Generate(new FileDotEngine(), $"{scriptDir}/{dotName}");
+
+    using (var process = Process.Start(new ProcessStartInfo
+    {
+        FileName = "dot",
+        Arguments = $"-Tpng {dotName} -o {pngName}",
+        WorkingDirectory = scriptDir,
+        WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+    }))
+    {
+        process.WaitForExit();
+    }
 }
