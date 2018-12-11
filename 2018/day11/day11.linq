@@ -1,4 +1,4 @@
-<Query Kind="Statements">
+<Query Kind="Program">
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
   <Namespace>MoreLinq.Extensions</Namespace>
@@ -9,56 +9,69 @@
   <Namespace>System.Drawing.Drawing2D</Namespace>
 </Query>
 
-var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
+void Main()
+{
+    var scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 
-// sample
+    // sample
 
-MakeGrid(57)[122, 79].ShouldBe(-5);
-MakeGrid(39)[217,196].ShouldBe(0);
-MakeGrid(71)[101,153].ShouldBe(4);
+    MakeGrid(57)[122, 79].ShouldBe(-5);
+    MakeGrid(39)[217, 196].ShouldBe(0);
+    MakeGrid(71)[101, 153].ShouldBe(4);
 
-//FindLargest(18, 3).ShouldBe((33, 45));
-//FindLargest(42, 3).ShouldBe((21, 61));
+    var (grid18, grid42) = (MakeGrid(18), MakeGrid(42));
 
-// problem
+    FindLargest(grid18, 3).pos.ShouldBe(new Pos(33, 45));
+    FindLargest(grid42, 3).pos.ShouldBe(new Pos(21, 61));
 
-// FindLargest()/ ?? lost it
+    FindLargestLargest(grid18).ShouldBe((new Pos(90, 269), 16));
+    FindLargestLargest(grid42).ShouldBe((new Pos(232, 251), 12));
 
-FindLargestLargest(8979).Dump();
+    // problem
 
+    var grid8979 = MakeGrid(8979);
+    FindLargest(grid8979, 3).pos.Dump().ShouldBe(new Pos(33, 34));
 
-(int x, int y, int size) FindLargestLargest(int serial)
+    //FindLargestLargest(8979).Dump().ShouldBe(235, 118, 14);
+}
+
+struct Pos
+{
+    public int X, Y;
+    
+    public Pos(int x, int y) { X = x; Y = y; }
+
+    public override string ToString() => $"{X},{Y}";
+}
+
+(Pos pos, int size) FindLargestLargest(int[,] grid)
 {
     int maxSize = 0;
     int maxPower = 0;
-    int x = 0, y = 0;
-    
-    var grid = MakeGrid(serial);
+    var pos = new Pos();
     
     for (var s = 1; s <= 300; ++s)
     {
-        var largest = FindLargest(grid, serial, s);
+        var largest = FindLargest(grid, s);
 
         if (largest.power > maxPower)
         {
             maxSize = s;
             maxPower = largest.power;
-            x = largest.x;
-            y = largest.y;
-        }
+            pos = largest.pos;
 
-        Console.WriteLine($"[{s}: {maxPower}]");
+            Console.WriteLine($"[{maxSize}: {pos.X},{pos.Y}] = {maxPower}");
+        }
     };
     
-    return (x, y, maxSize);
+    return (pos, maxSize);
 }
 
-
-(int x, int y, int power) FindLargest(int[,] grid, int serial, int size)
+(Pos pos, int power) FindLargest(int[,] grid, int size)
 {
-    (int lx, int ly) = (0, 0);
     var maxPower = 0;
-    
+    var maxPos = new Pos();
+
     for (var y = 1; y <= (300 - (size - 1)); ++y)
     {
         for (var x = 1; x <= (300 - (size - 1)); ++x)
@@ -70,13 +83,12 @@ FindLargestLargest(8979).Dump();
             if (total > maxPower)
             {
                 maxPower = total;
-                lx = x;
-                ly = y;
+                maxPos = new Pos(x, y);
             }
         }
     }
     
-    return (lx, ly, maxPower);
+    return (maxPos, maxPower);
 }
 
 int[,] MakeGrid(int serial)
