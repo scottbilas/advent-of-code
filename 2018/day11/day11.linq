@@ -15,9 +15,10 @@ void Main()
 
     // sample
 
-    MakeGrid(57)[122-1, 79-1].ShouldBe(-5);
-    MakeGrid(39)[217-1, 196-1].ShouldBe(0);
-    MakeGrid(71)[101-1, 153-1].ShouldBe(4);
+    int gridpos(int x, int y) => ((y-1)*300)+x-1;
+    MakeGrid(57)[gridpos(122, 79)].ShouldBe(-5);
+    MakeGrid(39)[gridpos(217, 196)].ShouldBe(0);
+    MakeGrid(71)[gridpos(101, 153)].ShouldBe(4);
 
     var (grid18, grid42) = (MakeGrid(18), MakeGrid(42));
 
@@ -44,7 +45,7 @@ struct Pos
     public override string ToString() => $"{X},{Y}";
 }
 
-(Pos pos, int size) FindLargestLargest(int[,] grid)
+(Pos pos, int size) FindLargestLargest(int[] grid)
 {
     int maxSize = 0;
     int maxPower = 0;
@@ -59,7 +60,6 @@ struct Pos
             maxSize = s;
             maxPower = largest.power;
             pos = largest.pos;
-
             Console.WriteLine($"[{maxSize}: {pos.X},{pos.Y}] = {maxPower}");
         }
     };
@@ -67,7 +67,7 @@ struct Pos
     return (pos, maxSize);
 }
 
-(Pos pos, int power) FindLargest(int[,] grid, int size)
+(Pos pos, int power) FindLargest(int[] grid, int size)
 {
     var maxPower = 0;
     var maxPos = new Pos();
@@ -78,8 +78,11 @@ struct Pos
         {
             var total = 0;
             for (var dy = 0; dy < size; ++dy)
+            {
+                var offset = x + 300 * (y + dy);
                 for (var dx = 0; dx < size; ++dx)
-                    total += grid[x + dx, y + dy];
+                    total += grid[offset + dx];
+            }
             if (total > maxPower)
             {
                 maxPower = total;
@@ -87,14 +90,14 @@ struct Pos
             }
         }
     }
-    
+
     return (maxPos, maxPower);
 }
 
-int[,] MakeGrid(int serial)
+int[] MakeGrid(int serial)
 {
-    var grid = new int[300, 300];
-    for (var y = 0; y < 300; ++y)
+    var grid = new int[300 * 300];
+    for (var (y, i) = (0, 0); y < 300; ++y)
     {
         for (var x = 0; x < 300; ++x)
         {
@@ -105,7 +108,7 @@ int[,] MakeGrid(int serial)
             power = (power / 100) % 10;
             power -= 5;
             
-            grid[x, y] = power;
+            grid[i++] = power;
         }
     }
     
