@@ -15,9 +15,9 @@ void Main()
 
     // sample
 
-    MakeGrid(57)[122, 79].ShouldBe(-5);
-    MakeGrid(39)[217, 196].ShouldBe(0);
-    MakeGrid(71)[101, 153].ShouldBe(4);
+    MakeGrid(57)[122-1, 79-1].ShouldBe(-5);
+    MakeGrid(39)[217-1, 196-1].ShouldBe(0);
+    MakeGrid(71)[101-1, 153-1].ShouldBe(4);
 
     var (grid18, grid42) = (MakeGrid(18), MakeGrid(42));
 
@@ -72,9 +72,9 @@ struct Pos
     var maxPower = 0;
     var maxPos = new Pos();
 
-    for (var y = 1; y <= (300 - (size - 1)); ++y)
+    for (var y = 0; y < (300 - (size - 1)); ++y)
     {
-        for (var x = 1; x <= (300 - (size - 1)); ++x)
+        for (var x = 0; x < (300 - (size - 1)); ++x)
         {
             var total = 0;
             for (var dy = 0; dy < size; ++dy)
@@ -83,7 +83,7 @@ struct Pos
             if (total > maxPower)
             {
                 maxPower = total;
-                maxPos = new Pos(x, y);
+                maxPos = new Pos(x + 1, y + 1);
             }
         }
     }
@@ -93,13 +93,13 @@ struct Pos
 
 int[,] MakeGrid(int serial)
 {
-    var grid = new int[301, 301];
-    for (var y = 1; y <= 300; ++y)
+    var grid = new int[300, 300];
+    for (var y = 0; y < 300; ++y)
     {
-        for (var x = 1; x <= 300; ++x)
+        for (var x = 0; x < 300; ++x)
         {
-            var rackId = x + 10;
-            var power = rackId * y;
+            var rackId = x + 1 + 10;
+            var power = rackId * (y + 1);
             power += serial;
             power *= rackId;
             power = (power / 100) % 10;
