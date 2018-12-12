@@ -15,37 +15,39 @@ void Main()
 
     // sample
 
-    int gridpos(int x, int y) => ((y-1)*300)+x-1;
-    MakeGrid(57)[gridpos(122, 79)].ShouldBe(-5);
-    MakeGrid(39)[gridpos(217, 196)].ShouldBe(0);
-    MakeGrid(71)[gridpos(101, 153)].ShouldBe(4);
+    int GridPos(int x, int y) => ((y-1)*300)+x-1;
+    MakeGrid(57)[GridPos(122, 79)].ShouldBe(-5);
+    MakeGrid(39)[GridPos(217, 196)].ShouldBe(0);
+    MakeGrid(71)[GridPos(101, 153)].ShouldBe(4);
 
-    var (grid18, grid42) = (MakeGrid(18), MakeGrid(42));
+    var (sums18, sums42) = (MakeGridSums(18), MakeGridSums(42));
 
-    FindLargest(grid18, 3).pos.ShouldBe(new Pos(33, 45));
-    FindLargest(grid42, 3).pos.ShouldBe(new Pos(21, 61));
+    FindLargest(sums18, 3).pos.ShouldBe(new Pos(33, 45));
+    FindLargest(sums42, 3).pos.ShouldBe(new Pos(21, 61));
 
-    FindLargestLargest(grid18).ShouldBe((new Pos(90, 269), 16));
-    FindLargestLargest(grid42).ShouldBe((new Pos(232, 251), 12));
+    FindLargestLargest(sums18).ShouldBe((new Pos(90, 269), 16));
+    FindLargestLargest(sums42).ShouldBe((new Pos(232, 251), 12));
 
     // problem
 
-    var grid8979 = MakeGrid(8979);
-    FindLargest(grid8979, 3).pos.Dump().ShouldBe(new Pos(33, 34));
+    var sums8979 = MakeGridSums(8979);
+    var largest8979_3 = FindLargest(sums8979, 3);
+    largest8979_3.pos.ToString().Dump();
+    largest8979_3.pos.ShouldBe(new Pos(33, 34));
 
-    //FindLargestLargest(8979).Dump().ShouldBe(235, 118, 14);
+    var largest8979 = FindLargestLargest(sums8979);
+    $"{largest8979.pos},{largest8979.size}".Dump();
+    largest8979.ShouldBe((new Pos(235, 118), 14));
 }
 
 struct Pos
 {
     public int X, Y;
-    
     public Pos(int x, int y) { X = x; Y = y; }
-
     public override string ToString() => $"{X},{Y}";
 }
 
-(Pos pos, int size) FindLargestLargest(int[] grid)
+(Pos pos, int size) FindLargestLargest(int[] sums)
 {
     int maxSize = 0;
     int maxPower = 0;
@@ -53,45 +55,48 @@ struct Pos
     
     for (var s = 1; s <= 300; ++s)
     {
-        var largest = FindLargest(grid, s);
+        var largest = FindLargest(sums, s);
 
         if (largest.power > maxPower)
         {
             maxSize = s;
             maxPower = largest.power;
             pos = largest.pos;
-            Console.WriteLine($"[{maxSize}: {pos.X},{pos.Y}] = {maxPower}");
         }
     };
     
     return (pos, maxSize);
 }
 
-(Pos pos, int power) FindLargest(int[] grid, int size)
+(Pos pos, int power) FindLargest(int[] sums, int size)
 {
-    var maxPower = 0;
-    var maxPos = new Pos();
-
-    for (var y = 0; y < (300 - (size - 1)); ++y)
-    {
-        for (var x = 0; x < (300 - (size - 1)); ++x)
+    return Enumerable
+        .Range(0, 300 - (size - 1))
+        .AsParallel()
+        .Select(y =>
         {
-            var total = 0;
-            for (var dy = 0; dy < size; ++dy)
-            {
-                var offset = x + 300 * (y + dy);
-                for (var dx = 0; dx < size; ++dx)
-                    total += grid[offset + dx];
-            }
-            if (total > maxPower)
-            {
-                maxPower = total;
-                maxPos = new Pos(x + 1, y + 1);
-            }
-        }
-    }
+            var maxPower = 0;
+            var maxPos = new Pos();
 
-    return (maxPos, maxPower);
+            var y0off = y * 301;
+            var y1off = (y + size) * 301;
+
+            for (var x = 0; x < (300 - (size - 1)); ++x)
+            {
+                var total
+                    = sums[x+size+y1off] - sums[x+y1off] - sums[x+size+y0off]
+                    + sums[x+y0off];
+                if (total > maxPower)
+                {
+                    maxPower = total;
+                    maxPos = new Pos(x + 1, y + 1);
+                }
+            }
+            
+            return (maxPos, maxPower);
+        })
+        .MaxBy(v => v.maxPower)
+        .First();
 }
 
 int[] MakeGrid(int serial)
@@ -111,6 +116,21 @@ int[] MakeGrid(int serial)
             grid[i++] = power;
         }
     }
-    
+
     return grid;
+}
+
+int[] MakeGridSums(int serial)
+{
+    var grid = MakeGrid(serial);
+    var sums = new int[301 * 301];
+
+    int GridPos(int x, int y) => y * 300 + x;
+    int SumPos(int x, int y) => y * 301 + x;
+
+    for (var y = 1; y < 301; ++y)
+        for (var x = 1; x < 301; ++x)
+            sums[SumPos(x, y)] = sums[SumPos(x-1, y)] + sums[SumPos(x, y-1)] - sums[SumPos(x-1, y-1)] + grid[GridPos(x-1, y-1)];
+
+    return sums;
 }
