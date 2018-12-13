@@ -10,48 +10,39 @@ string scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
 
 void Main()
 {
-
     // sample
 
-    Sim("sample1").ShouldBe(new Pos(0, 3));
-    Sim("sample2").ShouldBe(new Pos(7, 3));
-    Sim("sample3", false).ShouldBe(new Pos(6, 4));
+    Sim("sample1").ShouldBe((0, 3));
+    Sim("sample2").ShouldBe((7, 3));
+    Sim("sample3", false).ShouldBe((6, 4));
 
     // problem
 
     var firstCollide = Sim("input");
     firstCollide.ToString().Dump();
-    firstCollide.ShouldBe(new Pos(83, 121));
+    firstCollide.ShouldBe((83, 121));
 
     var lastSurviving = Sim("input", false);
     lastSurviving.ToString().Dump();
-    lastSurviving.ShouldBe(new Pos(102, 144));
+    lastSurviving.ShouldBe((102, 144));
 }
-
-struct Pos
-{
-    public int X, Y;
-    public Pos(int x, int y) { X = x; Y = y; }
-    public override string ToString() => $"{X},{Y}";
-}
-
-enum Dir { L, U, R, D };
 
 class Cart : IComparable<Cart>
 {
-    public Pos Pos;
-    public int Step;
-    public Dir Dir = Dir.D;
-    public Cart(int x, int y) { Pos.X = x; Pos.Y = y; }
+    public int X, Y;
+    public char C;
+    public int AI;
 
-    public int CompareTo(Cart obj)
+    public Cart(int x, int y, char dir) { X = x; Y = y; C = dir; }
+
+    public int CompareTo(Cart other)
     {
-        var compare = Pos.Y.CompareTo(obj.Pos.Y);
-        return compare == 0 ? Pos.X.CompareTo(obj.Pos.X) : compare;
+        var compare = Y.CompareTo(other.Y);
+        return compare == 0 ? X.CompareTo(other.X) : compare;
     }
 }
 
-Pos Sim(string name, bool findFirstCollision = true)
+(int x, int y) Sim(string name, bool findFirstCollision = true)
 {
     var lines = File.ReadAllLines($"{scriptDir}/{name}.txt");
     var maxLine = lines.Max(l => l.Length);
@@ -59,8 +50,9 @@ Pos Sim(string name, bool findFirstCollision = true)
     var state = new char[maxLine, lines.Length];
     var carts = new List<Cart>();
     
-    if (File.Exists($"{scriptDir}/{name}.out"))
-        File.Delete($"{scriptDir}/{name}.out");
+    var outPath = $"{scriptDir}/{name}.out";
+    if (File.Exists(outPath))
+        File.Delete(outPath);
     
     void Render(int frame)
     {
@@ -70,29 +62,13 @@ Pos Sim(string name, bool findFirstCollision = true)
         var dup = (char[,])state.Clone();
         foreach (var c in carts)
         {
-            if ("<^>v".Contains(dup[c.Pos.X, c.Pos.Y]))
-                dup[c.Pos.X, c.Pos.Y] = 'X';
+            if ("<^>v".Contains(dup[c.X, c.Y]))
+                dup[c.X, c.Y] = 'X';
             else
-            {
-                switch (c.Dir)
-                {
-                    case Dir.L:
-                        dup[c.Pos.X, c.Pos.Y] = '<';
-                        break;
-                    case Dir.U:
-                        dup[c.Pos.X, c.Pos.Y] = '^';
-                        break;
-                    case Dir.R:
-                        dup[c.Pos.X, c.Pos.Y] = '>';
-                        break;
-                    case Dir.D:
-                        dup[c.Pos.X, c.Pos.Y] = 'v';
-                        break;
-                }
-            }
+                dup[c.X, c.Y] = c.C;
         }
 
-        using (var f = File.AppendText($"{scriptDir}/{name}.out"))
+        using (var f = File.AppendText(outPath))
         {
             f.WriteLine($"***[{frame}]***");
             f.WriteLine();
@@ -106,222 +82,77 @@ Pos Sim(string name, bool findFirstCollision = true)
             }
             f.WriteLine();
 
-            f.WriteLine(string.Join("; ", carts.Select(c => c.Pos.ToString())));
+            f.WriteLine(string.Join("; ", carts.Select(c => $"{c.X},{c.Y}")));
 
             f.WriteLine();
             f.WriteLine();
         }
     }
+
+    var cartToState = (from:"^v<>", to:"|-");
 
     for (var y = 0; y < lines.Length; ++y)
     {
         var line = lines[y];
         for (var x = 0; x < line.Length; ++x)
         {
-            switch (line[x])
+            var found = cartToState.from.IndexOf(line[x]);
+            if (found >= 0)
             {
-                case 'v':
-                    state[x, y] = '|';
-                    carts.Add(new Cart(x, y) { Dir = Dir.D });
-                    break;
-                case '^':
-                    state[x, y] = '|';
-                    carts.Add(new Cart(x, y) { Dir = Dir.U });
-                    break;
-                case '<':
-                    state[x, y] = '-';
-                    carts.Add(new Cart(x, y) { Dir = Dir.L });
-                    break;
-                case '>':
-                    state[x, y] = '-';
-                    carts.Add(new Cart(x, y) { Dir = Dir.R });
-                    break;
-                default:
-                    state[x, y] = line[x];
-                    break;
+                state[x, y] = cartToState.to[found / 2];
+                carts.Add(new Cart(x, y, line[x]));
             }
+            else
+                state[x, y] = line[x];
         }
     }
-    
-    carts.Sort();
 
-    Render(0);
+    var indexers = "^>v<";
+    var moveSpec = (dx: new[] { 0, 1, 0, -1 }, dy: new[] { -1, 0, 1, 0 });
+    var turnSpec = (spec: new[] { '/', '\\', 0, 2 }, next: new[] { ">^<v", "<v>^", "<^>v", ">v<^" });
 
     for (var frame = 0;;++frame)
     {
         carts.Sort();
+        Render(frame);
+        
+        for (var i = 0; i < carts.Count; ++i)
+            if (carts[i].C == 'X')
+                carts.RemoveAt(i--);
 
-        for (var i = 0; i < carts.Count;)
+        if (carts.Count == 1 && !findFirstCollision)
+            return (carts[0].X, carts[0].Y);
+
+        for (var i = 0; i < carts.Count; ++i)
         {
             var cart = carts[i];
-            switch (state[cart.Pos.X, cart.Pos.Y])
-            {
-                case '-':
-                    if (cart.Dir == Dir.L)
-                    {
-                        --cart.Pos.X;
-                    }
-                    else
-                    {
-                        cart.Dir.ShouldBe(Dir.R);
-                        ++cart.Pos.X;
-                    }
-                    break;
-                case '|':
-                    if (cart.Dir == Dir.U)
-                    {
-                        --cart.Pos.Y;
-                    }
-                    else
-                    {
-                        cart.Dir.ShouldBe(Dir.D);
-                        ++cart.Pos.Y;
-                    }
-                    break;
-                case '/':
-                    switch (cart.Dir)
-                    {
-                        case Dir.L:
-                            ++cart.Pos.Y;
-                            cart.Dir = Dir.D;
-                            break;
-                        case Dir.U:
-                            ++cart.Pos.X;
-                            cart.Dir = Dir.R;
-                            break;
-                        case Dir.R:
-                            --cart.Pos.Y;
-                            cart.Dir = Dir.U;
-                            break;
-                        case Dir.D:
-                            --cart.Pos.X;
-                            cart.Dir = Dir.L;
-                            break;
-                    }
-                    break;
-                case '\\':
-                    switch (cart.Dir)
-                    {
-                        case Dir.L:
-                            --cart.Pos.Y;
-                            cart.Dir = Dir.U;
-                            break;
-                        case Dir.U:
-                            --cart.Pos.X;
-                            cart.Dir = Dir.L;
-                            break;
-                        case Dir.R:
-                            ++cart.Pos.Y;
-                            cart.Dir = Dir.D;
-                            break;
-                        case Dir.D:
-                            ++cart.Pos.X;
-                            cart.Dir = Dir.R;
-                            break;
-                    }
-                    break;
-                case '+':
-                    switch (cart.Dir)
-                    {
-                        case Dir.L:
-                            --cart.Pos.X;
-                            break;
-                        case Dir.U:
-                            --cart.Pos.Y;
-                            break;
-                        case Dir.R:
-                            ++cart.Pos.X;
-                            break;
-                        case Dir.D:
-                            ++cart.Pos.Y;
-                            break;
-                    }
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
+            if (cart.C == 'X')
+                continue;
 
-            if (state[cart.Pos.X, cart.Pos.Y] == '+')
+            var idir = indexers.IndexOf(cart.C);
+
+            // move
+            cart.X += moveSpec.dx[idir];
+            cart.Y += moveSpec.dy[idir];
+
+            // turn
+            var cell = state[cart.X, cart.Y];
+            if (cell == '+')
             {
-                switch (cart.Step)
-                {
-                    case 0: // turn left
-                        switch (cart.Dir)
-                        {
-                            case Dir.L:
-                                cart.Dir = Dir.D;
-                                break;
-                            case Dir.U:
-                                cart.Dir = Dir.L;
-                                break;
-                            case Dir.R:
-                                cart.Dir = Dir.U;
-                                break;
-                            case Dir.D:
-                                cart.Dir = Dir.R;
-                                break;
-                        }
-                        cart.Step = 1;
-                        break;
-                    case 1: // go straight
-                        cart.Step = 2;
-                        break;
-                    case 2: // turn right
-                        switch (cart.Dir)
-                        {
-                            case Dir.L:
-                                cart.Dir = Dir.U;
-                                break;
-                            case Dir.U:
-                                cart.Dir = Dir.R;
-                                break;
-                            case Dir.R:
-                                cart.Dir = Dir.D;
-                                break;
-                            case Dir.D:
-                                cart.Dir = Dir.L;
-                                break;
-                        }
-                        cart.Step = 0;
-                        break;
-                    default:
-                        throw new InvalidOperationException();
-                }
+                cell = (char)cart.AI;
+                cart.AI = (cart.AI + 1) % 3;
             }
             
-            var collide = carts.SingleOrDefault(c => c != cart && c.Pos.X == cart.Pos.X && c.Pos.Y == cart.Pos.Y);
-            if (collide != null)
+            var spec = Array.IndexOf(turnSpec.spec, cell);
+            if (spec >= 0)
+                cart.C = turnSpec.next[spec][idir];
+            
+            foreach (var dup in carts.Where(c => c != cart && c.X == cart.X && c.Y == cart.Y))
             {
+                cart.C = dup.C = 'X';
                 if (findFirstCollision)
-                {
-                    Render(frame + 1);
-                    return cart.Pos;
-                }
-
-                var where = carts.IndexOf(collide);
-                
-                if (where < i)
-                {
-                    carts.RemoveAt(i);
-                    carts.RemoveAt(where);
-                    --i;
-                }
-                else
-                {
-                    carts.RemoveAt(where);
-                    carts.RemoveAt(i);
-                }
-                
-                continue;
+                    return (cart.X, cart.Y);
             }
-            else
-                ++i;
-        }
-
-        Render(frame + 1);
-        if (carts.Count == 1 && !findFirstCollision)
-        {
-            return carts[0].Pos;
         }
     }
 }
