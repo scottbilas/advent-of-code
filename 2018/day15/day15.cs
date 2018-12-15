@@ -1,311 +1,246 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using MoreLinq.Extensions;
 using NiceIO;
 using NUnit.Framework;
 using RoyT.AStar;
 using Shouldly;
 
-class Day15 : AocFixture
+namespace Day15
 {
-    [Test]
-    public void Main()
+    static class Extensions
     {
-        // sample
-        
-        Si2("#######", // #######   
-            "#.G...#", // #G....#   G(200)
-            "#...EG#", // #.G...#   G(131)
-            "#.#.#G#", // #.#.#G#   G(59)
-            "#..G#E#", // #...#.#   
-            "#.....#", // #....G#   G(200)
-            "#######") // #######
-            // Combat ends after 47 full rounds
-            // Goblins win with 590 total hit points left
-            // Outcome: 47 * 590 = 27730
-            .ShouldBe((27730, 4988));
-        
-        Sim("#######", //      #######
-            "#G..#E#", //      #...#E#   E(200)
-            "#E#E.E#", //      #E#...#   E(197)
-            "#G.##.#", // -->  #.E##.#   E(185)
-            "#...#E#", //      #E..#E#   E(200), E(200)
-            "#...E.#", //      #.....#
-            "#######") //      #######
-                       // Combat ends after 37 full rounds
-                       // Elves win with 982 total hit points left
-                       // Outcome: 37 * 982 = 36334
-            .ShouldBe(36334);
-        
-        Si2("#######", //      #######   
-            "#E..EG#", //      #.E.E.#   E(164), E(197)
-            "#.#G.E#", //      #.#E..#   E(200)
-            "#E.##E#", // -->  #E.##.#   E(98)
-            "#G..#.#", //      #.E.#.#   E(200)
-            "#..E#.#", //      #...#.#   
-            "#######") //      #######   
-            // Combat ends after 46 full rounds
-            // Elves win with 859 total hit points left
-            // Outcome: 46 * 859 = 39514
-            .ShouldBe((39514, 31284));
-        
-        Si2("#######", //      #######   
-            "#E.G#.#", //      #G.G#.#   G(200), G(98)
-            "#.#G..#", //      #.#G..#   G(200)
-            "#G.#.G#", // -->  #..#..#   
-            "#G..#.#", //      #...#G#   G(95)
-            "#...E.#", //      #...G.#   G(200)
-            "#######") //      #######
-            // Combat ends after 35 full rounds
-            // Goblins win with 793 total hit points left
-            // Outcome: 35 * 793 = 27755
-            .ShouldBe((27755, 3478));
-        
-        Si2("#######", //      #######   
-            "#.E...#", //      #.....#   
-            "#.#..G#", //      #.#G..#   G(200)
-            "#.###.#", // -->  #.###.#   
-            "#E#G#G#", //      #.#.#.#   
-            "#...#G#", //      #G.G#G#   G(98), G(38), G(200)
-            "#######") //      #######   
-            // Combat ends after 54 full rounds
-            // Goblins win with 536 total hit points left
-            // Outcome: 54 * 536 = 28944
-            .ShouldBe((28944, 6474));
-        
-        Si2("#########", //      #########   
-            "#G......#", //      #.G.....#   G(137)
-            "#.E.#...#", //      #G.G#...#   G(200), G(200)
-            "#..##..G#", //      #.G##...#   G(200)
-            "#...##..#", // -->  #...##..#   
-            "#...#...#", //      #.G.#...#   G(200)
-            "#.G...G.#", //      #.......#   
-            "#.....G.#", //      #.......#   
-            "#########") //      #########   
-            // Combat ends after 20 full rounds
-            // Goblins win with 937 total hit points left
-            // Outcome: 20 * 937 = 18740
-            .ShouldBe((18740, 1140));
-    
-        // problem
-    
-        var result = Si2(File.ReadAllLines($"{ScriptDir}/input.txt"));
-        //result.outcome3.Dump();
-        //result.elvesOutcome.Dump();
-        result.ShouldBe((188576, 57112));
+        public static IEnumerable<T> OrderByReading<T>(this IEnumerable<T> @this, Func<T, Position> selector)
+        {
+            return
+                from item in @this
+                let pos = selector(item)
+                orderby pos.Y, pos.X
+                select item;
+        }
+
+        public static IEnumerable<Position> OrderByReading(this IEnumerable<Position> @this)
+            => @this.OrderByReading(_ => _);
+
+        public static IEnumerable<Unit> OrderByReading(this IEnumerable<Unit> @this)
+            => @this.OrderByReading(u => u.Pos);
+
+        public static IEnumerable<Position> SelectAdjacent(this Position @this)
+        {
+            yield return new Position(@this.X, @this.Y - 1);
+            yield return new Position(@this.X - 1, @this.Y);
+            yield return new Position(@this.X + 1, @this.Y);
+            yield return new Position(@this.X, @this.Y + 1);
+        }
+
+        public static IEnumerable<T> SelectAdjacent<T>(this Position @this, Func<Position, T> selector)
+            => @this.SelectAdjacent().Select(selector);
     }
-    
+
+    [DebuggerDisplay("{Type} @{Pos.X},{Pos.Y} = {HP}")]
     class Unit
     {
-        public char Type;
-        public int X, Y;
+        public char Type { get; private set; }
+        public int AttackPower { get; set; } = 3;
+
+        public Position Pos;
         public int HP = 200;
-        public int AttackPower = 3;
-    }
-    
-    int Sim(params string[] lines)
-    {
-        return SimFull(3, lines).outcome;
-    }
-    
-    (int outcome3, int elvesOutcome) Si2(params string[] lines)
-    {
-        var outcome3 = Sim(lines);
-        for (var attackPower = 4; ; ++attackPower)
+
+        public Unit(char type, int x, int y)
         {
-            var result = SimFull(attackPower, lines);
-            if (result.edeaths == 0)
-                return (outcome3, result.outcome);
+            Type = type;
+            Pos = new Position(x, y);
+        }
+
+        public Unit(char type, int x, int y, int attackPower)
+            : this(type, x, y)
+        {
+            if (Type == 'E')
+                AttackPower = attackPower;
         }
     }
     
-    (int edeaths, int outcome) SimFull(int attackPower, string[] lines)
+    class Board
     {
-        var (cx, cy) = (lines[0].Length, lines.Length);
-        var board = new object[cx, cy];
-        var astar = new Grid(cx, cy);
-    
-        var ecount = 0;
-        var units = new List<Unit>();
+        public object[,] Cells;
+        public List<Unit> Units = new List<Unit>();
+
+        public Board(int cx, int cy) => Cells = new object[cx, cy];
+
+        public int Width => Cells.GetLength(0);
+        public int Height => Cells.GetLength(1);
         
-        for (var y = 0; y < cy; ++y)
+        public static Board Parse(params string[] lines)
         {
-            for (var x = 0; x < cx; ++x)
+            var (cx, cy) = (lines[0].Length, lines.Length);
+            var board = new Board(cx, cy);
+
+            for (var y = 0; y < cy; ++y)
             {
-                var c = lines[y][x];
-                if (c == 'E' || c == 'G')
+                for (var x = 0; x < cx; ++x)
                 {
-                    var unit = new Unit { Type = c, X = x, Y = y };
-                    if (c == 'E')
+                    var c = lines[y][x];
+                    if (c == '#')
                     {
-                        unit.AttackPower = attackPower;
-                        ++ecount;
+                        board.Cells[x, y] = c;
                     }
-                    units.Add(unit);
-                    board[x, y] = unit;
-                    astar.BlockCell(new Position(x, y));
+                    else if (c != '.')
+                    {
+                        var unit = new Unit(c, x, y);
+                        board.Units.Add(unit);
+                        board.Cells[x, y] = unit;
+                    }
                 }
-                else if (c == '#')
+            }
+
+            return board;
+        }
+        
+        public static int Sim(params string[] lines)
+        {
+            return SimFull(3, lines).outcome;
+        }
+        
+        public static (int outcome3, int elvesOutcome) Si2(params string[] lines)
+        {
+            var outcome3 = Sim(lines);
+            for (var attackPower = 4; ; ++attackPower)
+            {
+                var result = SimFull(attackPower, lines);
+                if (result.edeaths == 0)
+                    return (outcome3, result.outcome);
+            }
+        }
+        
+        public static (int edeaths, int outcome) SimFull(int elfAttackPower, string[] lines)
+        {
+            var board = Board.Parse(lines);
+            var astar = new Grid(board.Width, board.Height);
+        
+            var elfCount = 0; 
+            foreach (var elf in board.Units.Where(u => u.Type == 'E'))
+            {
+                elf.AttackPower = elfAttackPower;
+                ++elfCount;
+            }
+
+            for (var y = 0; y < board.Width; ++y)
+                for (var x = 0; x < board.Height; ++x)
+                    if (board.Cells[x, y] != null)
+                        astar.BlockCell(new Position(x, y));
+    
+            for (var round = 0; ; ++round)
+            {
+                //Render(round);
+        
+                board.Units = board.Units.OrderByReading(u => u.Pos).ToList();
+        
+                for (var iunit = 0; iunit < board.Units.Count; ++iunit)
                 {
-                    board[x, y] = c;
-                    astar.BlockCell(new Position(x, y));
+                    var unit = board.Units[iunit];
+        
+                    bool Attack()
+                    {
+                        var target = unit.Pos
+                            .SelectAdjacent(p => board.Cells[p.X, p.Y])
+                            .OfType<Unit>()
+                            .Where(t => t.Type != unit.Type)
+                            .MinBy(t => t.HP)
+                            .FirstOrDefault();
+                        
+                        if (target == null)
+                            return false;
+                        
+                        target.HP -= unit.AttackPower;
+                        
+                        if (target.HP <= 0)
+                        {
+                            board.Cells[target.Pos.X, target.Pos.Y] = null;
+                            astar.UnblockCell(target.Pos);
+                            
+                            var found = board.Units.IndexOf(target);
+                            board.Units.RemoveAt(found);
+                            if (found < iunit)
+                                --iunit;
+                        }
+                        
+                        return true;
+                    }
+        
+                    if (!Attack())
+                    {
+                        var enemyUnits = board.Units
+                            .Where(t => t.Type != unit.Type)
+                            .ToList();
+        
+                        if (!enemyUnits.Any())
+                        {
+                            //Render(round);
+                            return (
+                                elfCount - board.Units.Count(u => u.Type == 'E'),
+                                round * board.Units.Sum(u => u.HP));
+                        }
+                            
+                        var validTargets = enemyUnits
+                            .SelectMany(e => e.Pos.SelectAdjacent())
+                            .Where(p => board.Cells[p.X, p.Y] == null) // open space
+                            .Select(p => (pos: p, path: astar.GetPath(unit.Pos, p, MovementPatterns.LateralOnly)))
+                            .Where(t => t.path.Any()) // reachable
+                            .MinBy(t => t.path.Length) // nearest
+                            .OrderByReading(t => t.pos) // reading order
+                            .ToList();
+                            
+                        if (validTargets.Any())
+                        {
+                            var chosen = validTargets.First().pos;
+        
+                            // now select how to step to get there
+                            var step = unit.Pos
+                                .SelectAdjacent()
+                                .Where(p => board.Cells[p.X, p.Y] == null)
+                                .Select(p => (pos: p, path: astar.GetPath(p, chosen, MovementPatterns.LateralOnly)))
+                                .Where(t => t.path.Any())
+                                .MinBy(t => t.path.Length) // nearest
+                                .OrderByReading(t => t.pos) // reading order
+                                .First();
+                            
+                            board.Cells[unit.Pos.X, unit.Pos.Y] = null;
+                            astar.UnblockCell(new Position(unit.Pos.X, unit.Pos.Y));
+        
+                            unit.Pos = step.pos;
+        
+                            board.Cells[unit.Pos.X, unit.Pos.Y] = unit;
+                            astar.BlockCell(unit.Pos);
+        
+                            Attack();
+                        }
+                    }
                 }
             }
         }
-    
-        for (var round = 0; ; ++round)
+
+        public IEnumerable<string> Render(Func<Unit, char> unitRenderer)
         {
-            //Render(round);
-    
-            /*if (round == 1)
+            var sb = new StringBuilder();
+            for (var y = 0; y < Height; ++y)
             {
-                "HERE".Dump();
-            }*/
-            
-            units = units.OrderBy(c => c.Y).ThenBy(c => c.X).ToList();
-    
-            for (var iunit = 0; iunit < units.Count; ++iunit)
-            {
-                var unit = units[iunit];
-    
-                bool Attack()
+                sb.Clear();                
+                for (var x = 0; x < Width; ++x)
                 {
-                    var target =
-                        new[]
-                        {
-                            board[unit.X, unit.Y - 1],
-                            board[unit.X - 1, unit.Y],
-                            board[unit.X + 1, unit.Y],
-                            board[unit.X, unit.Y + 1],
-                        }
-                        .OfType<Unit>()
-                        .Where(t => t.Type != unit.Type)
-                        .MinBy(t => t.HP)
-                        .FirstOrDefault();
-                    
-                    if (target == null)
-                        return false;
-                    
-                    target.HP -= unit.AttackPower;
-                    
-                    if (target.HP <= 0)
-                    {
-                        board[target.X, target.Y] = null;
-                        astar.UnblockCell(new Position(target.X, target.Y));
-                        
-                        var found = units.IndexOf(target);
-                        units.RemoveAt(found);
-                        if (found < iunit)
-                            --iunit;
-                    }
-                    
-                    return true;
+                    var c = Cells[x, y];
+                    if (c is Unit u)
+                        sb.Append(unitRenderer?.Invoke(u) ?? u.Type);
+                    else
+                        sb.Append(c ?? '.');
                 }
-    
-                if (!Attack())
-                {
-                    var enemyUnits = units
-                        .Where(t => t.Type != unit.Type)
-                        .ToList();
-    
-                    if (!enemyUnits.Any())
-                    {
-                        //Render(round);
-                        return (ecount - units.Count(u => u.Type == 'E'), round * units.Sum(u => u.HP));
-                    }
-                        
-                    var validTargets = enemyUnits
-                        .SelectMany(t => new[]
-                        {
-                            (x:t.X, y:t.Y - 1),
-                            (x:t.X - 1, y:t.Y),
-                            (x:t.X + 1, y:t.Y),
-                            (x:t.X, y:t.Y + 1),
-                        })
-                        .Select(l => (x: l.x, y: l.y, c: board[l.x, l.y]))
-                        .Where(t => t.c == null) // open space
-                        .Select(t =>
-                        {
-                            var path = astar.GetPath(
-                                new Position(unit.X, unit.Y), new Position(t.x, t.y),
-                                MovementPatterns.LateralOnly);
-                            return (x: t.x, y: t.y, path: path);
-                        })
-                        .Where(t => t.path.Any()) // reachable
-                        .MinBy(t => t.path.Length) // nearest
-                        .OrderBy(t => t.y).ThenBy(t => t.x) // reading order
-                        .ToList();
-                        
-                    if (validTargets.Any())
-                    {
-                        var chosen = (x: validTargets[0].x, y: validTargets[0].y);
-    
-                        // now select how to step to get there
-                        var step = new[]
-                        {
-                            (x:unit.X, y:unit.Y - 1),
-                            (x:unit.X - 1, y:unit.Y),
-                            (x:unit.X + 1, y:unit.Y),
-                            (x:unit.X, y:unit.Y + 1),
-                        }
-                        .Select(l => (x: l.x, y: l.y, c: board[l.x, l.y]))
-                        .Where(t => t.c == null) // open space
-                        .Select(t =>
-                        {
-                            var path = astar.GetPath(
-                                new Position(t.x, t.y), new Position(chosen.x, chosen.y),
-                                MovementPatterns.LateralOnly);
-                            return (x: t.x, y: t.y, path: path);
-                        })
-                        .Where(t => t.path.Any())
-                        .MinBy(t => t.path.Length) // nearest
-                        .OrderBy(t => t.y).ThenBy(t => t.x) // reading order
-                        .First();
-                        
-                        board[unit.X, unit.Y] = null;
-                        astar.UnblockCell(new Position(unit.X, unit.Y));
-    
-                        unit.X = step.x;
-                        unit.Y = step.y;
-    
-                        board[unit.X, unit.Y] = unit;
-                        astar.BlockCell(new Position(unit.X, unit.Y));
-    
-                        Attack();
-                    }
-                }
+
+                yield return sb.ToString();
             }
-        }
-    
-        void Render(int round)
-        {
-            var dup = (object[,])board.Clone();
-            foreach (var u in units)
-                dup[u.X, u.Y] = u.Type;
-    
-            for (var y = 0; y < lines.Length; ++y)
-            {
-                Console.WriteLine(new string(Enumerable.Range(0, cx).Select(x => dup[x, y])
-                    .Select(c =>
-                    {
-                        if (c == null)
-                            return '.';
-                        if (c is Unit u)
-                            return u.Type;
-                        return (char)c;
-                    })
-                    .ToArray()));
-            }
-            Console.WriteLine();
-    
-            Console.WriteLine($"ROUND: {round} (attack = {attackPower})");
-            Console.WriteLine($"G: " + string.Join(", ", units.Where(u => u.Type == 'G').Select(u => u.HP.ToString())));
-            Console.WriteLine($"E: " + string.Join(", ", units.Where(u => u.Type == 'E').Select(u => u.HP.ToString())));
-            
-            Console.WriteLine();
-            Console.WriteLine();
         }
     }
+
 }

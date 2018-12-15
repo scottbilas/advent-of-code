@@ -11,6 +11,7 @@
         <AssemblyName>aoc-2018</AssemblyName>
         <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -145,6 +146,7 @@
     </ItemGroup>
     <ItemGroup>
       <Compile Include="day15\day15.cs" />
+      <Compile Include="day15\day15.tests.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
