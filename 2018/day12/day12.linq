@@ -3,10 +3,7 @@
   <NuGetReference>Shouldly</NuGetReference>
   <Namespace>MoreLinq.Extensions</Namespace>
   <Namespace>Shouldly</Namespace>
-  <Namespace>System.Drawing</Namespace>
-  <Namespace>System.Drawing.Imaging</Namespace>
   <Namespace>System.Linq</Namespace>
-  <Namespace>System.Drawing.Drawing2D</Namespace>
 </Query>
 
 void Main()
@@ -21,10 +18,10 @@ void Main()
 
     SimSum(inputState, inputInstrs, 20).ShouldBe(3230);
     SimSum(inputState, inputInstrs, 50000000000).Dump();
-    // ^ answer = ((50000000000-200)*88)+17904
+    // ^ answer = ((50000000000-200)*88)+17904=4400000000304
 }
 
-int SimSum(string textState, string textInstrs, long genCount)
+long SimSum(string textState, string textInstrs, long genCount)
 {
     var size = 500;
     
@@ -51,19 +48,25 @@ int SimSum(string textState, string textInstrs, long genCount)
     .ToList();
     
     var lastSum = 0;
+    var lastDeltas = new List<int>();
     for (var gen = 0; ; ++gen)
     {
-        var sum2 = 0;
+        var sum = 0;
         for (int i = 0; i < pots.Length; ++i)
         {
             if (pots[i])
-                sum2 += i - potBase;
+                sum += i - potBase;
         }
-        $"{gen}: {lastSum},{sum2} d={sum2-lastSum}".Dump();
-        lastSum = sum2;
+        //$"{gen}: {lastSum},{sum2} d={sum2-lastSum}".Dump();
+        var delta = sum - lastSum;
+        lastDeltas.Add(delta);
+        if (lastDeltas.TakeLast(100).Count(s => s == sum) == delta)
+        {
+            return (genCount - gen) * delta;
+        }
 
         if (gen == genCount)
-            break;
+            return sum;
 
         var nextPots = pots == pots0 ? pots1 : pots0;
         for (var i = 0; i < nextPots.Length; ++i)
@@ -89,14 +92,6 @@ int SimSum(string textState, string textInstrs, long genCount)
     
         pots = nextPots;
     }
-
-    var sum = 0;
-    for (int i = 0; i < pots.Length; ++i)
-    {
-        if (pots[i])
-            sum += i - potBase;
-    }
-    return sum;
 }
 
 const string sampleState = "#..#.#..##......###...###";
