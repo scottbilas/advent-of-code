@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using MoreLinq.Extensions;
 using NUnit.Framework;
 using RoyT.AStar;
@@ -10,16 +11,36 @@ namespace Day15
 {
     class Day15 : AocFixture
     {
+        string[][] CutBoards(string text)
+        {
+            var lines = text.Split('\n').Where(l => l.Trim().StartsWith("#")).ToList();
+            var offsets = Regex.Matches(lines[0], @"#+");
+
+            var boards = new string[offsets.Count][];
+            for (var iboard = 0; iboard < offsets.Count; ++iboard)
+            {
+                boards[iboard] = new string[lines.Count];
+                for (var iline = 0; iline < lines.Count; ++iline)
+                    boards[iboard][iline] = lines[iline].Substring(offsets[iboard].Index, offsets[iboard].Length);
+            }
+
+            return boards;
+        }
+        
         [Test]
         public void UnitOrder_MatchesSample()
         {
-            var board = Board.Parse(
-                "#######",
-                "#.G.E.#",
-                "#E.G.E#",
-                "#.G.E.#",
-                "#######");
+            var boardData = CutBoards(@"
+                                 would take their
+                These units:   turns in this order:
+                  #######           #######
+                  #.G.E.#           #.1.2.#
+                  #E.G.E#           #3.4.5#
+                  #.G.E.#           #.6.7.#
+                  #######           #######
+                ");
 
+            var board = Board.Parse(boardData[0]);
             board.Units = board.Units.Shuffle(new Random(0)).ToList();
 
             //
@@ -28,14 +49,7 @@ namespace Day15
 
             board
                 .Render(u => (char)(board.Units.IndexOf(u) + '1'))
-                .ShouldBe(new[]
-                {
-                    "#######",
-                    "#.1.2.#",
-                    "#3.4.5#",
-                    "#.6.7.#",
-                    "#######"
-                });
+                .ShouldBe(boardData[1]);
         }
 
         [Test]
@@ -45,6 +59,21 @@ namespace Day15
             var ordered = adjacent.OrderByReading();
             
             ordered.ShouldBe(adjacent);
+        }
+
+        [Test]
+        public void MoveTargetSelection_MatchesSample()
+        {
+            var boardData = CutBoards(@"
+                Targets:      In range:     Reachable:    Nearest:      Chosen:
+                #######       #######       #######       #######       #######
+                #E..G.#       #E.?G?#       #E.@G.#       #E.!G.#       #E.+G.#
+                #...#.#  -->  #.?.#?#  -->  #.@.#.#  -->  #.!.#.#  -->  #...#.#
+                #.G.#G#       #?G?#G#       #@G@#G#       #!G.#G#       #.G.#G#
+                #######       #######       #######       #######       #######
+                ");
+
+            boardData.ShouldBeNull();//$$$$
         }
         
         [Test]
