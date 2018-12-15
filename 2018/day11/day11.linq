@@ -3,7 +3,10 @@
   <NuGetReference>Shouldly</NuGetReference>
   <Namespace>MoreLinq.Extensions</Namespace>
   <Namespace>Shouldly</Namespace>
+  <Namespace>System.Drawing</Namespace>
+  <Namespace>System.Drawing.Imaging</Namespace>
   <Namespace>System.Linq</Namespace>
+  <Namespace>System.Drawing.Drawing2D</Namespace>
 </Query>
 
 void Main()
