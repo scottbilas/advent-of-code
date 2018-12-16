@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using MoreLinq.Extensions;
 using RoyT.AStar;
 using AoC;
@@ -66,36 +65,29 @@ namespace Day15
         public object[,] Cells;
         public List<Unit> Units = new List<Unit>();
 
-        public Board(int cx, int cy) => Cells = new object[cx, cy];
-
-        public int Width => Cells.GetLength(0);
-        public int Height => Cells.GetLength(1);
-        
-        public static Board Parse(params string[] lines)
+        public Board(params string[] lines)
         {
             var (cx, cy) = (lines[0].Length, lines.Length);
-            var board = new Board(cx, cy);
+            Cells = new object[cx, cy];
 
-            for (var y = 0; y < cy; ++y)
+            foreach (var (x, y) in Cells.SelectCoords())
             {
-                for (var x = 0; x < cx; ++x)
+                var c = lines[y][x];
+                if (c == '#')
                 {
-                    var c = lines[y][x];
-                    if (c == '#')
-                    {
-                        board.Cells[x, y] = c;
-                    }
-                    else if (c != '.')
-                    {
-                        var unit = new Unit(c, x, y);
-                        board.Units.Add(unit);
-                        board.Cells[x, y] = unit;
-                    }
+                    Cells[x, y] = c;
+                }
+                else if (c != '.')
+                {
+                    var unit = new Unit(c, x, y);
+                    Units.Add(unit);
+                    Cells[x, y] = unit;
                 }
             }
-
-            return board;
         }
+        
+        public int Width => Cells.GetLength(0);
+        public int Height => Cells.GetLength(1);
         
         public static int Sim(params string[] lines)
         {
@@ -139,18 +131,15 @@ namespace Day15
         public Grid GeneratePathfinder()
         {
             var pathfinder = new Grid(Width, Height);
-
-            for (var y = 0; y < Height; ++y)
-                for (var x = 0; x < Width; ++x)
-                    if (Cells[x, y] != null)
-                        pathfinder.BlockCell(new Position(x, y));
+            foreach (var (_, x, y) in Cells.SelectCells().Where(c => c.cell != null))
+                pathfinder.BlockCell(new Position(x, y));
 
             return pathfinder;
         }
         
         public static (int edeaths, int outcome) SimFull(int elfAttackPower, string[] lines)
         {
-            var board = Board.Parse(lines);
+            var board = new Board(lines);
         
             var elfCount = 0; 
             foreach (var elf in board.Units.Where(u => u.Type == 'E'))
@@ -253,22 +242,21 @@ namespace Day15
 
         public char[,] Render(Func<Unit, char> unitRenderer)
         {
-            var render = new char[Width, Height];
-            render.Fill('.');
-            
-            for (var y = 0; y < Height; ++y)
-            {
-                for (var x = 0; x < Width; ++x)
+            return new char[Width, Height]
+                .Fill(coord =>
                 {
-                    var cell = Cells[x, y];
-                    if (cell is Unit unit)
-                        render[x, y] = unitRenderer?.Invoke(unit) ?? unit.Type;
-                    else if (cell is char c)
-                        render[x, y] = c;
-                }
-            }
-
-            return render;
+                    switch (Cells[coord.x, coord.y])
+                    {
+                        case Unit unit:
+                            return unitRenderer?.Invoke(unit) ?? unit.Type;
+                        case char c:
+                            return c;
+                        case null:
+                            return '.';
+                        default:
+                            throw new InvalidOperationException(); 
+                    }
+                });
         }
 
         public char[,] Render()

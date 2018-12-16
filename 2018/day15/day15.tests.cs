@@ -41,7 +41,7 @@ namespace Day15
                   #######           #######
                 ");
 
-            var board = Board.Parse(boardData[0]);
+            var board = new Board(boardData[0]);
             board.Units = board.Units.Shuffle(new Random(0)).ToList();
 
             //
@@ -74,7 +74,7 @@ namespace Day15
                 #######       #######       #######       #######       #######
                 ");
 
-            var board = Board.Parse(boardData[0]);
+            var board = new Board(boardData[0]);
             var pathfinder = board.GeneratePathfinder();
 
             // Targets
@@ -200,7 +200,7 @@ namespace Day15
         
             // problem
         
-            var result = Board.Si2(File.ReadAllLines($"{ScriptDir}/input.txt"));
+            var result = Board.Si2(ScriptDir.Combine("input.txt").ReadAllLines());
             //result.outcome3.Dump();
             //result.elvesOutcome.Dump();
             result.ShouldBe((188576, 57112));

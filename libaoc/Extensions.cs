@@ -15,7 +15,7 @@ namespace AoC
 
         public static IEnumerable<IReadOnlyList<T>> BatchList<T>(this IEnumerable<T> @this, int batchSize) =>
             @this.Batch(batchSize).Select(b => b.ToList());
-        
+
         public static IEnumerable<TR> Batch<T, TR>(this IEnumerable<T> @this, int batchSize, Func<IReadOnlyList<T>, TR> selector) =>
             BatchExtension.Batch(@this, batchSize, b => selector(b.ToList()));
 
@@ -24,7 +24,7 @@ namespace AoC
             for (var i = 0; i < count; ++i)
                 dst[i + dstOffset] = @this[i + srcOffset];
         }
-        
+
         public static T[] SliceArray<T>(this IReadOnlyList<T> @this, int offset, int count)
         {
             var sliced = new T[count];
@@ -40,13 +40,18 @@ namespace AoC
                     : selector(default(T), false);
         }
 
+        public static (int cx, int cy) GetDimensions<T>(this T[,] @this)
+            => (cx: @this.GetLength(0), cy: @this.GetLength(1));
+        
         public static IEnumerable<string> ToLines(this char[,] @this)
         {
+            var (cx, cy) = @this.GetDimensions();
+            
             var sb = new StringBuilder();
-            for (var y = 0; y < @this.GetLength(1); ++y)
+            for (var y = 0; y < cy; ++y)
             {
                 sb.Clear();
-                for (var x = 0; x < @this.GetLength(0); ++x)
+                for (var x = 0; x < cx; ++x)
                     sb.Append(@this[x, y]);
                 yield return sb.ToString();
             }
@@ -55,11 +60,31 @@ namespace AoC
         public static string ToString(this char[,] @this)
             => string.Join('\n', @this.ToLines());
 
-        public static void Fill<T>(this T[,] @this, T value)
+        public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this)
         {
-            for (var y = 0; y < @this.GetLength(1); ++y)
-                for (var x = 0; x < @this.GetLength(0); ++x)
-                    @this[x, y] = value;
+            var (cx, cy) = @this.GetDimensions();
+            for (var y = 0; y < cy; ++y)
+                for (var x = 0; x < cx; ++x)
+                    yield return (cell: @this[x, y], x, y);
+        }
+        
+        public static IEnumerable<(int x, int y)> SelectCoords<T>(this T[,] @this)
+        {
+            var (cx, cy) = @this.GetDimensions();
+            for (var y = 0; y < cy; ++y)
+                for (var x = 0; x < cx; ++x)
+                    yield return (x, y);
+        }
+        
+        public static T[,] Fill<T>(this T[,] @this, T value)
+            => @this.Fill(_ => value);
+
+        public static T[,] Fill<T>(this T[,] @this, Func<(int x, int y), T> generator)
+        {
+            foreach (var coord in @this.SelectCoords())
+                @this[coord.x, coord.y] = generator(coord);
+
+            return @this;
         }
     }
 }

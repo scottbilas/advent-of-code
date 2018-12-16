@@ -22,17 +22,17 @@ namespace Day16
         public void Part1()
         {
             Solver
-                .CountOpsMatching(3, File.ReadAllText($"{ScriptDir}/input1.txt"))
+                .CountOpsMatching(3, ScriptDir.Combine("input1.txt").ReadAllText())
                 .ShouldBe(521);
         }
 
         [Test]
         public void Part2()
         {
-            var ops = Solver.DeduceOps(File.ReadAllText($"{ScriptDir}/input1.txt"));
+            var ops = Solver.DeduceOps(ScriptDir.Combine("input1.txt").ReadAllText());
             
             Solver
-                .RunProgram(ops, File.ReadAllText($"{ScriptDir}/input2.txt"))
+                .RunProgram(ops, ScriptDir.Combine("input2.txt").ReadAllText())
                 .ShouldBe(594);
         }
     }
