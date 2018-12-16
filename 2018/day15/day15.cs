@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using MoreLinq.Extensions;
 using RoyT.AStar;
+using AoC;
 
 namespace Day15
 {
@@ -111,11 +112,45 @@ namespace Day15
                     return (outcome3, result.outcome);
             }
         }
+
+        public IEnumerable<Unit> SelectEnemyUnits(Unit self)
+            => Units.Where(t => t.Type != self.Type);
+
+        public IEnumerable<Position> SelectEnemyMoveTargets(IEnumerable<Unit> enemyUnits)
+            => enemyUnits
+                .SelectMany(e => e.Pos.SelectAdjacent())
+                .Where(p => Cells[p.X, p.Y] == null);
+
+        public IEnumerable<(Position pos, int dist)> SelectReachableMoveTargets(Unit self, IEnumerable<Position> moveTargets, Grid pathfinder)
+            => moveTargets
+                .Select(pos => (pos, dist: pathfinder.GetPath(self.Pos, pos, MovementPatterns.LateralOnly).Length))
+                .Where(target => target.dist != 0);
+
+        public IEnumerable<Position> SelectNearestMoveTarget(IEnumerable<(Position pos, int dist)> moveTargets)
+            => moveTargets
+                .MinBy(target => target.dist)
+                .Select(target => target.pos);
+
+        public Position? ChooseMoveTarget(IEnumerable<Position> moveTargets)
+            => moveTargets
+                .OrderByReading()
+                .FirstOrDefault((pos, hasValue) => hasValue ? pos : (Position?)null);
+
+        public Grid GeneratePathfinder()
+        {
+            var pathfinder = new Grid(Width, Height);
+
+            for (var y = 0; y < Height; ++y)
+                for (var x = 0; x < Width; ++x)
+                    if (Cells[x, y] != null)
+                        pathfinder.BlockCell(new Position(x, y));
+
+            return pathfinder;
+        }
         
         public static (int edeaths, int outcome) SimFull(int elfAttackPower, string[] lines)
         {
             var board = Board.Parse(lines);
-            var astar = new Grid(board.Width, board.Height);
         
             var elfCount = 0; 
             foreach (var elf in board.Units.Where(u => u.Type == 'E'))
@@ -124,10 +159,7 @@ namespace Day15
                 ++elfCount;
             }
 
-            for (var y = 0; y < board.Width; ++y)
-                for (var x = 0; x < board.Height; ++x)
-                    if (board.Cells[x, y] != null)
-                        astar.BlockCell(new Position(x, y));
+            var pathfinder = board.GeneratePathfinder();
     
             for (var round = 0; ; ++round)
             {
@@ -156,7 +188,7 @@ namespace Day15
                         if (target.HP <= 0)
                         {
                             board.Cells[target.Pos.X, target.Pos.Y] = null;
-                            astar.UnblockCell(target.Pos);
+                            pathfinder.UnblockCell(target.Pos);
                             
                             var found = board.Units.IndexOf(target);
                             board.Units.RemoveAt(found);
@@ -184,7 +216,7 @@ namespace Day15
                         var validTargets = enemyUnits
                             .SelectMany(e => e.Pos.SelectAdjacent())
                             .Where(p => board.Cells[p.X, p.Y] == null) // open space
-                            .Select(p => (pos: p, path: astar.GetPath(unit.Pos, p, MovementPatterns.LateralOnly)))
+                            .Select(p => (pos: p, path: pathfinder.GetPath(unit.Pos, p, MovementPatterns.LateralOnly)))
                             .Where(t => t.path.Any()) // reachable
                             .MinBy(t => t.path.Length) // nearest
                             .OrderByReading(t => t.pos) // reading order
@@ -198,19 +230,19 @@ namespace Day15
                             var step = unit.Pos
                                 .SelectAdjacent()
                                 .Where(p => board.Cells[p.X, p.Y] == null)
-                                .Select(p => (pos: p, path: astar.GetPath(p, chosen, MovementPatterns.LateralOnly)))
+                                .Select(p => (pos: p, path: pathfinder.GetPath(p, chosen, MovementPatterns.LateralOnly)))
                                 .Where(t => t.path.Any())
                                 .MinBy(t => t.path.Length) // nearest
                                 .OrderByReading(t => t.pos) // reading order
                                 .First();
                             
                             board.Cells[unit.Pos.X, unit.Pos.Y] = null;
-                            astar.UnblockCell(new Position(unit.Pos.X, unit.Pos.Y));
+                            pathfinder.UnblockCell(new Position(unit.Pos.X, unit.Pos.Y));
         
                             unit.Pos = step.pos;
         
                             board.Cells[unit.Pos.X, unit.Pos.Y] = unit;
-                            astar.BlockCell(unit.Pos);
+                            pathfinder.BlockCell(unit.Pos);
         
                             Attack();
                         }
@@ -219,24 +251,27 @@ namespace Day15
             }
         }
 
-        public IEnumerable<string> Render(Func<Unit, char> unitRenderer)
+        public char[,] Render(Func<Unit, char> unitRenderer)
         {
-            var sb = new StringBuilder();
+            var render = new char[Width, Height];
+            render.Fill('.');
+            
             for (var y = 0; y < Height; ++y)
             {
-                sb.Clear();                
                 for (var x = 0; x < Width; ++x)
                 {
-                    var c = Cells[x, y];
-                    if (c is Unit u)
-                        sb.Append(unitRenderer?.Invoke(u) ?? u.Type);
-                    else
-                        sb.Append(c ?? '.');
+                    var cell = Cells[x, y];
+                    if (cell is Unit unit)
+                        render[x, y] = unitRenderer?.Invoke(unit) ?? unit.Type;
+                    else if (cell is char c)
+                        render[x, y] = c;
                 }
-
-                yield return sb.ToString();
             }
-        }
-    }
 
+            return render;
+        }
+
+        public char[,] Render()
+            => Render(u => u.Type);
+    }
 }

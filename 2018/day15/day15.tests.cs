@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AoC;
 using MoreLinq.Extensions;
 using NUnit.Framework;
 using RoyT.AStar;
@@ -11,7 +12,7 @@ namespace Day15
 {
     class Day15 : AocFixture
     {
-        string[][] CutBoards(string text)
+        static string[][] CutBoards(string text)
         {
             var lines = text.Split('\n').Where(l => l.Trim().StartsWith("#")).ToList();
             var offsets = Regex.Matches(lines[0], @"#+");
@@ -48,7 +49,7 @@ namespace Day15
             //
 
             board
-                .Render(u => (char)(board.Units.IndexOf(u) + '1'))
+                .Render(u => (char)(board.Units.IndexOf(u) + '1')).ToLines()
                 .ShouldBe(boardData[1]);
         }
 
@@ -73,7 +74,49 @@ namespace Day15
                 #######       #######       #######       #######       #######
                 ");
 
-            boardData.ShouldBeNull();//$$$$
+            var board = Board.Parse(boardData[0]);
+            var pathfinder = board.GeneratePathfinder();
+
+            // Targets
+            
+            var targetsRender = board.Render();
+            targetsRender.ToLines().ShouldBe(boardData[0]);
+
+            var friendlyUnit = board.Units.Single(u => u.Type == 'E');
+            var enemyUnits = board.SelectEnemyUnits(friendlyUnit).ToList();
+            enemyUnits.Count.ShouldBe(3);
+
+            // In range
+            
+            var inRangeRender = board.Render();
+            var inRangeTargets = board.SelectEnemyMoveTargets(enemyUnits).ToList();
+            foreach (var inRangeTarget in inRangeTargets)
+                inRangeRender[inRangeTarget.X, inRangeTarget.Y] = '?';
+            inRangeRender.ToLines().ShouldBe(boardData[1]);
+
+            // Reachable
+            
+            var reachableRender = board.Render();
+            var reachableTargets = board.SelectReachableMoveTargets(friendlyUnit, inRangeTargets, pathfinder);
+            foreach (var reachableTarget in reachableTargets)
+                reachableRender[reachableTarget.pos.X, reachableTarget.pos.Y] = '@';
+            reachableRender.ToLines().ShouldBe(boardData[2]);
+            
+            // Nearest
+
+            var nearestRender = board.Render();
+            var nearestTargets = board.SelectNearestMoveTarget(reachableTargets);
+            foreach (var nearestTarget in nearestTargets)
+                nearestRender[nearestTarget.X, nearestTarget.Y] = '!';
+            nearestRender.ToLines().ShouldBe(boardData[3]);
+            
+            // Chosen
+            
+            var chosenRender = board.Render();
+            var chosenTarget = board.ChooseMoveTarget(nearestTargets);
+            chosenTarget.ShouldNotBeNull();
+            chosenRender[chosenTarget.Value.X, chosenTarget.Value.Y] = '+';
+            chosenRender.ToLines().ShouldBe(boardData[4]);
         }
         
         [Test]
