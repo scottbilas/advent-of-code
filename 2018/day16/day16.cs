@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using MoreLinq.Extensions;
+using AoC;
 
 namespace Day16
 {
@@ -11,10 +10,11 @@ namespace Day16
         string m_Name;
         public Action<Instr, int[]> Exec { get; }
 
-        Op(string name, Action<Instr, int[]> exec) =>
-            (m_Name, Exec) = (name, exec);
+        Op(string name, Action<Instr, int[]> exec)
+            => (m_Name, Exec) = (name, exec);
 
-        public override string ToString() => m_Name;
+        public override string ToString()
+            => m_Name;
 
         public bool Test(Sample sample)
         {
@@ -75,14 +75,13 @@ namespace Day16
         public int Id;
         public int A, B, C;
 
-        public Instr(IReadOnlyList<int> ints, int offset = 0) =>
-            (Id, A, B, C) = (ints[0 + offset], ints[1 + offset], ints[2 + offset], ints[3 + offset]);
+        public Instr(IReadOnlyList<int> ints, int offset = 0)
+            => (Id, A, B, C) = (ints[0 + offset], ints[1 + offset], ints[2 + offset], ints[3 + offset]);
 
-        public static IEnumerable<Instr> Parse(string text) => Regex
-            .Matches(text, @"\d+")
-            .Cast<Match>()
-            .Select(m => int.Parse(m.Value))
-            .Batch(4, b => new Instr(b.ToList()));
+        public static IEnumerable<Instr> Parse(string text)
+            => text
+                .SelectInts()
+                .Batch(4, b => new Instr(b));
     }
 
     class Sample
@@ -90,22 +89,20 @@ namespace Day16
         public int[] Before, After;
         public Instr Instr;
 
-        Sample(IReadOnlyList<int> ints) =>
-            (Before, Instr, After) = (ints.Slice(0, 4).ToArray(), new Instr(ints, 4), ints.Slice(8, 4).ToArray());
+        Sample(IReadOnlyList<int> ints)
+            => (Before, Instr, After) = (ints.SliceArray(0, 4), new Instr(ints, 4), ints.SliceArray(8, 4));
 
-        public static IEnumerable<Sample> Parse(string text) => Regex
-            .Matches(text, @"\d+")
-            .Cast<Match>()
-            .Select(m => int.Parse(m.Value))
-            .Batch(12, b => new Sample(b.ToList()));
+        public static IEnumerable<Sample> Parse(string text)
+            => text.SelectInts().Batch(12, b => new Sample(b));
     }
 
     static class Solver
     {
-        public static int CountOpsMatching(int matchCountPerOp, string samplesText) => Sample
-            .Parse(samplesText)
-            .Select(sample => Op.All.Count(op => op.Test(sample)))
-            .Count(c => c >= matchCountPerOp);
+        public static int CountOpsMatching(int matchCountPerOp, string samplesText)
+            => Sample
+                .Parse(samplesText)
+                .Select(sample => Op.All.Count(op => op.Test(sample)))
+                .Count(c => c >= matchCountPerOp);
 
         public static IReadOnlyDictionary<int, Op> DeduceOps(string samplesText)
         {
@@ -122,8 +119,8 @@ namespace Day16
             var ops = new Dictionary<int, Op>();
             while (successes.Any())
             {
-                var singleton = successes.First(kv => kv.Value.Count == 1);
-                var (id, op) = (singleton.Key, singleton.Value[0]);
+                var (id, value) = successes.First(kv => kv.Value.Count == 1);
+                var op = value[0];
 
                 foreach (var o in successes.Values)
                     o.Remove(op);
@@ -131,6 +128,7 @@ namespace Day16
                 successes.Remove(id);
                 ops.Add(id, op);
             }
+            
             return ops;
         }
         

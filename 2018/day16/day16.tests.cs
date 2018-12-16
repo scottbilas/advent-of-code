@@ -3,9 +3,6 @@ using System.IO;
 using NUnit.Framework;
 using Shouldly;
 
-// ReSharper disable CommentTypo
-// ReSharper disable StringLiteralTypo
-
 namespace Day16
 {
     class Day16 : AocFixture
