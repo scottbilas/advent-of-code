@@ -8,16 +8,25 @@ namespace Day16
 {
     class Op
     {
-        public string Name;
-        public Action<Instr, int[]> Exec;
+        string m_Name;
+        public Action<Instr, int[]> Exec { get; }
 
         Op(string name, Action<Instr, int[]> exec) =>
-            (Name, Exec) = (name, exec);
+            (m_Name, Exec) = (name, exec);
 
-        public override string ToString() => Name;
+        public override string ToString() => m_Name;
 
-        public static List<Op> All { get; } = new List<Op>
+        public bool Test(Sample sample)
         {
+            var working = (int[])sample.Before.Clone();
+            Exec(sample.Instr, working);
+            return working.SequenceEqual(sample.After);
+        }
+
+        public static IEnumerable<Op> All { get; } = new List<Op>
+        {
+            // ReSharper disable CommentTypo, StringLiteralTypo
+            
             // addr (add register) stores into register C the result of adding register A and register B.
             new Op("addr", (instr, regs) => regs[instr.C] = regs[instr.A] + regs[instr.B]),
             // addi (add immediate) stores into register C the result of adding register A and value B.
@@ -56,6 +65,8 @@ namespace Day16
             new Op("eqri", (instr, regs) => regs[instr.C] = regs[instr.A] == instr.B ? 1 : 0),
             // eqrr (equal register/register) sets register C to 1 if register A is equal to register B. Otherwise, register C is set to 0.
             new Op("eqrr", (instr, regs) => regs[instr.C] = regs[instr.A] == regs[instr.B] ? 1 : 0),
+            
+            // ReSharper restore CommentTypo, StringLiteralTypo
         };        
     }
 
@@ -91,39 +102,35 @@ namespace Day16
 
     static class Solver
     {
-        static bool TestOp(Op op, Sample sample)
-        {
-            var working = (int[])sample.Before.Clone();
-            op.Exec(sample.Instr, working);
-            return working.SequenceEqual(sample.After);
-        }
-        
         public static int CountOpsMatching(int matchCountPerOp, string samplesText) => Sample
             .Parse(samplesText)
-            .Select(sample => Op.All.Count(op => TestOp(op, sample)))
+            .Select(sample => Op.All.Count(op => op.Test(sample)))
             .Count(c => c >= matchCountPerOp);
 
         public static IReadOnlyDictionary<int, Op> DeduceOps(string samplesText)
         {
             var successes = Sample
                 .Parse(samplesText)
-                .SelectMany(s => Op.All.Select(o => (o, s)).Where(v => TestOp(v.o, v.s)))
-                .GroupBy(v => v.s.Instr.Id)
-                .ToDictionary(g => g.Key, g => g.Select(v => v.o).Distinct().ToList());
+                .SelectMany(sample => Op.All
+                    .Select(op => (op, sample))
+                    .Where(v => v.op.Test(v.sample)))
+                .GroupBy(v => v.sample.Instr.Id)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(v => v.op).Distinct().ToList());
 
             var ops = new Dictionary<int, Op>();
             while (successes.Any())
             {
-                var singleton = successes.First(kvp => kvp.Value.Count == 1);
+                var singleton = successes.First(kv => kv.Value.Count == 1);
                 var (id, op) = (singleton.Key, singleton.Value[0]);
-                
+
                 foreach (var o in successes.Values)
                     o.Remove(op);
                 
-                ops.Add(id, op);
                 successes.Remove(id);
+                ops.Add(id, op);
             }
-
             return ops;
         }
         

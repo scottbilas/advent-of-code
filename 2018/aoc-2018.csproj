@@ -160,6 +160,8 @@
       </ProjectReference>
     </ItemGroup>
     <ItemGroup>
+      <Content Include="day15\day15.txt" />
+      <Content Include="day15\input.txt" />
       <Content Include="day16\day16.txt" />
       <Content Include="day16\input2.txt" />
       <Content Include="day16\input1.txt" />
