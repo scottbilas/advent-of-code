@@ -147,6 +147,8 @@
     <ItemGroup>
       <Compile Include="day15\day15.cs" />
       <Compile Include="day15\day15.tests.cs" />
+      <Compile Include="day16\day16.cs" />
+      <Compile Include="day16\day16.tests.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
@@ -156,6 +158,11 @@
         <Project>{bb6eafeb-918d-4a62-8d28-73f5c1e17313}</Project>
         <Name>libaoc</Name>
       </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="day16\day16.txt" />
+      <Content Include="day16\input2.txt" />
+      <Content Include="day16\input1.txt" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
