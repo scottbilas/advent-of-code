@@ -90,9 +90,7 @@ namespace Day15
         public int Height => Cells.GetLength(1);
         
         public static int Sim(params string[] lines)
-        {
-            return SimFull(3, lines).outcome;
-        }
+            => SimFull(3, lines).outcome;
         
         public static (int outcome3, int elvesOutcome) Si2(params string[] lines)
         {
@@ -105,6 +103,9 @@ namespace Day15
             }
         }
 
+        public static int GetPathDistance(Grid pathfinder, Position start, Position end)
+            => pathfinder.GetPath(start, end, MovementPatterns.LateralOnly).Length;
+        
         public IEnumerable<Unit> SelectEnemyUnits(Unit self)
             => Units.Where(t => t.Type != self.Type);
 
@@ -115,7 +116,7 @@ namespace Day15
 
         public IEnumerable<(Position pos, int dist)> SelectReachableMoveTargets(Unit self, IEnumerable<Position> moveTargets, Grid pathfinder)
             => moveTargets
-                .Select(pos => (pos, dist: pathfinder.GetPath(self.Pos, pos, MovementPatterns.LateralOnly).Length))
+                .Select(pos => (pos, dist: GetPathDistance(pathfinder, self.Pos, pos)))
                 .Where(target => target.dist != 0);
 
         public IEnumerable<Position> SelectNearestMoveTarget(IEnumerable<(Position pos, int dist)> moveTargets)
@@ -128,6 +129,16 @@ namespace Day15
                 .OrderByReading()
                 .FirstOrDefault((pos, hasValue) => hasValue ? pos : (Position?)null);
 
+        public Position ChooseMoveStep(Grid pathfinder, Position current, Position target)
+            => current
+                .SelectAdjacent()
+                .Where(pos => Cells[pos.X, pos.Y] == null)
+                .Select(pos => (pos, dist: GetPathDistance(pathfinder, pos, target)))
+                .MinBy(path => path.dist)
+                .Select(path => path.pos)
+                .OrderByReading()
+                .First();
+        
         public Grid GeneratePathfinder()
         {
             var pathfinder = new Grid(Width, Height);
@@ -137,7 +148,8 @@ namespace Day15
             return pathfinder;
         }
         
-        public static (int edeaths, int outcome) SimFull(int elfAttackPower, string[] lines)
+        public static (int edeaths, int outcome, Board board)
+            SimFull(int elfAttackPower, string[] lines, int maxRound = int.MaxValue)
         {
             var board = new Board(lines);
         
@@ -148,17 +160,27 @@ namespace Day15
                 ++elfCount;
             }
 
+            var round = 0;
+
+            (int edeaths, int outcome, Board board) GetReturn()
+            {
+                return (
+                    edeaths: elfCount - board.Units.Count(u => u.Type == 'E'),
+                    outcome: round * board.Units.Sum(u => u.HP),
+                    board);
+            }
+
             var pathfinder = board.GeneratePathfinder();
-    
-            for (var round = 0; ; ++round)
+
+            for (; round < maxRound; ++round)
             {
                 //Render(round);
         
                 board.Units = board.Units.OrderByReading(u => u.Pos).ToList();
         
-                for (var iunit = 0; iunit < board.Units.Count; ++iunit)
+                for (var iUnit = 0; iUnit < board.Units.Count; ++iUnit)
                 {
-                    var unit = board.Units[iunit];
+                    var unit = board.Units[iUnit];
         
                     bool Attack()
                     {
@@ -181,8 +203,8 @@ namespace Day15
                             
                             var found = board.Units.IndexOf(target);
                             board.Units.RemoveAt(found);
-                            if (found < iunit)
-                                --iunit;
+                            if (found < iUnit)
+                                --iUnit;
                         }
                         
                         return true;
@@ -195,12 +217,7 @@ namespace Day15
                             .ToList();
         
                         if (!enemyUnits.Any())
-                        {
-                            //Render(round);
-                            return (
-                                elfCount - board.Units.Count(u => u.Type == 'E'),
-                                round * board.Units.Sum(u => u.HP));
-                        }
+                            return GetReturn();
                             
                         var validTargets = enemyUnits
                             .SelectMany(e => e.Pos.SelectAdjacent())
@@ -238,6 +255,8 @@ namespace Day15
                     }
                 }
             }
+            
+            return GetReturn();
         }
 
         public char[,] Render(Func<Unit, char> unitRenderer)
