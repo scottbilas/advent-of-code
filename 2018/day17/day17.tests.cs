@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.IO;
 using AoC;
 using NUnit.Framework;
@@ -12,7 +13,7 @@ namespace Day17
         public void Samples()
         {
             Solver
-                .CountReachableTiles((500, 0), @"
+                .CountReachableTiles(new Point(500, 0), @"
                     x=495, y=2..7
                     y=7, x=495..501
                     x=501, y=3..7
@@ -27,11 +28,11 @@ namespace Day17
         [Test]
         public void Problem()
         {
-            var result = Solver
-                .CountReachableTiles((500, 0), ScriptDir.Combine("input.txt").ReadAllText());
-                
-            result.touched.ShouldBe(39162);
-            result.retained.ShouldBe(1);
+            Solver
+                .CountReachableTiles(
+                    new Point(500, 0),
+                    ScriptDir.Combine("input.txt").ReadAllText())
+                .ShouldBe((39162, 32047));
         }
     }
 }

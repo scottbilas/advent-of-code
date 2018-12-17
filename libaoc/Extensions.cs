@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -86,5 +87,22 @@ namespace AoC
 
             return @this;
         }
+        
+        public static Rectangle Bounds(this IEnumerable<Rectangle> @this)
+        {
+            var (l, t, r, b) = (int.MaxValue, int.MaxValue, int.MinValue, int.MinValue);  
+            foreach (var rect in @this)
+            {
+                l = Math.Min(l, rect.Left);
+                t = Math.Min(t, rect.Top);
+                r = Math.Max(r, rect.Right);
+                b = Math.Max(b, rect.Bottom);
+            }
+
+            return Rectangle.FromLTRB(l, t, r, b);
+        }
+
+        public static Point BottomRight(in this Rectangle @this)
+            => new Point(@this.Right, @this.Bottom);
     }
 }
