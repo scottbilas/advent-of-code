@@ -57,7 +57,7 @@ namespace AoC
             }
         }
 
-        public static string ToString(this char[,] @this)
+        public static string ToText(this char[,] @this)
             => string.Join('\n', @this.ToLines());
 
         public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this)
