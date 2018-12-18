@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AoC;
@@ -56,7 +57,7 @@ namespace Day15
         [Test]
         public void SelectAdjacent_IsInReadingOrder()
         {
-            var adjacent = new Position(5, 10).SelectAdjacent().ToList();
+            var adjacent = new Point(5, 10).SelectAdjacent().ToList();
             var ordered = adjacent.OrderByReading();
             
             ordered.ShouldBe(adjacent);
@@ -168,7 +169,7 @@ namespace Day15
             var distanceRender = board.Render();
             foreach (var (_, x, y) in distanceRender.SelectCells().Where(c => c.cell == '.'))
             {
-                var dist = Board.GetPathDistance(pathfinder, new Position(x, y), chosenTarget);
+                var dist = Board.GetPathDistance(pathfinder, new Point(x, y), chosenTarget);
                 distanceRender[x, y] = (char)(dist - 1 + '0');
             }
             distanceRender.ToLines().ShouldBe(boardData[3]);

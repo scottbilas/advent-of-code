@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using MoreLinq.Extensions;
 using RoyT.AStar;
@@ -10,46 +11,29 @@ namespace Day15
 {
     static class Extensions
     {
-        public static IEnumerable<T> OrderByReading<T>(this IEnumerable<T> @this, Func<T, Position> selector)
-        {
-            return
-                from item in @this
-                let pos = selector(item)
-                orderby pos.Y, pos.X
-                select item;
-        }
-
-        public static IEnumerable<Position> OrderByReading(this IEnumerable<Position> @this)
-            => @this.OrderByReading(_ => _);
-
         public static IEnumerable<Unit> OrderByReading(this IEnumerable<Unit> @this)
             => @this.OrderByReading(u => u.Pos);
 
-        public static IEnumerable<Position> SelectAdjacent(this Position @this)
-        {
-            yield return new Position(@this.X, @this.Y - 1);
-            yield return new Position(@this.X - 1, @this.Y);
-            yield return new Position(@this.X + 1, @this.Y);
-            yield return new Position(@this.X, @this.Y + 1);
-        }
-
-        public static IEnumerable<T> SelectAdjacent<T>(this Position @this, Func<Position, T> selector)
-            => @this.SelectAdjacent().Select(selector);
+        public static Point ToPoint(ref this Position @this)
+            => new Point(@this.X, @this.Y);
+        
+        public static Position ToPosition(ref this Point @this)
+            => new Position(@this.X, @this.Y);
     }
-
+    
     [DebuggerDisplay("{Type} @{Pos.X},{Pos.Y} = {HP}")]
     class Unit
     {
         public char Type { get; private set; }
         public int AttackPower { get; set; } = 3;
 
-        public Position Pos;
+        public Point Pos;
         public int HP = 200;
 
         public Unit(char type, int x, int y)
         {
             Type = type;
-            Pos = new Position(x, y);
+            Pos = new Point(x, y);
         }
 
         public Unit(char type, int x, int y, int attackPower)
@@ -70,18 +54,18 @@ namespace Day15
             var (cx, cy) = (lines[0].Length, lines.Length);
             Cells = new object[cx, cy];
 
-            foreach (var (x, y) in Cells.SelectCoords())
+            foreach (var coord in Cells.SelectCoords())
             {
-                var c = lines[y][x];
+                var c = lines[coord.Y][coord.X];
                 if (c == '#')
                 {
-                    Cells[x, y] = c;
+                    Cells[coord.X, coord.Y] = c;
                 }
                 else if (c != '.')
                 {
-                    var unit = new Unit(c, x, y);
+                    var unit = new Unit(c, coord.X, coord.Y);
                     Units.Add(unit);
-                    Cells[x, y] = unit;
+                    Cells[coord.X, coord.Y] = unit;
                 }
             }
         }
@@ -103,33 +87,33 @@ namespace Day15
             }
         }
 
-        public static int GetPathDistance(Grid pathfinder, Position start, Position end)
-            => pathfinder.GetPath(start, end, MovementPatterns.LateralOnly).Length;
+        public static int GetPathDistance(Grid pathfinder, Point start, Point end)
+            => pathfinder.GetPath(start.ToPosition(), end.ToPosition(), MovementPatterns.LateralOnly).Length;
         
         public IEnumerable<Unit> SelectEnemyUnits(Unit self)
             => Units.Where(t => t.Type != self.Type);
 
-        public IEnumerable<Position> SelectEnemyMoveTargets(IEnumerable<Unit> enemyUnits)
+        public IEnumerable<Point> SelectEnemyMoveTargets(IEnumerable<Unit> enemyUnits)
             => enemyUnits
                 .SelectMany(e => e.Pos.SelectAdjacent())
                 .Where(p => Cells[p.X, p.Y] == null);
 
-        public IEnumerable<(Position pos, int dist)> SelectReachableMoveTargets(Unit self, IEnumerable<Position> moveTargets, Grid pathfinder)
+        public IEnumerable<(Point pos, int dist)> SelectReachableMoveTargets(Unit self, IEnumerable<Point> moveTargets, Grid pathfinder)
             => moveTargets
                 .Select(pos => (pos, dist: GetPathDistance(pathfinder, self.Pos, pos)))
                 .Where(target => target.dist != 0);
 
-        public IEnumerable<Position> SelectNearestMoveTarget(IEnumerable<(Position pos, int dist)> moveTargets)
+        public IEnumerable<Point> SelectNearestMoveTarget(IEnumerable<(Point pos, int dist)> moveTargets)
             => moveTargets
                 .MinBy(target => target.dist)
                 .Select(target => target.pos);
 
-        public Position? ChooseMoveTarget(IEnumerable<Position> moveTargets)
+        public Point? ChooseMoveTarget(IEnumerable<Point> moveTargets)
             => moveTargets
                 .OrderByReading()
-                .FirstOrDefault((pos, hasValue) => hasValue ? pos : (Position?)null);
+                .FirstOrDefault((pos, hasValue) => hasValue ? pos : (Point?)null);
 
-        public Position ChooseMoveStep(Grid pathfinder, Position current, Position target)
+        public Point ChooseMoveStep(Grid pathfinder, Point current, Point target)
             => current
                 .SelectAdjacent()
                 .Where(pos => Cells[pos.X, pos.Y] == null)
@@ -199,7 +183,7 @@ namespace Day15
                         if (target.HP <= 0)
                         {
                             board.Cells[target.Pos.X, target.Pos.Y] = null;
-                            pathfinder.UnblockCell(target.Pos);
+                            pathfinder.UnblockCell(target.Pos.ToPosition());
                             
                             var found = board.Units.IndexOf(target);
                             board.Units.RemoveAt(found);
@@ -222,7 +206,7 @@ namespace Day15
                         var validTargets = enemyUnits
                             .SelectMany(e => e.Pos.SelectAdjacent())
                             .Where(p => board.Cells[p.X, p.Y] == null) // open space
-                            .Select(p => (pos: p, path: pathfinder.GetPath(unit.Pos, p, MovementPatterns.LateralOnly)))
+                            .Select(p => (pos: p, path: pathfinder.GetPath(unit.Pos.ToPosition(), p.ToPosition(), MovementPatterns.LateralOnly)))
                             .Where(t => t.path.Any()) // reachable
                             .MinBy(t => t.path.Length) // nearest
                             .OrderByReading(t => t.pos) // reading order
@@ -236,19 +220,19 @@ namespace Day15
                             var step = unit.Pos
                                 .SelectAdjacent()
                                 .Where(p => board.Cells[p.X, p.Y] == null)
-                                .Select(p => (pos: p, path: pathfinder.GetPath(p, chosen, MovementPatterns.LateralOnly)))
+                                .Select(p => (pos: p, path: pathfinder.GetPath(p.ToPosition(), chosen.ToPosition(), MovementPatterns.LateralOnly)))
                                 .Where(t => t.path.Any())
                                 .MinBy(t => t.path.Length) // nearest
                                 .OrderByReading(t => t.pos) // reading order
                                 .First();
                             
                             board.Cells[unit.Pos.X, unit.Pos.Y] = null;
-                            pathfinder.UnblockCell(new Position(unit.Pos.X, unit.Pos.Y));
+                            pathfinder.UnblockCell(unit.Pos.ToPosition());
         
                             unit.Pos = step.pos;
         
                             board.Cells[unit.Pos.X, unit.Pos.Y] = unit;
-                            pathfinder.BlockCell(unit.Pos);
+                            pathfinder.BlockCell(unit.Pos.ToPosition());
         
                             Attack();
                         }
@@ -264,7 +248,7 @@ namespace Day15
             return new char[Width, Height]
                 .Fill(coord =>
                 {
-                    switch (Cells[coord.x, coord.y])
+                    switch (Cells[coord.X, coord.Y])
                     {
                         case Unit unit:
                             return unitRenderer?.Invoke(unit) ?? unit.Type;

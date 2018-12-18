@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Text.RegularExpressions;
 using AoC;
-using MoreLinq;
+using static AoC.Utils;
 
 namespace Day18
 {
@@ -14,70 +11,43 @@ namespace Day18
         public static int Sim(int minutes, string yardText)
         {
             var yardLines = yardText.Split('\n').Select(l => l.Trim()).Where(l => l.Any()).ToList(); // << UTIL
-            var board = new char[yardLines.Count, yardLines[0].Length].Fill(coord => yardLines[coord.y][coord.x]);
+            var board = new char[yardLines.Count, yardLines[0].Length].Fill(coord => yardLines[coord.Y][coord.X]);
             var dims = board.GetDimensions();
 
+            (int trees, int yards) CountThings(IEnumerable<char> cells) =>
+                cells.Aggregate((trees: 0, yards: 0), (sum, c) => (
+                    trees: sum.trees + (c == '|' ? 1 : 0),
+                    yards: sum.yards + (c == '#' ? 1 : 0)));
+            
             var next = (char[,])board.Clone();
-
             for (var minute = 0; minute < minutes; ++minute)
             {
                 next.Fill(coord =>
                 {
-                    int tcount = 0, lcount = 0;
-                    void Add(char c)
-                    {
-                        if (c == '#') ++lcount; else if (c == '|') ++tcount;
-                    }
+                    var counts = CountThings(coord
+                        .SelectAdjacentWithDiagonals()
+                        .Where(p => p.X >= 0 && p.X < dims.Width && p.Y >= 0 && p.Y < dims.Height)
+                        .Select(p => board[p.X, p.Y]));
                     
-                    if (coord.y > 0)
+                    var cc = board[coord.X, coord.Y]; 
+                    switch (cc)
                     {
-                        if (coord.x > 0)
-                            Add(board[coord.x-1, coord.y-1]);
-                        Add(board[coord.x, coord.y-1]);
-                        if (coord.x < (dims.cx - 1))
-                            Add(board[coord.x + 1, coord.y-1]);
+                        case '.' when counts.trees >= 3:
+                            return '|';
+                        case '|' when counts.yards >= 3:
+                            return '#';
+                        case '#' when (counts.yards < 1 || counts.trees < 1):
+                            return '.';
+                        default:
+                            return cc;
                     }
-                    if (coord.x > 0)
-                        Add(board[coord.x - 1, coord.y]);
-                    if (coord.x < (dims.cx - 1))
-                        Add(board[coord.x + 1, coord.y]);
-                    if (coord.y < (dims.cy - 1))
-                    {
-                        if (coord.x > 0)
-                            Add(board[coord.x-1, coord.y+1]);
-                        Add(board[coord.x, coord.y+1]);
-                        if (coord.x < (dims.cx - 1))
-                            Add(board[coord.x + 1, coord.y+1]);
-                    }
-
-                    char cc = board[coord.x, coord.y]; 
-                    char nc = cc;
-                    if (cc == '.' && tcount >= 3)
-                        nc = '|';
-                    else if (cc == '|' && lcount >= 3)
-                        nc = '#';
-                    else if (cc == '#' && (lcount < 1 || tcount < 1))
-                        nc = '.';
-
-                    return nc;
                 });
 
-                var last = board;
-                board = next;
-                next = last;
+                Swap(ref board, ref next);
             }
 
-            int a = 0, b= 0;
-            foreach (var c in board.SelectCells())
-            {
-                if (c.cell == '#')
-                    ++a;
-                else if (c.cell == '|')
-                    ++b;
-            }
-
-            Debug.WriteLine($"m:{minutes}, p:{a*b}");
-            return a * b;
+            var totalCounts = CountThings(board.SelectCells().Select(c => c.cell));
+            return totalCounts.trees * totalCounts.yards;
         }
     }
 }

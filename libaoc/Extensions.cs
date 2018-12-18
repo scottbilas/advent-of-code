@@ -38,21 +38,21 @@ namespace AoC
             using (var e = @this.GetEnumerator())
                 return e.MoveNext()
                     ? selector(e.Current, true)
-                    : selector(default(T), false);
+                    : selector(default, false);
         }
 
-        public static (int cx, int cy) GetDimensions<T>(this T[,] @this)
-            => (cx: @this.GetLength(0), cy: @this.GetLength(1));
+        public static Size GetDimensions<T>(this T[,] @this)
+            => new Size(@this.GetLength(0), @this.GetLength(1));
         
         public static IEnumerable<string> ToLines(this char[,] @this)
         {
-            var (cx, cy) = @this.GetDimensions();
+            var size = @this.GetDimensions();
             
             var sb = new StringBuilder();
-            for (var y = 0; y < cy; ++y)
+            for (var y = 0; y < size.Height; ++y)
             {
                 sb.Clear();
-                for (var x = 0; x < cx; ++x)
+                for (var x = 0; x < size.Width; ++x)
                     sb.Append(@this[x, y]);
                 yield return sb.ToString();
             }
@@ -63,27 +63,27 @@ namespace AoC
 
         public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this)
         {
-            var (cx, cy) = @this.GetDimensions();
-            for (var y = 0; y < cy; ++y)
-                for (var x = 0; x < cx; ++x)
+            var size = @this.GetDimensions();
+            for (var y = 0; y < size.Height; ++y)
+                for (var x = 0; x < size.Width; ++x)
                     yield return (cell: @this[x, y], x, y);
         }
         
-        public static IEnumerable<(int x, int y)> SelectCoords<T>(this T[,] @this)
+        public static IEnumerable<Point> SelectCoords<T>(this T[,] @this)
         {
-            var (cx, cy) = @this.GetDimensions();
-            for (var y = 0; y < cy; ++y)
-                for (var x = 0; x < cx; ++x)
-                    yield return (x, y);
+            var size = @this.GetDimensions();
+            for (var y = 0; y < size.Height; ++y)
+                for (var x = 0; x < size.Width; ++x)
+                    yield return new Point(x, y);
         }
         
         public static T[,] Fill<T>(this T[,] @this, T value)
             => @this.Fill(_ => value);
 
-        public static T[,] Fill<T>(this T[,] @this, Func<(int x, int y), T> generator)
+        public static T[,] Fill<T>(this T[,] @this, Func<Point, T> generator)
         {
             foreach (var coord in @this.SelectCoords())
-                @this[coord.x, coord.y] = generator(coord);
+                @this[coord.X, coord.Y] = generator(coord);
 
             return @this;
         }
@@ -104,5 +104,46 @@ namespace AoC
 
         public static Point BottomRight(in this Rectangle @this)
             => new Point(@this.Right, @this.Bottom);
+
+        public static IEnumerable<T> OrderByReading<T>(this IEnumerable<T> @this, Func<T, Point> selector)
+        {
+            return
+                from item in @this
+                let pos = selector(item)
+                orderby pos.Y, pos.X
+                select item;
+        }
+
+        public static IEnumerable<Point> OrderByReading(this IEnumerable<Point> @this)
+            => @this.OrderByReading(_ => _);
+
+        public static IEnumerable<Point> SelectAdjacent(this Point @this)
+        {
+            yield return new Point(@this.X, @this.Y - 1);
+            yield return new Point(@this.X - 1, @this.Y);
+            yield return new Point(@this.X + 1, @this.Y);
+            yield return new Point(@this.X, @this.Y + 1);
+        }
+
+        public static IEnumerable<T> SelectAdjacent<T>(this Point @this, Func<Point, T> selector)
+            => @this.SelectAdjacent().Select(selector);
+
+        public static IEnumerable<Point> SelectAdjacentWithDiagonals(this Point @this)
+        {
+            yield return new Point(@this.X - 1, @this.Y - 1);
+            yield return new Point(@this.X, @this.Y - 1);
+            yield return new Point(@this.X + 1, @this.Y - 1);
+            
+            yield return new Point(@this.X - 1, @this.Y);
+            yield return new Point(@this.X + 1, @this.Y);
+            
+            yield return new Point(@this.X - 1, @this.Y + 1);
+            yield return new Point(@this.X, @this.Y + 1);
+            yield return new Point(@this.X + 1, @this.Y + 1);
+        }
+
+        public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Point @this, Func<Point, T> selector)
+            => @this.SelectAdjacentWithDiagonals().Select(selector);
     }
+
 }
