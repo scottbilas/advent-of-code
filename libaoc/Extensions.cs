@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using MoreLinq.Extensions;
 
 namespace AoC
@@ -12,6 +13,7 @@ namespace AoC
     {
         public static IEnumerable<int> SelectInts(this string @this) => Regex
             .Matches(@this, @"\d+")
+            .Cast<Match>()
             .Select(m => int.Parse(m.Value));
 
         public static IEnumerable<IReadOnlyList<T>> BatchList<T>(this IEnumerable<T> @this, int batchSize) =>
@@ -59,7 +61,7 @@ namespace AoC
         }
 
         public static string ToText(this char[,] @this)
-            => string.Join('\n', @this.ToLines());
+            => string.Join("\n", @this.ToLines());
 
         public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this)
         {
@@ -75,6 +77,21 @@ namespace AoC
             for (var y = 0; y < size.Height; ++y)
                 for (var x = 0; x < size.Width; ++x)
                     yield return new Point(x, y);
+        }
+
+        public static char[,] ToGrid([NotNull] this string @this)
+        {
+            var lines = @this
+                .Trim()
+                .Split('\n')
+                .Select(l => l.Trim())
+                .ToList();
+
+            if (lines.Any(l => l.Length != lines[0].Length))
+                throw new InvalidOperationException("Non-regular grid");
+            
+            return new char[lines[0].Length, lines.Count]
+                .Fill(coord => lines[coord.Y][coord.X]);
         }
         
         public static T[,] Fill<T>(this T[,] @this, T value)
