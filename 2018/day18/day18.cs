@@ -10,8 +10,7 @@ namespace Day18
     {
         public static int Sim(int minutes, string yardText)
         {
-            var yardLines = yardText.Split('\n').Select(l => l.Trim()).Where(l => l.Any()).ToList(); // << UTIL
-            var board = new char[yardLines.Count, yardLines[0].Length].Fill(coord => yardLines[coord.Y][coord.X]);
+            var board = yardText.ToGrid();
             var dims = board.GetDimensions();
 
             (int trees, int yards) CountThings(IEnumerable<char> cells) =>
