@@ -14,5 +14,10 @@
   * ^ most of these should be extension methods on char/object[,] and give grid ability to implicit cast to that
   * ^ or use a new interface type I2DGrid<T>...
   * grid access[,] with Point obj
+* Sparse grid object
+* IGrid for algorithms (implemented by sparse and smart grids)
+  * line and box drawing
+* Rectangle missing common stuff like TopLeft() - could go with extension methods but maybe just find a nuget package or write one for 2d
+* And Rectangle.Zero, Point.Zero..
 
 Worth doing unit tests for all these..
