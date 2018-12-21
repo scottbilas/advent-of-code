@@ -159,7 +159,11 @@ namespace SantaVM
 
                 var line = ToText();
 
-                line = Regex.Replace(line, @"(\w+) = ((\1 \+ 1)|(1 \+ \1))", "++$1");
+
+                // do these very last. also, order matters among them.
+                line = Regex.Replace(line, @"(\w+) = \1 ([+\-*/|&]) (\S+);", "$1 $2= $3;");
+                line = Regex.Replace(line, @"(\w+) = (\S+) ([+*|&]) \1;", "$1 $3= $2;");
+                line = Regex.Replace(line, @"(\w+) += 1;", "++$1;");
 
                 lines.Add(line);
             }
