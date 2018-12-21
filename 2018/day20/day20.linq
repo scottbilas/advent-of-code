@@ -60,7 +60,7 @@ Render(sample4).ShouldBe(new[] {
     "###-#-###-#-#",
     "#.|.#.|.|.#.#",
     "#############"});
-//Solve(sample4).longestPath.ShouldBe(24); << off by one, need to debug
+//Solve(sample4).longestPath.ShouldBe(24); //<< off by one, need to debug
 
 var sample5 = Walk("^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$");
 Render(sample5).ShouldBe(new[] {
@@ -85,7 +85,7 @@ var input = Walk(File.ReadLines($"{scriptDir}/input.txt").First().Trim());
 //string.Join("\n", Render(input)).Dump();
 var solved = Solve(input);
 solved.longestPath.Dump().ShouldBe(4239);
-solved.shortestCount.Dump();//ShouldBe(..);
+solved.shortestCount.Dump().ShouldBe(8205);
 
 Dictionary<Point, int> Walk(string dirs)
 {
@@ -142,11 +142,9 @@ Dictionary<Point, int> Walk(string dirs)
                 stack.Pop();
                 stack.Push(stack.Peek());
                 break;
-                
             case '^':
                 stack.Push(new Point(0, 0));
                 break;
-
             case '$':
                 stack.Pop();
                 break;
@@ -155,19 +153,6 @@ Dictionary<Point, int> Walk(string dirs)
 
     stack.ShouldBeEmpty();
     return grid;
-}
-
-string ToNews(int dir)
-{
-    IEnumerable<char> Break()
-    {
-        if ((dir & 0b1000) != 0) yield return 'N';
-        if ((dir & 0b0100) != 0) yield return 'E';
-        if ((dir & 0b0010) != 0) yield return 'W';
-        if ((dir & 0b0001) != 0) yield return 'S';
-    }
-    
-    return new string(Break().ToArray());
 }
 
 /*
@@ -186,14 +171,8 @@ How many rooms have a shortest path from your current location that pass through
 
 (int longestPath, int shortestCount) Solve(Dictionary<Point, int> grid)
 {
-    var counts = new Dictionary<Point, int>();
-    foreach (var kv in grid)
-        counts.Add(kv.Key, int.MaxValue);
+    var counts = grid.ToDictionary(kv => kv.Key, _ => int.MaxValue);
     
-    var longestPath = Recurse(new Point(0, 0), 0) - 1;
-    var shortestCount = counts.Values.Count(c => c >= 1000);
-    return (longestPath, shortestCount);
-
     int Recurse(Point pos, int depth)
     {
         var conn = grid[pos];
@@ -225,6 +204,10 @@ How many rooms have a shortest path from your current location that pass through
         
         return dist + 1;
     }
+
+    return (
+        Recurse(new Point(0, 0), 0) - 1,
+        counts.Values.Count(c => c >= 1000));
 }
 
 IEnumerable<string> Render(IReadOnlyDictionary<Point, int> grid)
@@ -237,31 +220,17 @@ IEnumerable<string> Render(IReadOnlyDictionary<Point, int> grid)
         new Point(gridBounds.Left - 1, gridBounds.Top - 1),
         new Size(gridBounds.Width * 2 + 1, gridBounds.Height * 2 + 1));
 
-    var board = new char[boardBounds.Width, boardBounds.Height].Fill('?');
-    for (var y = 0; y < boardBounds.Height; y += 2)
-    {
-        for (var x = 0; x < boardBounds.Width; ++x)
-            board[x, y] = '#';
-        if ((y + 1) < boardBounds.Height)
-            for (var x = 0; x < boardBounds.Width; x += 2)
-                board[x, y + 1] = '#';
-    }
-
     (int x, int y) GetBoardPos(int x, int y) => ((x - gridBounds.Left) * 2 + 1, (y - gridBounds.Top) * 2 + 1);
 
+    var board = new char[boardBounds.Width, boardBounds.Height].Fill('#');
     foreach (var kv in grid)
     {
         var (x, y) = GetBoardPos(kv.Key.X, kv.Key.Y);
         board[x, y] = '.';
-
-        if ((kv.Value & 0b1000) != 0)
-            board[x, y - 1] = '-';
-        if ((kv.Value & 0b0100) != 0)
-            board[x + 1, y] = '|';
-        if ((kv.Value & 0b0010) != 0)
-            board[x - 1, y] = '|';
-        if ((kv.Value & 0b0001) != 0)
-            board[x, y + 1] = '-';
+        board[x, y - 1] = ((kv.Value & 0b1000) != 0) ? '-' : '#';
+        board[x + 1, y] = ((kv.Value & 0b0100) != 0) ? '|' : '#';
+        board[x - 1, y] = ((kv.Value & 0b0010) != 0) ? '|' : '#';
+        board[x, y + 1] = ((kv.Value & 0b0001) != 0) ? '-' : '#';
     }
 
     var start = GetBoardPos(0, 0);
