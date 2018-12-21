@@ -19,5 +19,7 @@
   * line and box drawing
 * Rectangle missing common stuff like TopLeft() - could go with extension methods but maybe just find a nuget package or write one for 2d
 * And Rectangle.Zero, Point.Zero..
+* Deque that impls IReadOnlyList, with pythonisms like rotate, and ability to set max size which will truncate from the other side when adding too much to one side
+* Reverse() that works correctly on IReadOnlyList
 
 Worth doing unit tests for all these..
