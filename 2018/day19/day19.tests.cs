@@ -10,7 +10,7 @@ namespace Day19
         public void Samples()
         {
             Solver
-                .RunProgram(0, 0, @"
+                .RunProgram(@"
                     #ip 0
                     seti 5 0 1
                     seti 6 0 2
@@ -22,11 +22,11 @@ namespace Day19
                 .ShouldBe(6);
         }
 
-        //[Test] // should just derive it
+        [Test] // should just derive it
         public void Part1()
         {
             Solver
-                .RunProgram(4, 0, ScriptDir.Combine("input.txt").ReadAllText())
+                .RunProgram(ScriptDir.Combine("input.txt").ReadAllText())
                 .ShouldBe(2240);
         }
 

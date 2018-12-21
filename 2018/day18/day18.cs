@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using AoC;
@@ -19,34 +18,41 @@ namespace Day18
                     yards: sum.yards + (c == '#' ? 1 : 0)));
             
             var next = (char[,])board.Clone();
-            for (var minute = 0; minute < minutes; ++minute)
-            {
-                next.Fill(coord =>
-                {
-                    var counts = CountThings(coord
-                        .SelectAdjacentWithDiagonals()
-                        .Where(p => p.X >= 0 && p.X < dims.Width && p.Y >= 0 && p.Y < dims.Height)
-                        .Select(p => board[p.X, p.Y]));
-                    
-                    var cc = board[coord.X, coord.Y]; 
-                    switch (cc)
-                    {
-                        case '.' when counts.trees >= 3:
-                            return '|';
-                        case '|' when counts.yards >= 3:
-                            return '#';
-                        case '#' when (counts.yards < 1 || counts.trees < 1):
-                            return '.';
-                        default:
-                            return cc;
-                    }
-                });
 
-                Swap(ref board, ref next);
+            IEnumerable<int> Loop()
+            {
+                for (var minute = 0; minute < minutes; ++minute)
+                {
+                    next.Fill(coord =>
+                    {
+                        var counts = CountThings(coord
+                            .SelectAdjacentWithDiagonals()
+                            .Where(p => p.X >= 0 && p.X < dims.Width && p.Y >= 0 && p.Y < dims.Height)
+                            .Select(p => board[p.X, p.Y]));
+                        
+                        var cc = board[coord.X, coord.Y]; 
+                        switch (cc)
+                        {
+                            case '.' when counts.trees >= 3:
+                                return '|';
+                            case '|' when counts.yards >= 3:
+                                return '#';
+                            case '#' when (counts.yards < 1 || counts.trees < 1):
+                                return '.';
+                            default:
+                                return cc;
+                        }
+                    });
+
+                    Swap(ref board, ref next);
+
+                    var result = CountThings(board.SelectCells().Select(c => c.cell));
+                    yield return result.trees * result.yards;
+
+                }
             }
 
-            var totalCounts = CountThings(board.SelectCells().Select(c => c.cell));
-            return totalCounts.trees * totalCounts.yards;
+            return Loop().PatternSeekingGetItemAt(minutes);
         }
     }
 }

@@ -1,9 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using MoreLinq.Extensions;
 
@@ -11,10 +11,9 @@ namespace AoC
 {
     public static class Extensions
     {
-        public static IEnumerable<int> SelectInts(this string @this) => Regex
-            .Matches(@this, @"\d+")
-            .Cast<Match>()
-            .Select(m => int.Parse(m.Value));
+        public static IEnumerable<T> WhereNotNull<T>([NotNull] this IEnumerable<T> @this) where T : class
+            => @this.Where(t => !(t is null));
+
 
         public static IEnumerable<IReadOnlyList<T>> BatchList<T>(this IEnumerable<T> @this, int batchSize) =>
             @this.Batch(batchSize).Select(b => b.ToList());
@@ -79,21 +78,34 @@ namespace AoC
                     yield return new Point(x, y);
         }
 
-        public static char[,] ToGrid([NotNull] this string @this)
+        public static ValueTuple<T, T> First2<T>([NotNull] this IEnumerable<T> @this)
         {
-            var lines = @this
-                .Trim()
-                .Split('\n')
-                .Select(l => l.Trim())
-                .ToList();
+            using (var e = @this.GetEnumerator())
+            {
+                e.MoveNext();
+                var t0 = e.Current;
+                e.MoveNext();
+                var t1 = e.Current;
 
-            if (lines.Any(l => l.Length != lines[0].Length))
-                throw new InvalidOperationException("Non-regular grid");
-            
-            return new char[lines[0].Length, lines.Count]
-                .Fill(coord => lines[coord.Y][coord.X]);
+                return ValueTuple.Create(t0, t1);
+            }
         }
-        
+
+        public static ValueTuple<T, T, T> First3<T>([NotNull] this IEnumerable<T> @this)
+        {
+            using (var e = @this.GetEnumerator())
+            {
+                e.MoveNext();
+                var t0 = e.Current;
+                e.MoveNext();
+                var t1 = e.Current;
+                e.MoveNext();
+                var t2 = e.Current;
+
+                return ValueTuple.Create(t0, t1, t2);
+            }
+        }
+
         public static T[,] Fill<T>(this T[,] @this, T value)
             => @this.Fill(_ => value);
 
@@ -161,6 +173,113 @@ namespace AoC
 
         public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Point @this, Func<Point, T> selector)
             => @this.SelectAdjacentWithDiagonals().Select(selector);
+
+        public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, Func<TKey, TValue> getDefault)
+            => new AutoDictionary<TKey, TValue>(@this, getDefault);
+
+        public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default)
+            => new AutoDictionary<TKey, TValue>(@this, _ => defaultValue);
+
+        public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)
+        {
+            // TODO: use proper deque
+            var history = new Dictionary<T, List<int>>().ToAutoDictionary(_ => new List<int>());
+
+            var i = 0;
+            foreach (var item in @this)
+            {
+                // no pattern yet, but hit the index anyway
+                if (i == index)
+                    return item;
+
+                var list = history[item];
+                list.Add(i);
+
+                if (list.Count >= minRepeat)
+                {
+                    // $$$$ don't use list[] or Equals(), work with indices and deltas..
+                    var ok = true;
+                    var match = list[list.Count - 1];
+                    for (var repeat = 1; repeat < minRepeat; ++repeat)
+                    {
+                        if (!Equals(list[list.Count - 1 - repeat], match))
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+
+                    if (ok)
+                    {
+                        var delta = list[list.Count - 1] - list[list.Count - 2];
+                        if ((index - i) % delta == 0)
+                            return item;
+                    }
+                }
+
+                ++i;
+            }
+
+            throw new IndexOutOfRangeException();
+        }
     }
 
+    // exactly like a Dictionary except it will guarantee that entries exist for any `get` call by ensuring already filled by delegate from ctor
+    public class AutoDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IDictionary<TKey, TValue>
+    {
+        readonly IDictionary<TKey, TValue> m_Dictionary;
+        readonly Func<TKey, TValue> m_GetDefault;
+
+        public AutoDictionary(IDictionary<TKey, TValue> dictionary, Func<TKey, TValue> getDefault)
+            => (m_Dictionary, m_GetDefault) = (dictionary, getDefault);
+
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+            => m_Dictionary.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+            => m_Dictionary.GetEnumerator();
+
+        public void Add(TKey key, TValue value)
+            => m_Dictionary.Add(key, value);
+        public void Add(KeyValuePair<TKey, TValue> item)
+            => m_Dictionary.Add(item);
+        public void Clear()
+            => m_Dictionary.Clear();
+        public bool ContainsKey(TKey key)
+            => m_Dictionary.ContainsKey(key);
+        public bool Contains(KeyValuePair<TKey, TValue> item)
+            => m_Dictionary.Contains(item);
+        public int Count
+            => m_Dictionary.Count;
+        public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+            => m_Dictionary.CopyTo(array, arrayIndex);
+        public bool IsReadOnly
+            => m_Dictionary.IsReadOnly;
+        public bool Remove(TKey key)
+            => m_Dictionary.Remove(key);
+        public bool Remove(KeyValuePair<TKey, TValue> item)
+            => m_Dictionary.Remove(item);
+        public bool TryGetValue(TKey key, out TValue value)
+            => m_Dictionary.TryGetValue(key, out value);
+
+
+        public ICollection<TKey> Keys
+            => m_Dictionary.Keys;
+        public ICollection<TValue> Values
+            => m_Dictionary.Values;
+        IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys
+            => m_Dictionary.Keys;
+        IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values
+            => m_Dictionary.Values;
+
+        public TValue this[TKey key]
+        {
+            get
+            {
+                if (!m_Dictionary.TryGetValue(key, out var value))
+                    m_Dictionary.Add(key, value = m_GetDefault(key));
+                return value;
+            }
+            set => m_Dictionary[key] = value;
+        }
+    }
 }

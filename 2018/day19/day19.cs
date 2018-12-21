@@ -1,44 +1,22 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using AoC;
-using Day16;
+using SantaVM;
 
 namespace Day19
 {
-    class Instr : InstrData
-    {
-        public Op Op;
-
-        public Instr(Op op, IReadOnlyList<int> ints)
-            : base(ints) => Op = op;
-    }
-
     static class Solver
     {
-        public static int RunProgram(int boundIp, int start0, string instrText)
+        public static int RunProgram(string programText)
         {
-            var ops = Op.All.ToDictionary(o => o.Name);
-
-            var instrs = instrText
-                .Split('\n')
-                .Select(l => l.Trim())
-                .Where(l => l.Any())
-                .Skip(1)
-                .Select(l => new Instr(
-                    ops[l.Split(' ')[0].Trim()],
-                    l.SelectInts().ToList()))
-                .ToList();
-
+            var (boundIP, instrs) = Parser.Parse(programText);
             var regs = new int[6];
-            regs[0] = start0;
 
-            for (; regs[boundIp] >= 0 && regs[boundIp] < instrs.Count ;)
+            for (; regs[boundIP] >= 0 && regs[boundIP] < instrs.Count ;)
             {
-                var instr = instrs[regs[boundIp]];
+                var instr = instrs[regs[boundIP]];
 
                 var oldRegs = regs.ToList();
-                var oldIp = regs[boundIp];
+                var oldIp = regs[boundIP];
                 instr.Op.Exec(instr, regs);
 
                 Debug.WriteLine(
@@ -46,7 +24,7 @@ namespace Day19
                     $"{instr.Op} {instr.A} {instr.B} {instr.C} " +
                     $"[{regs[0]}, {regs[1]}, {regs[2]}, {regs[3]}, {regs[4]}, {regs[5]}]");
 
-                ++regs[boundIp];
+                ++regs[boundIP];
             }
             
             return regs[0] - 1;

@@ -87,9 +87,9 @@ var solved = Solve(input);
 solved.longestPath.Dump().ShouldBe(4239);
 solved.shortestCount.Dump().ShouldBe(8205);
 
-Dictionary<Point, int> Walk(string dirs)
+AutoDictionary<Point, int> Walk(string dirs)
 {
-    var grid = new Dictionary<Point, int>();
+    var grid = new Dictionary<Point, int>().ToAutoDictionary();
     var stack = new Stack<Point>();
 
     for (var i = 0; i < dirs.Length; ++i)
@@ -104,10 +104,6 @@ Dictionary<Point, int> Walk(string dirs)
                 {
                     var pos = stack.Pop();
 
-                    int fconn;
-                    if (!grid.TryGetValue(pos, out fconn))
-                        grid.Add(pos, fconn);
-
                     switch (c)
                     {
                         case 'N': grid[pos] |= 0b1000; --pos.Y; break;
@@ -115,10 +111,6 @@ Dictionary<Point, int> Walk(string dirs)
                         case 'W': grid[pos] |= 0b0010; --pos.X; break;
                         case 'S': grid[pos] |= 0b0001; ++pos.Y; break;
                     }
-
-                    int tconn;
-                    if (!grid.TryGetValue(pos, out tconn))
-                        grid.Add(pos, tconn);
 
                     switch (c)
                     {
@@ -169,7 +161,7 @@ How many rooms have a shortest path from your current location that pass through
 1000 doors?
 */
 
-(int longestPath, int shortestCount) Solve(Dictionary<Point, int> grid)
+(int longestPath, int shortestCount) Solve(IDictionary<Point, int> grid)
 {
     var counts = grid.ToDictionary(kv => kv.Key, _ => int.MaxValue);
     
