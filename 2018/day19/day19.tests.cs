@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using AoC;
 using NUnit.Framework;
 using Shouldly;
@@ -24,7 +22,7 @@ namespace Day19
                 .ShouldBe(6);
         }
 
-        [Test]
+        //[Test] // should just derive it
         public void Part1()
         {
             Solver
@@ -35,10 +33,15 @@ namespace Day19
         [Test]
         public void Part2()
         {
-            /*
-            Solver
-                .RunProgram(4, 1, ScriptDir.Combine("input.txt").ReadAllText())
-                .ShouldBe(1);*/
+            // resulted from manual disassembly and reduction (see disasm.txt); not a brute force thing
+
+            var rc = 0;
+
+            for (var i = 1; i <= 10551348; ++i)
+                if ((10551348 % i) == 0)
+                    rc += i;
+
+            rc.ShouldBe(26671554);
         }
     }
 }

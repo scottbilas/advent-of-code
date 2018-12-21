@@ -7,14 +7,14 @@ namespace Day16
 {
     class Op
     {
-        string m_Name;
-        public Action<Instr, int[]> Exec { get; }
+        public string Name { get; }
+        public Action<InstrData, int[]> Exec { get; }
 
-        Op(string name, Action<Instr, int[]> exec)
-            => (m_Name, Exec) = (name, exec);
+        Op(string name, Action<InstrData, int[]> exec)
+            => (Name, Exec) = (name, exec);
 
         public override string ToString()
-            => m_Name;
+            => Name;
 
         public bool Test(Sample sample)
         {
@@ -70,13 +70,20 @@ namespace Day16
         };        
     }
 
-    class Instr
+    class InstrData
+    {
+        public int A, B, C;
+        public InstrData(IReadOnlyList<int> ints, int offset = 0)
+            => (A, B, C) = (ints[offset], ints[1 + offset], ints[2 + offset]);
+
+    }
+
+    class Instr : InstrData
     {
         public int Id;
-        public int A, B, C;
 
         public Instr(IReadOnlyList<int> ints, int offset = 0)
-            => (Id, A, B, C) = (ints[0 + offset], ints[1 + offset], ints[2 + offset], ints[3 + offset]);
+            : base(ints, offset + 1) => Id = ints[offset];
 
         public static IEnumerable<Instr> Parse(string text)
             => text
