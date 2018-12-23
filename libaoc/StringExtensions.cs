@@ -30,9 +30,14 @@ namespace AoC
         }
 
         public static IEnumerable<int> SelectInts([NotNull] this string @this) => Regex
-            .Matches(@this, @"\d+")
+            .Matches(@this, @"[-+]?\d+")
             .Cast<Match>()
             .Select(m => int.Parse(m.Value));
+
+        public static IEnumerable<float> SelectFloats([NotNull] this string @this) => Regex
+            .Matches(@this, @"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
+            .Cast<Match>()
+            .Select(m => float.Parse(m.Value));
 
         // string-enumerable extensions
 

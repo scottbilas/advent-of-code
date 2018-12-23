@@ -14,12 +14,16 @@ namespace AoC
         public static IEnumerable<T> WhereNotNull<T>([NotNull] this IEnumerable<T> @this) where T : class
             => @this.Where(t => !(t is null));
 
-
-        public static IEnumerable<IReadOnlyList<T>> BatchList<T>(this IEnumerable<T> @this, int batchSize) =>
+        public static IEnumerable<IReadOnlyList<T>> BatchList<T>([NotNull] this IEnumerable<T> @this, int batchSize) =>
             @this.Batch(batchSize).Select(b => b.ToList());
-
-        public static IEnumerable<TR> Batch<T, TR>(this IEnumerable<T> @this, int batchSize, Func<IReadOnlyList<T>, TR> selector) =>
+        public static IEnumerable<TR> Batch<T, TR>([NotNull] this IEnumerable<T> @this, int batchSize, [NotNull] Func<IReadOnlyList<T>, TR> selector) =>
             BatchExtension.Batch(@this, batchSize, b => selector(b.ToList()));
+        public static IEnumerable<ValueTuple<T, T>> Batch2<T>([NotNull] this IEnumerable<T> @this) =>
+            @this.Batch(2).Select(b => b.First2());
+        public static IEnumerable<ValueTuple<T, T, T>> Batch3<T>([NotNull] this IEnumerable<T> @this) =>
+            @this.Batch(3).Select(b => b.First3());
+        public static IEnumerable<ValueTuple<T, T, T, T>> Batch4<T>([NotNull] this IEnumerable<T> @this) =>
+            @this.Batch(4).Select(b => b.First4());
 
         public static void Copy<T>(this IReadOnlyList<T> @this, int srcOffset, T[] dst, int dstOffset, int count)
         {
@@ -34,12 +38,24 @@ namespace AoC
             return sliced;
         }
 
+        public static T FirstOrDefault<T>(this IEnumerable<T> @this, T defaultValue)
+        {
+            using (var e = @this.GetEnumerator())
+                return e.MoveNext() ? e.Current : defaultValue;
+        }
+
         public static TR FirstOrDefault<T, TR>(this IEnumerable<T> @this, Func<T, bool, TR> selector)
         {
             using (var e = @this.GetEnumerator())
                 return e.MoveNext()
                     ? selector(e.Current, true)
                     : selector(default, false);
+        }
+
+        public static T? FirstOrNull<T>(this IEnumerable<T> @this) where T : struct
+        {
+            using (var e = @this.GetEnumerator())
+                return e.MoveNext() ? e.Current : (T?)null;
         }
 
         public static Size GetDimensions<T>(this T[,] @this)
@@ -62,13 +78,15 @@ namespace AoC
         public static string ToText(this char[,] @this)
             => string.Join("\n", @this.ToLines());
 
-        public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this)
+        public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this, Size max)
         {
-            var size = @this.GetDimensions();
-            for (var y = 0; y < size.Height; ++y)
-                for (var x = 0; x < size.Width; ++x)
+            for (var y = 0; y < max.Height; ++y)
+                for (var x = 0; x < max.Width; ++x)
                     yield return (cell: @this[x, y], x, y);
         }
+
+        public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this)
+            => @this.SelectCells(@this.GetDimensions());
         
         public static IEnumerable<Point> SelectCoords<T>(this T[,] @this)
         {
@@ -103,6 +121,23 @@ namespace AoC
                 var t2 = e.Current;
 
                 return ValueTuple.Create(t0, t1, t2);
+            }
+        }
+
+        public static ValueTuple<T, T, T, T> First4<T>([NotNull] this IEnumerable<T> @this)
+        {
+            using (var e = @this.GetEnumerator())
+            {
+                e.MoveNext();
+                var t0 = e.Current;
+                e.MoveNext();
+                var t1 = e.Current;
+                e.MoveNext();
+                var t2 = e.Current;
+                e.MoveNext();
+                var t3 = e.Current;
+
+                return ValueTuple.Create(t0, t1, t2, t3);
             }
         }
 

@@ -111,7 +111,7 @@ namespace Day15
         public Point? ChooseMoveTarget(IEnumerable<Point> moveTargets)
             => moveTargets
                 .OrderByReading()
-                .FirstOrDefault((pos, hasValue) => hasValue ? pos : (Point?)null);
+                .FirstOrNull();
 
         public Point ChooseMoveStep(Grid pathfinder, Point current, Point target)
             => current
