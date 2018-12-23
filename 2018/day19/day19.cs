@@ -8,7 +8,7 @@ namespace Day19
     {
         public static int RunProgram(string programText)
         {
-            var (boundIP, instrs) = Parser.Parse(programText);
+            var (boundIP, instrs) = SantaVM.Parser.Parse(programText);
             var regs = new int[6];
 
             for (; regs[boundIP] >= 0 && regs[boundIP] < instrs.Count ;)
