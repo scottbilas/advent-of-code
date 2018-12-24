@@ -1,5 +1,5 @@
 <Query Kind="Statements">
-  <Reference Relative="..\..\libaoc\bin\Debug\netstandard2.0\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\netstandard2.0\libaoc.dll</Reference>
+  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\net472\libaoc.dll</Reference>
   <NuGetReference>Shouldly</NuGetReference>
   <Namespace>AoC</Namespace>
   <Namespace>Shouldly</Namespace>

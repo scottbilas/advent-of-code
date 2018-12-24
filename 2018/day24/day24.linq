@@ -1,5 +1,5 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\libaoc\bin\Debug\netstandard2.0\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\netstandard2.0\libaoc.dll</Reference>
+  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\net472\libaoc.dll</Reference>
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
   <NuGetReference>YC.QuickGraph</NuGetReference>
@@ -15,27 +15,28 @@
   <Namespace>System.Drawing</Namespace>
   <Namespace>System.Linq</Namespace>
   <Namespace>System.Text</Namespace>
+  <Namespace>NiceIO</Namespace>
 </Query>
 
-string scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
+NPath scriptDir = new NPath(Util.CurrentQueryPath).Parent;
 
 void Main()
 {
     // sample part 1
-    Sim($"{scriptDir}/sample.txt").ShouldBe((immune: 0, infection: 5216));
+    Sim(scriptDir.Combine("sample.txt")).ShouldBe((immune: 0, infection: 5216));
 
     // sample part 2
-    var sample = FindMinimalBoost($"{scriptDir}/sample.txt");
+    var sample = FindMinimalBoost(scriptDir.Combine("sample.txt"));
     sample.ShouldBe(51);
-    Sim($"{scriptDir}/sample.txt", 1570).ShouldBe((immune: sample, infection: 0));
+    Sim(scriptDir.Combine("sample.txt"), 1570).ShouldBe((immune: sample, infection: 0));
 
     // problem part 1
-    var part1 = Sim($"{scriptDir}/input.txt");
+    var part1 = Sim(scriptDir.Combine("input.txt"));
     part1.infection.Dump();
     part1.ShouldBe((immune: 0, infection: 16678));
 
     // problem part 2
-    FindMinimalBoost($"{scriptDir}/input.txt").Dump().ShouldBe(3758);
+    FindMinimalBoost(scriptDir.Combine("input.txt")).Dump().ShouldBe(3758);
 }
 
 enum Side { ImmuneSystem, Infection };
@@ -98,9 +99,9 @@ IEnumerable<AttackGroup> Parse(Side side, string text, int boost = 0)
             return attackGroup;
         });
 
-(int immune, int infection) Sim(string path, int boost = 0)
+(int immune, int infection) Sim(NPath path, int boost = 0)
 {
-    var specs = Regex.Split(File.ReadAllText(path), "Infection:");
+    var specs = path.ReadAllText().Split("Infection:");
     
     var immuneSystem = Parse(Side.ImmuneSystem, specs[0], boost).ToList();
     var infection = Parse(Side.Infection, specs[1]).ToList();
@@ -167,7 +168,7 @@ IEnumerable<AttackGroup> Parse(Side side, string text, int boost = 0)
 }
 
 // wrong: 1569, 1570
-int FindMinimalBoost(string path)
+int FindMinimalBoost(NPath path)
 {
     var boost = 0;
     
