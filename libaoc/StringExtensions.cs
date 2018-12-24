@@ -14,6 +14,14 @@ namespace AoC
         public static string[] Split([NotNull] this string @this, char delim, int count)
             => @this.Split(new[] { delim }, count);
 
+        public static string[] Split([NotNull] this string @this, string splitText)
+        {
+            var found = @this.IndexOf(splitText);
+            return found >= 0
+                ? new [] { @this.Left(found), @this.Mid(found + splitText.Length) }
+                : new [] { @this };
+        }
+
         public static char[,] ToGrid([NotNull] this string @this)
         {
             var lines = @this
@@ -40,6 +48,31 @@ namespace AoC
             .Select(m => float.Parse(m.Value));
 
         // string-enumerable extensions
+
+        [NotNull]
+        public static string Left([NotNull] this string @this, int maxChars)
+            => @this.Substring(0, Math.Min(maxChars, @this.Length));
+
+        [NotNull]
+        public static string Mid([NotNull] this string @this, int offset, int maxChars = -1)
+        {
+            if (offset < 0)
+                throw new ArgumentException("offset must be >= 0", nameof(offset));
+
+            var safeOffset = offset.Clamp(0, @this.Length);
+            var actualMaxChars = @this.Length - safeOffset;
+
+            var safeMaxChars = maxChars < 0 ? actualMaxChars : Math.Min(maxChars, actualMaxChars);
+
+            return @this.Substring(safeOffset, safeMaxChars);
+        }
+
+        [NotNull]
+        public static string Right([NotNull] this string @this, int maxChars)
+        {
+            var safeMaxChars = Math.Min(maxChars, @this.Length);
+            return @this.Substring(@this.Length - safeMaxChars, safeMaxChars);
+        }
 
         public static string StringJoin([NotNull] this IEnumerable @this, [NotNull] string separator)
             => string.Join(separator, @this.Cast<object>());

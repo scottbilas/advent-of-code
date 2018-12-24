@@ -1,6 +1,6 @@
 namespace AoC
 {
-    public static class Utils
+    public static partial class Utils
     {
         public static void Swap<T>(ref T left, ref T right)
         {

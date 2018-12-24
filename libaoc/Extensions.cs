@@ -9,10 +9,16 @@ using MoreLinq.Extensions;
 
 namespace AoC
 {
-    public static class Extensions
+    public static partial class Extensions
     {
         public static IEnumerable<T> WhereNotNull<T>([NotNull] this IEnumerable<T> @this) where T : class
             => @this.Where(t => !(t is null));
+
+        public static IEnumerable<T> EmptyIfNull<T>([CanBeNull] this IEnumerable<T> @this)
+            => @this ?? Enumerable.Empty<T>();
+
+        public static T OrNull<T>([CanBeNull] this T @this, Func<T, T> operation) where T : class
+            => @this != null ? operation(@this) : null;
 
         public static IEnumerable<IReadOnlyList<T>> BatchList<T>([NotNull] this IEnumerable<T> @this, int batchSize) =>
             @this.Batch(batchSize).Select(b => b.ToList());
@@ -53,10 +59,10 @@ namespace AoC
         }
 
         public static T? FirstOrNull<T>(this IEnumerable<T> @this) where T : struct
-        {
-            using (var e = @this.GetEnumerator())
-                return e.MoveNext() ? e.Current : (T?)null;
-        }
+            => @this.Select(item => (T?)item).FirstOrDefault();
+
+        public static T? SingleOrNull<T>(this IEnumerable<T> @this) where T : struct
+            => @this.Select(item => (T?)item).SingleOrDefault();
 
         public static Size GetDimensions<T>(this T[,] @this)
             => new Size(@this.GetLength(0), @this.GetLength(1));
@@ -214,6 +220,16 @@ namespace AoC
 
         public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default)
             => new AutoDictionary<TKey, TValue>(@this, _ => defaultValue);
+
+        public static T Clamp<T>([NotNull] this T @this, T min, T max) where T : IComparable<T>
+        {
+            if (min.CompareTo(max) > 0)
+                throw new ArgumentException("'min' cannot be greater than 'max'", nameof(min));
+
+            if (@this.CompareTo(min) < 0) return min;
+            if (@this.CompareTo(max) > 0) return max;
+            return @this;
+        }
 
         public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)
         {
