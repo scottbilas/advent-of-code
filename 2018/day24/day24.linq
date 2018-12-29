@@ -78,11 +78,11 @@ IEnumerable<AttackGroup> Parse(Side side, string text, int boost = 0)
             {
                 Id = i + 1,
                 Side = side,
-                Units = int.Parse(match.Groups["units"].Value),
-                HP = int.Parse(match.Groups["hp"].Value),
-                AttackDamage = int.Parse(match.Groups["attack"].Value) + boost,
+                Units = match.GroupInt("units"),
+                HP = match.GroupInt("hp"),
+                AttackDamage = match.GroupInt("attack") + boost,
                 AttackType = match.Groups["type"].Value,
-                Initiative = int.Parse(match.Groups["initiative"].Value)
+                Initiative = match.GroupInt("initiative")
             };
             
             foreach (var tmatch in Regex
@@ -142,14 +142,12 @@ IEnumerable<AttackGroup> Parse(Side side, string text, int boost = 0)
 
         var attackOrder = bothArmies
             .OrderByDescending(g => g.Initiative)
+            .Where(a => a.Units > 0)
             .ToList();
-        foreach (var attacker in attackOrder.Where(a => a.Units > 0))
+        foreach (var attacker in attackOrder)
         {
             if (attackers.TryGetValue(attacker, out var defender))
             {
-                var poweragainst = attacker.PowerAgainst(defender);
-                var damaged = poweragainst / defender.HP;
-                
                 defender.Units -= Math.Min(attacker.PowerAgainst(defender) / defender.HP, defender.Units);
                 if (defender.Units == 0)
                 {
@@ -167,28 +165,12 @@ IEnumerable<AttackGroup> Parse(Side side, string text, int boost = 0)
         infection: infection.Sum(g => g.Units));
 }
 
-// wrong: 1569, 1570
 int FindMinimalBoost(NPath path)
 {
-    var boost = 0;
-    
-    for (;;)
+    for (var boost = 0; ; ++boost)
     {
         var result = Sim(path, boost);
-        if (result.infection > 0)
-            boost += 100;
-        else
-            break;
-    }
-    
-    var lastUnits = 0;
-    for (;;)
-    {
-        var result = Sim(path, boost);
-        if (result.infection > 0)
-            return lastUnits;
-            
-        lastUnits = result.immune;
-        --boost;
+        if (result.infection == 0)
+            return result.immune;
     }
 }
