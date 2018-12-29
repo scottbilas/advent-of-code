@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using MoreLinq.Extensions;
 
@@ -17,8 +18,20 @@ namespace AoC
         public static IEnumerable<T> EmptyIfNull<T>([CanBeNull] this IEnumerable<T> @this)
             => @this ?? Enumerable.Empty<T>();
 
-        public static T OrNull<T>([CanBeNull] this T @this, Func<T, T> operation) where T : class
+        public static T OrNull<T>([CanBeNull] this T @this, [NotNull] Func<T, T> operation) where T : class
             => @this != null ? operation(@this) : null;
+
+        public static IEnumerable<TResult> SelectWhere<TSource, TResult>(
+            [NotNull] this IEnumerable<TSource> @this,
+            [NotNull] Func<TSource, (TResult selected, bool where)> selectWhere)
+        {
+            foreach (var item in @this)
+            {
+                var (selected, where) = selectWhere(item);
+                if (where)
+                    yield return selected;
+            }
+        }
 
         public static IEnumerable<IReadOnlyList<T>> BatchList<T>([NotNull] this IEnumerable<T> @this, int batchSize) =>
             @this.Batch(batchSize).Select(b => b.ToList());
@@ -83,6 +96,14 @@ namespace AoC
 
         public static string ToText(this char[,] @this)
             => string.Join("\n", @this.ToLines());
+
+        public static int ParseInt([NotNull] this string @this)
+            => int.Parse(@this);
+
+        public static int GroupInt([NotNull] this Match @this, int groupNum)
+            => @this.Groups[groupNum].Value.ParseInt();
+        public static int GroupInt([NotNull] this Match @this, string groupName)
+            => @this.Groups[groupName].Value.ParseInt();
 
         public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this, Size max)
         {
