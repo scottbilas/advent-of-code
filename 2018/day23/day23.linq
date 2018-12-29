@@ -1,5 +1,5 @@
 <Query Kind="Statements">
-  <Reference Relative="..\..\libaoc\bin\Debug\netstandard2.0\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\netstandard2.0\libaoc.dll</Reference>
+  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\net472\libaoc.dll</Reference>
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
   <NuGetReference>YC.QuickGraph</NuGetReference>
@@ -15,9 +15,10 @@
   <Namespace>System.Drawing</Namespace>
   <Namespace>System.Linq</Namespace>
   <Namespace>System.Text</Namespace>
+  <Namespace>NiceIO</Namespace>
 </Query>
 
-string scriptDir = Path.GetDirectoryName(Util.CurrentQueryPath);
+NPath scriptDir = new NPath(Util.CurrentQueryPath).Parent;
 
 Part1(@"
     pos=<0,0,0>, r=4
@@ -40,25 +41,48 @@ Part2(@"
     pos=<10,10,10>, r=5
     ").ShouldBe(36);
 
-Part1(File.ReadAllText($"{scriptDir}/input.txt")).Dump().ShouldBe(319);
+Part1(scriptDir.Combine("input.txt").ReadAllText()).Dump().ShouldBe(319);
+Part2(scriptDir.Combine("input.txt").ReadAllText()).Dump().ShouldBe(129293598);
 
-int ManhattanDistance(in Point3 a, in Point3 b) =>
-     Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z);
-
-IEnumerable<(int id, Point3 pos, int r)> Parse(string botText)
+IEnumerable<(int id, Int3 pos, int r)> Parse(string botText)
     => botText
         .SelectInts()
         .Batch4()
-        .Select((ints, id) => (id, pos: new Point3(ints.Item1, ints.Item2, ints.Item3), r: ints.Item4));
+        .Select((ints, id) => (id, pos: new Int3(ints.Item1, ints.Item2, ints.Item3), r: ints.Item4));
 
 int Part1(string botText)
 {
     var bots = Parse(botText).ToList();    
     var strongest = bots.MaxBy(b => b.r).First();
-    return bots.Count(b => ManhattanDistance(b.pos, strongest.pos) <= strongest.r);
+    return bots.Count(b => b.pos.ManhattanDistance(strongest.pos) <= strongest.r);
 }
 
 int Part2(string botText)
 {
-    return 0;
+    var bots = Parse(botText).ToList();
+    var bounds = bots.Select(b => b.pos).CalcAABB();
+
+    for (;;)
+    {
+        var selected = bounds.Corners
+            .Select(corner =>
+            {
+                var quadrant = AABB.FromPoints(corner, bounds.Center);
+                var inside = bots.Count(bot => quadrant.Corners.Any(c => bot.pos.ManhattanDistance(c) <= bot.r));
+                return (quadrant, inside);
+            })
+            .MaxBy(v => v.inside)
+            .First();
+
+        if (selected.quadrant.Size == Int3.One)
+        {
+            var max = selected.quadrant.Corners
+                .Select(corner => (corner, count: bots.Count(bot => bot.pos.ManhattanDistance(corner) <= bot.r)))
+                .MaxBy(v => v.count)
+                .First();
+            return max.corner.ManhattanDistance(Int3.Zero);
+        }
+
+        bounds = selected.quadrant;
+    }
 }
