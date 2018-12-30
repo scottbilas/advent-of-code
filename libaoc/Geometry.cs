@@ -13,6 +13,32 @@ namespace AoC
             => (X, Y, Z) = (x, y, z);
         public Int3(int v)
             => (X, Y, Z) = (v, v, v);
+        public Int3(IEnumerable<int> xyz)
+            => (X, Y, Z) = xyz.First3();
+        public Int3(ValueTuple<int, int, int> xyz)
+            => (X, Y, Z) = xyz;
+
+        public unsafe int this[int index]
+        {
+            get
+            {
+                if (index < 0 || index > 2)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (int* i = &X)
+                {
+                    return i[index];
+                }
+            }
+            set
+            {
+                if (index < 0 || index > 2)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (int* i = &X)
+                {
+                    i[index] = value;
+                }
+            }
+        }
 
         public bool Equals(Int3 other)
             => X == other.X && Y == other.Y && Z == other.Z;
@@ -31,8 +57,8 @@ namespace AoC
             }
         }
 
-        public static bool operator ==(Int3 left, Int3 right) => left.Equals(right);
-        public static bool operator !=(Int3 left, Int3 right) => !left.Equals(right);
+        public static bool operator ==(in Int3 left, in Int3 right) => left.Equals(right);
+        public static bool operator !=(in Int3 left, in Int3 right) => !left.Equals(right);
 
         public override string ToString()
             => $"{X}, {Y}, {Z}";
@@ -90,6 +116,118 @@ namespace AoC
             => a >= b.X && a >= b.Y && a >= b.Z;
     }
 
+    public struct Int4 : IEquatable<Int4>
+    {
+        public int X, Y, Z, W;
+
+        public Int4(int x, int y, int z, int w)
+            => (X, Y, Z, W) = (x, y, z, w);
+        public Int4(int v)
+            => (X, Y, Z, W) = (v, v, v, v);
+        public Int4(IEnumerable<int> xyzw)
+            => (X, Y, Z, W) = xyzw.First4();
+        public Int4(ValueTuple<int, int, int, int> xyzw)
+            => (X, Y, Z, W) = xyzw;
+
+        public unsafe int this[int index]
+        {
+            get
+            {
+                if (index < 0 || index > 3)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (int* i = &X)
+                {
+                    return i[index];
+                }
+            }
+            set
+            {
+                if (index < 0 || index > 3)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (int* i = &X)
+                {
+                    i[index] = value;
+                }
+            }
+        }
+
+        public bool Equals(Int4 other)
+            => X == other.X && Y == other.Y && Z == other.Z && W == other.W;
+
+        public override bool Equals(object obj)
+            => !ReferenceEquals(obj, null) && obj is Int4 other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = X;
+                hashCode = (hashCode * 397) ^ Y;
+                hashCode = (hashCode * 397) ^ Z;
+                hashCode = (hashCode * 397) ^ W;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(in Int4 left, in Int4 right) => left.Equals(right);
+        public static bool operator !=(in Int4 left, in Int4 right) => !left.Equals(right);
+
+        public override string ToString()
+            => $"{X}, {Y}, {Z}, {W}";
+
+        static readonly Int4 k_Zero = new Int4(0), k_One = new Int4(1);
+        public static ref readonly Int4 Zero => ref k_Zero;
+        public static ref readonly Int4 One => ref k_One;
+
+        public Int4 Abs()
+            => new Int4(Math.Abs(X), Math.Abs(Y), Math.Abs(Z), Math.Abs(W));
+
+        public static Int4 operator +(in Int4 a, in Int4 b)
+            => new Int4(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
+        public static Int4 operator +(in Int4 a, int d)
+            => new Int4(a.X + d, a.Y + d, a.Z + d, a.W + d);
+        public static Int4 operator -(in Int4 a, in Int4 b)
+            => new Int4(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
+        public static Int4 operator -(in Int4 a, int d)
+            => new Int4(a.X - d, a.Y - d, a.Z - d, a.W - d);
+        public static Int4 operator *(in Int4 a, in Int4 b)
+            => new Int4(a.X * b.X, a.Y * b.Y, a.Z * b.Z, a.W * b.W);
+        public static Int4 operator *(in Int4 a, int d)
+            => new Int4(a.X * d, a.Y * d, a.Z * d, a.W * d);
+        public static Int4 operator /(in Int4 a, in Int4 b)
+            => new Int4(a.X / b.X, a.Y / b.Y, a.Z / b.Z, a.W / b.W);
+        public static Int4 operator /(in Int4 a, int d)
+            => new Int4(a.X / d, a.Y / d, a.Z / d, a.W / d);
+
+        public static bool operator <(in Int4 a, in Int4 b)
+            => a.X < b.X && a.Y < b.Y && a.Z < b.Z && a.W < b.W;
+        public static bool operator <(in Int4 a, int b)
+            => a.X < b && a.Y < b && a.Z < b && a.W < b;
+        public static bool operator <(int a, in Int4 b)
+            => a < b.X && a < b.Y && a < b.Z && a < b.W;
+
+        public static bool operator <=(in Int4 a, in Int4 b)
+            => a.X <= b.X && a.Y <= b.Y && a.Z <= b.Z && a.W <= b.W;
+        public static bool operator <=(in Int4 a, int b)
+            => a.X <= b && a.Y <= b && a.Z <= b && a.W <= b;
+        public static bool operator <=(int a, in Int4 b)
+            => a <= b.X && a <= b.Y && a <= b.Z && a <= b.W;
+
+        public static bool operator >(in Int4 a, in Int4 b)
+            => a.X > b.X && a.Y > b.Y && a.Z > b.Z && a.W > b.W;
+        public static bool operator >(in Int4 a, int b)
+            => a.X > b && a.Y > b && a.Z > b && a.W > b;
+        public static bool operator >(int a, in Int4 b)
+            => a > b.X && a > b.Y && a > b.Z && a > b.W;
+
+        public static bool operator >=(in Int4 a, in Int4 b)
+            => a.X >= b.X && a.Y >= b.Y && a.Z >= b.Z && a.W >= b.W;
+        public static bool operator >=(in Int4 a, int b)
+            => a.X >= b && a.Y >= b && a.Z >= b && a.W >= b;
+        public static bool operator >=(int a, in Int4 b)
+            => a >= b.X && a >= b.Y && a >= b.Z && a >= b.W;
+    }
+
     public struct AABB : IEquatable<AABB>
     {
         public Int3 Min;
@@ -126,18 +264,18 @@ namespace AoC
             => Max - Min;
 
         public Int3 Center
-            => Min.Midpoint(Max);
+            => Min.Midpoint(in Max);
 
         public void Encapsulate(in AABB aabb)
-            => (Min, Max) = (Min.Min(aabb.Min), Max = Max.Max(aabb.Max));
+            => (Min, Max) = (Min.Min(in aabb.Min), Max = Max.Max(in aabb.Max));
 
         public void Encapsulate(in Int3 point)
-            => (Min, Max) = (Min.Min(point), Max.Max(point));
+            => (Min, Max) = (Min.Min(in point), Max.Max(in point));
 
         public bool Intersect(in AABB aabb)
         {
-            Min = Min.Max(aabb.Min);
-            Max = Max.Min(aabb.Max);
+            Min = Min.Max(in aabb.Min);
+            Max = Max.Min(in aabb.Max);
             return Min <= Max;
         }
 
@@ -187,8 +325,8 @@ namespace AoC
             var aabb = new AABB(new Int3(int.MaxValue), new Int3(int.MinValue));
             foreach (var point in points)
             {
-                aabb.Min.Minimize(point);
-                aabb.Max.Maximize(point);
+                aabb.Min.Minimize(in point);
+                aabb.Max.Maximize(in point);
             }
             return aabb;
         }
@@ -197,7 +335,7 @@ namespace AoC
         {
             var combined = new AABB(new Int3(int.MaxValue), new Int3(int.MinValue));
             foreach (var aabb in aabbs)
-                combined.Encapsulate(aabb);
+                combined.Encapsulate(in aabb);
             return combined;
         }
 
@@ -209,32 +347,51 @@ namespace AoC
     {
         public static int ManhattanDistance(in Int3 a, in Int3 b) =>
             Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z);
+        public static int ManhattanDistance(in Int4 a, in Int4 b) =>
+            Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z) + Math.Abs(a.W - b.W);
         public static Int3 Min(in Int3 a, in Int3 b) =>
             new Int3(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z));
+        public static Int4 Min(in Int4 a, in Int4 b) =>
+            new Int4(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z), Math.Min(a.W, b.W));
         public static Int3 Max(in Int3 a, in Int3 b) =>
             new Int3(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z));
+        public static Int4 Max(in Int4 a, in Int4 b) =>
+            new Int4(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z), Math.Max(a.W, b.W));
         public static void Minimize(ref Int3 a, in Int3 b)
-            => a = a.Min(b);
+            => a = Min(a, in b);
+        public static void Minimize(ref Int4 a, in Int4 b)
+            => a = Min(a, in b);
         public static void Maximize(ref Int3 a, in Int3 b)
-            => a = a.Max(b);
+            => a = Max(a, in b);
+        public static void Maximize(ref Int4 a, in Int4 b)
+            => a = Max(a, in b);
         public static Int3 Midpoint(in Int3 a, in Int3 b)
             => new Int3(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2, a.Z + (b.Z - a.Z) / 2);
+        public static Int4 Midpoint(in Int4 a, in Int4 b)
+            => new Int4(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2, a.Z + (b.Z - a.Z) / 2, a.W + (b.W - a.W) / 2);
 
         public static AABB? IntersectAll([NotNull] IEnumerable<AABB> aabbs)
         {
             var intersection = new AABB(new Int3(int.MinValue), new Int3(int.MaxValue));
-            return aabbs.All(i => intersection.Intersect(i)) ? intersection : (AABB?)null;
+            return aabbs.All(i => intersection.Intersect(in i)) ? intersection : (AABB?)null;
         }
     }
 
     public static partial class Extensions
     {
         public static int ManhattanDistance(this in Int3 a, in Int3 b) => Utils.ManhattanDistance(in a, in b);
+        public static int ManhattanDistance(this in Int4 a, in Int4 b) => Utils.ManhattanDistance(in a, in b);
         public static Int3 Min(this in Int3 a, in Int3 b) => Utils.Min(in a, in b);
+        public static Int4 Min(this in Int4 a, in Int4 b) => Utils.Min(in a, in b);
         public static Int3 Max(this in Int3 a, in Int3 b) => Utils.Max(in a, in b);
+        public static Int4 Max(this in Int4 a, in Int4 b) => Utils.Max(in a, in b);
         public static void Minimize(ref this Int3 a, in Int3 b) => Utils.Minimize(ref a, in b);
+        public static void Minimize(ref this Int4 a, in Int4 b) => Utils.Minimize(ref a, in b);
         public static void Maximize(ref this Int3 a, in Int3 b) => Utils.Maximize(ref a, in b);
+        public static void Maximize(ref this Int4 a, in Int4 b) => Utils.Maximize(ref a, in b);
         public static Int3 Midpoint(this in Int3 a, in Int3 b) => Utils.Midpoint(in a, in b);
+        public static Int4 Midpoint(this in Int4 a, in Int4 b) => Utils.Midpoint(in a, in b);
+
         public static AABB CalcAABB([NotNull] this IEnumerable<Int3> @this) => AABB.FromPoints(@this);
         public static AABB CalcAABB([NotNull] this IEnumerable<AABB> @this) => AABB.FromAABBs(@this);
         public static AABB? IntersectAll([NotNull] this IEnumerable<AABB> @this) => Utils.IntersectAll(@this);

@@ -168,6 +168,9 @@ namespace AoC
             }
         }
 
+        public static T[,] FillNew<T>(this T[,] @this) where T : new()
+            => @this.Fill(_ => new T());
+
         public static T[,] Fill<T>(this T[,] @this, T value)
             => @this.Fill(_ => value);
 
