@@ -9,13 +9,13 @@ namespace Day22
 
     class Solver
     {
-        protected Point TargetPos { get; }
-        protected Size Size { get; }
+        public Point TargetPos { get; }
+        public Size Size { get; }
 
-        public Solver(Point targetPos)
+        public Solver(Point targetPos, Size padding)
         {
             TargetPos = targetPos;
-            Size = new Size(TargetPos.X * 2, TargetPos.Y * 2);
+            Size = new Size(TargetPos.X + 1 + padding.Width, TargetPos.Y + 1 + padding.Height);
         }
 
         public int[,] BuildErosion(int caveDepth)

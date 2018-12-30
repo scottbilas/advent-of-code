@@ -20,8 +20,8 @@ namespace Day22
 
     class QuickGraphSolver : Solver
     {
-        public QuickGraphSolver(Point targetPos)
-            : base(targetPos) { }
+        public QuickGraphSolver(Point targetPos, Size padding)
+            : base(targetPos, padding) { }
 
         public int CalcMinDistToTarget(int[,] erosion)
         {

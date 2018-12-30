@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using AoC;
 
@@ -23,25 +25,31 @@ namespace Day22
         public static readonly Mask E = All[1];
         public static readonly Mask W = All[2];
         public static readonly Mask S = All[3];
+    }
 
-        public const int Visited = 0b10000;
+    struct SubCell
+    {
+        public int Connections;
+        public int ShortestPath;
     }
 
     class Cell
     {
-        public int[] Bits = new int[3];
+        public SubCell[] SubCells = new SubCell[3];
 
-        public int this[Equip equip]
+        public ref SubCell this[Equip equip] => ref SubCells[(int)equip];
+
+        public Cell()
         {
-            get => Bits[(int)equip];
-            set => Bits[(int)equip] = value;
+            for (int i = 0; i < 3; ++i)
+                SubCells[i].ShortestPath = int.MaxValue;
         }
     }
 
     class ManualSolver : Solver
     {
-        public ManualSolver(Point targetPos)
-            : base(targetPos) { }
+        public ManualSolver(Point targetPos, Size padding)
+            : base(targetPos, padding) { }
 
         public int CalcMinDistToTarget(int[,] erosion)
         {
@@ -60,13 +68,13 @@ namespace Day22
                     {
                         if (left == a || left == b)
                         {
-                            grid[x, y][equip] |= Mask.W.Bits;
-                            grid[x - 1, y][equip] |= Mask.E.Bits;
+                            grid[x, y][equip].Connections |= Mask.W.Bits;
+                            grid[x - 1, y][equip].Connections |= Mask.E.Bits;
                         }
                         if (up == a || up == b)
                         {
-                            grid[x, y][equip] |= Mask.N.Bits;
-                            grid[x, y - 1][equip] |= Mask.S.Bits;
+                            grid[x, y][equip].Connections |= Mask.N.Bits;
+                            grid[x, y - 1][equip].Connections |= Mask.S.Bits;
                         }
                     }
 
@@ -79,7 +87,7 @@ namespace Day22
                 }
             }
 
-            int shortest = 50;//int.MaxValue;
+            int shortest = int.MaxValue; //1020; //$$$$ int.MaxValue;
 
             int Walk(Point inPos, Equip inEquip, int inMinutes)
             {
@@ -87,22 +95,44 @@ namespace Day22
                     return int.MaxValue;
 
                 var cell = grid[inPos.X, inPos.Y];
-                if ((cell[inEquip] & Mask.Visited) != 0)
+                if (cell[inEquip].ShortestPath < inMinutes)
                     return int.MaxValue;
 
                 if (inPos == TargetPos && inEquip == Equip.Torch)
                 {
                     shortest = Math.Min(shortest, inMinutes);
-                    //shortest.Dump();
-                    //stack.Reverse().Select(s => $"{s.Item1.X},{s.Item1.Y}({s.Item2.ToString()[0]})={s.Item3}").StringJoin(' ').Dump();
+                    Debug.WriteLine(shortest);
                     return inMinutes;
                 }
 
-                //$"{inPos} {inEquip}".Dump();
-
-                var conn = cell[inEquip] |= Mask.Visited;
-
+                cell[inEquip].ShortestPath = inMinutes;
+                var conn = cell[inEquip].Connections;
                 var minutes = int.MaxValue;
+
+                IEnumerable<Mask> SelectMaskOrder()
+                {
+                    if (TargetPos.X > inPos.X)
+                    {
+                        yield return Mask.E;
+                        yield return Mask.S;
+                        yield return Mask.W;
+                        yield return Mask.N;
+                    }
+                    else if (TargetPos.Y > inPos.Y)
+                    {
+                        yield return Mask.S;
+                        yield return Mask.E;
+                        yield return Mask.W;
+                        yield return Mask.N;
+                    }
+                    else
+                    {
+                        yield return Mask.W;
+                        yield return Mask.S;
+                        yield return Mask.E;
+                        yield return Mask.N;
+                    }
+                }
 
                 for (var i = 0; i < 3; ++i)
                 {
@@ -110,7 +140,7 @@ namespace Day22
                     if (equip > Equip.Neither)
                         equip = 0;
 
-                    foreach (var mask in Mask.All)
+                    foreach (var mask in SelectMaskOrder())
                     {
                         if ((conn & mask.Bits) != 0)
                         {
@@ -123,8 +153,6 @@ namespace Day22
                         }
                     }
                 }
-
-                cell[inEquip] &= ~Mask.Visited;
 
                 return minutes;
             }
