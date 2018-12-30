@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using AoC;
 
 namespace Day22
@@ -30,7 +31,7 @@ namespace Day22
     struct SubCell
     {
         public int Connections;
-        public int ShortestPath;
+        public int TimeFromOrigin;
     }
 
     class Cell
@@ -41,8 +42,8 @@ namespace Day22
 
         public Cell()
         {
-            for (int i = 0; i < 3; ++i)
-                SubCells[i].ShortestPath = int.MaxValue;
+            for (var i = 0; i < SubCells.Length; ++i)
+                SubCells[i].TimeFromOrigin = int.MaxValue;
         }
     }
 
@@ -55,7 +56,7 @@ namespace Day22
         {
             var board = BuildBoard(erosion);
 
-            var grid = new Cell[Size.Width, Size.Height].Fill(_ => new Cell());
+            var grid = new Cell[Size.Width, Size.Height].FillNew();
             for (var y = 0; y < Size.Height; ++y)
             {
                 for (var x = 0; x < Size.Width; ++x)
@@ -87,52 +88,32 @@ namespace Day22
                 }
             }
 
-            int shortest = int.MaxValue; //1020; //$$$$ int.MaxValue;
+            var shortest = int.MaxValue;
+            var walking = new Queue<(Point pos, Equip equip, int minutes)>();
+            walking.Enqueue((new Point(0, 0), Equip.Torch, 0));
 
-            int Walk(Point inPos, Equip inEquip, int inMinutes)
+            while (walking.Any())
             {
+                var (inPos, inEquip, inMinutes) = walking.Dequeue();
+
+                // early-out if we can't possibly get to target faster
                 if (inMinutes + Math.Abs(TargetPos.X - inPos.X) + Math.Abs(TargetPos.Y - inPos.Y) >= shortest)
-                    return int.MaxValue;
+                    continue;
 
+                // early-out if an earlier and faster route to the same subcell was found
                 var cell = grid[inPos.X, inPos.Y];
-                if (cell[inEquip].ShortestPath < inMinutes)
-                    return int.MaxValue;
+                if (cell[inEquip].TimeFromOrigin <= inMinutes)
+                    continue;
 
+                // detect if we hit target
                 if (inPos == TargetPos && inEquip == Equip.Torch)
                 {
                     shortest = Math.Min(shortest, inMinutes);
                     Debug.WriteLine(shortest);
-                    return inMinutes;
                 }
 
-                cell[inEquip].ShortestPath = inMinutes;
-                var conn = cell[inEquip].Connections;
-                var minutes = int.MaxValue;
-
-                IEnumerable<Mask> SelectMaskOrder()
-                {
-                    if (TargetPos.X > inPos.X)
-                    {
-                        yield return Mask.E;
-                        yield return Mask.S;
-                        yield return Mask.W;
-                        yield return Mask.N;
-                    }
-                    else if (TargetPos.Y > inPos.Y)
-                    {
-                        yield return Mask.S;
-                        yield return Mask.E;
-                        yield return Mask.W;
-                        yield return Mask.N;
-                    }
-                    else
-                    {
-                        yield return Mask.W;
-                        yield return Mask.S;
-                        yield return Mask.E;
-                        yield return Mask.N;
-                    }
-                }
+                // new winner
+                cell[inEquip].TimeFromOrigin = inMinutes;
 
                 for (var i = 0; i < 3; ++i)
                 {
@@ -140,26 +121,21 @@ namespace Day22
                     if (equip > Equip.Neither)
                         equip = 0;
 
-                    foreach (var mask in SelectMaskOrder())
+                    foreach (var mask in Mask.All)
                     {
-                        if ((conn & mask.Bits) != 0)
+                        if ((cell[equip].Connections & mask.Bits) != 0)
                         {
                             var subMinutes = inMinutes + 1;
-                            if (inEquip != equip)
+                            if (equip != inEquip)
                                 subMinutes += 7;
 
-                            subMinutes = Walk(new Point(inPos.X + mask.Dx, inPos.Y + mask.Dy), equip, subMinutes);
-                            minutes = Math.Min(minutes, subMinutes);
+                            walking.Enqueue((new Point(inPos.X + mask.Dx, inPos.Y + mask.Dy), equip, subMinutes));
                         }
                     }
                 }
-
-                return minutes;
             }
 
-            return Walk(new Point(0, 0), Equip.Torch, 0);
+            return shortest;
         }
-
     }
-
 }

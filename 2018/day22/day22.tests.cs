@@ -9,8 +9,12 @@ namespace Day22
     {
         (int depth, Point target, Size padding, int part1, int part2)
             m_SampleData = (510, new Point(10, 10), new Size(5, 5), 114, 45);
+
+        // input
+        //   depth: 3879
+        //   target: 8,713
         (int depth, Point target, Size padding, int part1, int part2)
-            m_ProblemData = (3879, new Point(8, 713), new Size(10, 10), 6323, 0);
+            m_ProblemData = (3879, new Point(8, 713), new Size(50, 50), 6323, 982);
 
         [Test]
         public void Sample_Erosion_Matches()
@@ -31,8 +35,7 @@ namespace Day22
                 =.=|=.=..=.||==|
                 ||=|=...|==.=|==
                 |=.=||===.|||===
-                ||.|==.|.|.||=||
-                "
+                ||.|==.|.|.||=||"
                 .ToGrid();
 
             var solver = new Solver(m_SampleData.target, m_SampleData.padding);
@@ -89,7 +92,6 @@ namespace Day22
             var solver = new QuickGraphSolver(m_ProblemData.target, m_ProblemData.padding);
             var erosion = solver.BuildErosion(m_ProblemData.depth);
             solver.CalcMinDistToTarget(erosion).ShouldBe(m_ProblemData.part2);
-            // wrong: 1012
         }
     }
 }
