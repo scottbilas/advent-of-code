@@ -5,36 +5,30 @@ using Shouldly;
 
 namespace Aoc2019
 {
-    class Int4Tests
+    class Int2Tests
     {
         [Test]
         public void Indexers_WithInvalidOffsets_ShouldThrow()
         {
-            var int4 = new Int4(1, 2, 3, 4);
+            var int2 = new Int2(1, 2);
 
-            Should.Throw<ArgumentOutOfRangeException>(() => int4[-1]);
-            Should.Throw<ArgumentOutOfRangeException>(() => int4[4] = 5);
+            Should.Throw<ArgumentOutOfRangeException>(() => int2[-1]);
+            Should.Throw<ArgumentOutOfRangeException>(() => int2[2] = 5);
         }
 
         [Test]
         public void Indexers_WithValidOffsets_ShouldSetGetIndividualComponents()
         {
-            var int4 = new Int4(1, 2, 3, 4);
+            var int2 = new Int2(1, 2);
 
-            int4.X.ShouldBe(1);
-            int4.Y.ShouldBe(2);
-            int4.Z.ShouldBe(3);
-            int4.W.ShouldBe(4);
+            int2.X.ShouldBe(1);
+            int2.Y.ShouldBe(2);
 
-            int4[0] = -10;
-            int4[1] = -20;
-            int4[2] = -30;
-            int4[3] = -40;
+            int2[0] = -10;
+            int2[1] = -20;
 
-            int4.X.ShouldBe(-10);
-            int4.Y.ShouldBe(-20);
-            int4.Z.ShouldBe(-30);
-            int4.W.ShouldBe(-40);
+            int2.X.ShouldBe(-10);
+            int2.Y.ShouldBe(-20);
         }
     }
 
@@ -65,6 +59,39 @@ namespace Aoc2019
             int3.X.ShouldBe(-10);
             int3.Y.ShouldBe(-20);
             int3.Z.ShouldBe(-30);
+        }
+    }
+
+    class Int4Tests
+    {
+        [Test]
+        public void Indexers_WithInvalidOffsets_ShouldThrow()
+        {
+            var int4 = new Int4(1, 2, 3, 4);
+
+            Should.Throw<ArgumentOutOfRangeException>(() => int4[-1]);
+            Should.Throw<ArgumentOutOfRangeException>(() => int4[4] = 5);
+        }
+
+        [Test]
+        public void Indexers_WithValidOffsets_ShouldSetGetIndividualComponents()
+        {
+            var int4 = new Int4(1, 2, 3, 4);
+
+            int4.X.ShouldBe(1);
+            int4.Y.ShouldBe(2);
+            int4.Z.ShouldBe(3);
+            int4.W.ShouldBe(4);
+
+            int4[0] = -10;
+            int4[1] = -20;
+            int4[2] = -30;
+            int4[3] = -40;
+
+            int4.X.ShouldBe(-10);
+            int4.Y.ShouldBe(-20);
+            int4.Z.ShouldBe(-30);
+            int4.W.ShouldBe(-40);
         }
     }
 

@@ -12,31 +12,6 @@ namespace Aoc2019
 {
     public static partial class Extensions
     {
-        /// <summary>Filter null elements from stream</summary>
-        public static IEnumerable<T> WhereNotNull<T>([NotNull] this IEnumerable<T> @this) where T : class
-            => @this.Where(t => !(t is null));
-
-        /// <summary>Return the enumerable if non-null, otherwise return an empty enumerable</summary>
-        public static IEnumerable<T> EmptyIfNull<T>([CanBeNull] this IEnumerable<T> @this)
-            => @this ?? Enumerable.Empty<T>();
-
-        /// <summary>Return the result of `operation` on the given object if non-null, otherwise just return null</summary>
-        public static T OrNull<T>([CanBeNull] this T @this, [NotNull] Func<T, T> operation) where T : class
-            => @this != null ? operation(@this) : null;
-
-        /// <summary>Combine Select and Where in one operator</summary>
-        public static IEnumerable<TResult> SelectWhere<TSource, TResult>(
-            [NotNull] this IEnumerable<TSource> @this,
-            [NotNull] Func<TSource, (TResult selected, bool where)> selectWhere)
-        {
-            foreach (var item in @this)
-            {
-                var (selected, where) = selectWhere(item);
-                if (where)
-                    yield return selected;
-            }
-        }
-
         /// <summary>Segment an enumerable into batches of the given size</summary>
         public static IEnumerable<IReadOnlyList<T>> BatchList<T>([NotNull] this IEnumerable<T> @this, int batchSize) =>
             @this.Batch(batchSize).Select(b => b.ToList());
@@ -65,26 +40,6 @@ namespace Aoc2019
             @this.Copy(offset, sliced, 0, count);
             return sliced;
         }
-
-        public static T FirstOrDefault<T>(this IEnumerable<T> @this, T defaultValue)
-        {
-            using (var e = @this.GetEnumerator())
-                return e.MoveNext() ? e.Current : defaultValue;
-        }
-
-        public static TR FirstOrDefault<T, TR>(this IEnumerable<T> @this, Func<T, bool, TR> selector)
-        {
-            using (var e = @this.GetEnumerator())
-                return e.MoveNext()
-                    ? selector(e.Current, true)
-                    : selector(default, false);
-        }
-
-        public static T? FirstOrNull<T>(this IEnumerable<T> @this) where T : struct
-            => @this.Select(item => (T?)item).FirstOrDefault();
-
-        public static T? SingleOrNull<T>(this IEnumerable<T> @this) where T : struct
-            => @this.Select(item => (T?)item).SingleOrDefault();
 
         public static Size GetDimensions<T>(this T[,] @this)
             => new Size(@this.GetLength(0), @this.GetLength(1));
@@ -255,17 +210,6 @@ namespace Aoc2019
         /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it a default-get delegate that just returns `defaultValue`</summary>
         public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default)
             => new AutoDictionary<TKey, TValue>(@this, _ => defaultValue);
-
-        /// <summary>Return the given value, clamped to [min, max]</summary>
-        public static T Clamp<T>([NotNull] this T @this, T min, T max) where T : IComparable<T>
-        {
-            if (min.CompareTo(max) > 0)
-                throw new ArgumentException("'min' cannot be greater than 'max'", nameof(min));
-
-            if (@this.CompareTo(min) < 0) return min;
-            if (@this.CompareTo(max) > 0) return max;
-            return @this;
-        }
 
         public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)
         {

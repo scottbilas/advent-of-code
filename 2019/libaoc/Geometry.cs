@@ -5,6 +5,116 @@ using JetBrains.Annotations;
 
 namespace Aoc2019
 {
+    public struct Int2 : IEquatable<Int2>
+    {
+        public int X, Y;
+
+        public Int2(int x, int y)
+            => (X, Y) = (x, y);
+        public Int2(int v)
+            => (X, Y) = (v, v);
+        public Int2(IEnumerable<int> xy)
+            => (X, Y) = xy.First2();
+        public Int2(ValueTuple<int, int> xy)
+            => (X, Y) = xy;
+
+        public unsafe int this[int index]
+        {
+            get
+            {
+                if (index < 0 || index > 1)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (int* i = &X)
+                {
+                    return i[index];
+                }
+            }
+            set
+            {
+                if (index < 0 || index > 1)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (int* i = &X)
+                {
+                    i[index] = value;
+                }
+            }
+        }
+
+        public bool Equals(Int2 other)
+            => X == other.X && Y == other.Y;
+
+        public override bool Equals(object obj)
+            => !ReferenceEquals(obj, null) && obj is Int2 other && Equals(other);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = X;
+                hashCode = (hashCode * 397) ^ Y;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(in Int2 left, in Int2 right) => left.Equals(right);
+        public static bool operator !=(in Int2 left, in Int2 right) => !left.Equals(right);
+
+        public override string ToString()
+            => $"{X}, {Y}";
+
+        static readonly Int2 k_Zero = new Int2(0), k_One = new Int2(1);
+        public static ref readonly Int2 Zero => ref k_Zero;
+        public static ref readonly Int2 One => ref k_One;
+
+        public Int2 Abs()
+            => new Int2(Math.Abs(X), Math.Abs(Y));
+
+        public static Int2 operator +(in Int2 a, in Int2 b)
+            => new Int2(a.X + b.X, a.Y + b.Y);
+        public static Int2 operator +(in Int2 a, int d)
+            => new Int2(a.X + d, a.Y + d);
+        public static Int2 operator -(in Int2 a, in Int2 b)
+            => new Int2(a.X - b.X, a.Y - b.Y);
+        public static Int2 operator -(in Int2 a, int d)
+            => new Int2(a.X - d, a.Y - d);
+        public static Int2 operator *(in Int2 a, in Int2 b)
+            => new Int2(a.X * b.X, a.Y * b.Y);
+        public static Int2 operator *(in Int2 a, int d)
+            => new Int2(a.X * d, a.Y * d);
+        public static Int2 operator /(in Int2 a, in Int2 b)
+            => new Int2(a.X / b.X, a.Y / b.Y);
+        public static Int2 operator /(in Int2 a, int d)
+            => new Int2(a.X / d, a.Y / d);
+
+        public static bool operator <(in Int2 a, in Int2 b)
+            => a.X < b.X && a.Y < b.Y;
+        public static bool operator <(in Int2 a, int b)
+            => a.X < b && a.Y < b;
+        public static bool operator <(int a, in Int2 b)
+            => a < b.X && a < b.Y;
+
+        public static bool operator <=(in Int2 a, in Int2 b)
+            => a.X <= b.X && a.Y <= b.Y;
+        public static bool operator <=(in Int2 a, int b)
+            => a.X <= b && a.Y <= b;
+        public static bool operator <=(int a, in Int2 b)
+            => a <= b.X && a <= b.Y;
+
+        public static bool operator >(in Int2 a, in Int2 b)
+            => a.X > b.X && a.Y > b.Y;
+        public static bool operator >(in Int2 a, int b)
+            => a.X > b && a.Y > b;
+        public static bool operator >(int a, in Int2 b)
+            => a > b.X && a > b.Y;
+
+        public static bool operator >=(in Int2 a, in Int2 b)
+            => a.X >= b.X && a.Y >= b.Y;
+        public static bool operator >=(in Int2 a, int b)
+            => a.X >= b && a.Y >= b;
+        public static bool operator >=(int a, in Int2 b)
+            => a >= b.X && a >= b.Y;
+    }
+
     public struct Int3 : IEquatable<Int3>
     {
         public int X, Y, Z;
