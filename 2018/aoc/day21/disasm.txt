@@ -1,0 +1,31 @@
+ 00  seti 123     .        3       >> r = 123
+ 01  bani 3       456      3       >> r &= 456
+ 02  eqri 3       72       3       >> r = r == 72
+ 03  addr 3       5        5*      >> ip += r
+ 04  seti 0       .        5*      >> ip = 0
+ 05  seti 0       .        3       >> r = 0
+ 06  bori 3       65536    1       >> a = r | 65536
+ 07  seti 9450265 .        3       >> r = 9450265
+ 08  bani 1       255      4       >> t = a & 255
+ 09  addr 3       4        3       >> r += t
+ 10  bani 3       16777215 3       >> r &= 16777215
+ 11  muli 3       65899    3       >> r *= 65899
+ 12  bani 3       16777215 3       >> r &= 16777215
+ 13  gtir 256     1        4       >> t = 256 > a
+ 14  addr 4       5        5*      >> ip += t
+ 15  addi 5       1        5*      >> ++ip
+ 16  seti 27      .        5*      >> ip = 27
+ 17  seti 0       .        4       >> t = 0
+ 18  addi 4       1        2       >> i = t + 1
+ 19  muli 2       256      2       >> i *= 256
+ 20  gtrr 2       1        2       >> i = i > a
+ 21  addr 2       5        5*      >> ip += i
+ 22  addi 5       1        5*      >> ++ip
+ 23  seti 25      .        5*      >> ip = 25
+ 24  addi 4       1        4       >> ++d
+ 25  seti 17      .        5*      >> ip = 17
+ 26  setr 4       .        1       >> a = t
+ 27  seti 7       .        5*      >> ip = 7
+ 28  eqrr 3       0        4       >> t = r == target
+ 29  addr 4       5        5*      >> ip += t
+ 30  seti 5       .        5*      >> ip = 5

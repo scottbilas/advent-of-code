@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aoc-2018", "2018\aoc-2018.csproj", "{DA7B0273-BB54-4E02-9E03-AAD6C141E7EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aoc", "2018\aoc\aoc.csproj", "{DA7B0273-BB54-4E02-9E03-AAD6C141E7EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "libaoc", "libaoc\libaoc.csproj", "{EBC5C4BF-024E-4F55-A6E5-08484605D0BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "libaoc", "2018\libaoc\libaoc.csproj", "{EBC5C4BF-024E-4F55-A6E5-08484605D0BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libaoc.tests", "libaoc.tests\libaoc.tests.csproj", "{E7741326-51F3-4043-A175-7398431289F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libaoc.tests", "2018\libaoc.tests\libaoc.tests.csproj", "{E7741326-51F3-4043-A175-7398431289F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2018", "2018", "{B8D80C9B-DC63-4BF1-8E5D-B6B30A3381A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,5 +35,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {91B6619F-0BFF-4500-B1E7-32B06B433891}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DA7B0273-BB54-4E02-9E03-AAD6C141E7EE} = {B8D80C9B-DC63-4BF1-8E5D-B6B30A3381A4}
+		{EBC5C4BF-024E-4F55-A6E5-08484605D0BC} = {B8D80C9B-DC63-4BF1-8E5D-B6B30A3381A4}
+		{E7741326-51F3-4043-A175-7398431289F7} = {B8D80C9B-DC63-4BF1-8E5D-B6B30A3381A4}
 	EndGlobalSection
 EndGlobal
