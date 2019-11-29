@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 // ReSharper disable UnusedMember.Global
 
-namespace Aoc2018
+namespace Aoc2019
 {
     public static class StringExtensions
     {

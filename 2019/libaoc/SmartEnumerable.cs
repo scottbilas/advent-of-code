@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using JetBrains.Annotations;
 
-namespace Aoc2018
+namespace Aoc2019
 {
     public class SmartEnumerable<T> : IEnumerable<SmartEnumerable<T>.Element>
     {

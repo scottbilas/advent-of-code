@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace Aoc2018
+namespace Aoc2019
 {
     public struct Int3 : IEquatable<Int3>
     {

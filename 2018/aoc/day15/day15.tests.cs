@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AoC;
+using Aoc2018;
 using MoreLinq.Extensions;
 using NUnit.Framework;
 using RoyT.AStar;

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using AoC;
-using static AoC.Utils;
+using Aoc2018;
+using static Aoc2018.Utils;
 
 namespace Day18
 {

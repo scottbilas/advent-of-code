@@ -3,7 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Aoc2018
+namespace Aoc2019
 {
     class Int4Tests
     {

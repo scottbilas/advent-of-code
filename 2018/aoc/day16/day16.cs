@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AoC;
+using Aoc2018;
 using SantaVM;
 
 namespace Day16

@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
-using AoC;
+using Aoc2018;
 
 namespace Day17
 {

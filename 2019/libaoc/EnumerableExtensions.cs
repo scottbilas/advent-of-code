@@ -2,7 +2,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace Aoc2018
+namespace Aoc2019
 {
     public static partial class EnumerableExtensions
     {

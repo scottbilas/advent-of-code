@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using MoreLinq.Extensions;
 using RoyT.AStar;
-using AoC;
+using Aoc2018;
 
 namespace Day15
 {

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using MoreLinq.Extensions;
 
-namespace Aoc2018
+namespace Aoc2019
 {
     public static partial class Extensions
     {

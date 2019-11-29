@@ -3,7 +3,7 @@ using System.Drawing;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Aoc2018
+namespace Aoc2019
 {
     class ExtensionsTests
     {

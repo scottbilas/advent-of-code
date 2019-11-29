@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Aoc2018
+namespace Aoc2019
 {
     public static class DelegateEqualityComparer
     {

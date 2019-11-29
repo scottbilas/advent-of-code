@@ -1,7 +1,7 @@
 using NiceIO;
 using NUnit.Framework;
 
-namespace Aoc2018
+namespace Aoc2019
 {
     [Parallelizable(ParallelScope.All)]
     public class AocFixture

@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Diagnostics;
-using AoC;
+using Aoc2018;
 
 namespace SantaVM
 {
