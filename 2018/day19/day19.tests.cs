@@ -22,7 +22,7 @@ namespace Day19
                 .ShouldBe(6);
         }
 
-        [Test] // should just derive it
+        [Test, Category("Very slow")] // should just derive it
         public void Part1()
         {
             Solver

@@ -32,7 +32,7 @@ namespace Day18
                 .ShouldBe(384480);
         }
 
-        [Test]
+        [Test, Category("Very slow")]
         public void Part2()
         {
             Solver
