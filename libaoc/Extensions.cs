@@ -12,15 +12,19 @@ namespace AoC
 {
     public static partial class Extensions
     {
+        /// <summary>Filter null elements from stream</summary>
         public static IEnumerable<T> WhereNotNull<T>([NotNull] this IEnumerable<T> @this) where T : class
             => @this.Where(t => !(t is null));
 
+        /// <summary>Return the enumerable if non-null, otherwise return an empty enumerable</summary>
         public static IEnumerable<T> EmptyIfNull<T>([CanBeNull] this IEnumerable<T> @this)
             => @this ?? Enumerable.Empty<T>();
 
+        /// <summary>Return the result of `operation` on the given object if non-null, otherwise just return null</summary>
         public static T OrNull<T>([CanBeNull] this T @this, [NotNull] Func<T, T> operation) where T : class
             => @this != null ? operation(@this) : null;
 
+        /// <summary>Combine Select and Where in one operator</summary>
         public static IEnumerable<TResult> SelectWhere<TSource, TResult>(
             [NotNull] this IEnumerable<TSource> @this,
             [NotNull] Func<TSource, (TResult selected, bool where)> selectWhere)
@@ -33,14 +37,19 @@ namespace AoC
             }
         }
 
+        /// <summary>Segment an enumerable into batches of the given size</summary>
         public static IEnumerable<IReadOnlyList<T>> BatchList<T>([NotNull] this IEnumerable<T> @this, int batchSize) =>
             @this.Batch(batchSize).Select(b => b.ToList());
+        /// <summary>Reduce an enumerable using an operator that takes batches of the given size and outputs one element per batch</summary>
         public static IEnumerable<TR> Batch<T, TR>([NotNull] this IEnumerable<T> @this, int batchSize, [NotNull] Func<IReadOnlyList<T>, TR> selector) =>
             BatchExtension.Batch(@this, batchSize, b => selector(b.ToList()));
+        /// <summary>Stream enumerable batches into 2-tuples</summary>
         public static IEnumerable<ValueTuple<T, T>> Batch2<T>([NotNull] this IEnumerable<T> @this) =>
             @this.Batch(2).Select(b => b.First2());
+        /// <summary>Stream enumerable batches into 3-tuples</summary>
         public static IEnumerable<ValueTuple<T, T, T>> Batch3<T>([NotNull] this IEnumerable<T> @this) =>
             @this.Batch(3).Select(b => b.First3());
+        /// <summary>Stream enumerable batches into 4-tuples</summary>
         public static IEnumerable<ValueTuple<T, T, T, T>> Batch4<T>([NotNull] this IEnumerable<T> @this) =>
             @this.Batch(4).Select(b => b.First4());
 
@@ -239,12 +248,15 @@ namespace AoC
         public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Point @this, Func<Point, T> selector)
             => @this.SelectAdjacentWithDiagonals().Select(selector);
 
+        /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it the given default-get delegate</summary>
         public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, Func<TKey, TValue> getDefault)
             => new AutoDictionary<TKey, TValue>(@this, getDefault);
 
+        /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it a default-get delegate that just returns `defaultValue`</summary>
         public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default)
             => new AutoDictionary<TKey, TValue>(@this, _ => defaultValue);
 
+        /// <summary>Return the given value, clamped to [min, max]</summary>
         public static T Clamp<T>([NotNull] this T @this, T min, T max) where T : IComparable<T>
         {
             if (min.CompareTo(max) > 0)
@@ -263,7 +275,7 @@ namespace AoC
             var i = 0;
             foreach (var item in @this)
             {
-                // no pattern yet, but hit the index anyway
+                // no pattern yet, but we hit the index anyway
                 if (i == index)
                     return item;
 
@@ -299,7 +311,10 @@ namespace AoC
         }
     }
 
-    // exactly like a Dictionary except it will guarantee that entries exist for any `get` call by ensuring already filled by delegate from ctor
+    /// <summary>
+    /// This is exactly like a Dictionary except instead of throwing on a failed lookup of `dict[key]` it will instead
+    /// call the `GetDefault` (given in the ctor) to populate the entry and then return it.
+    /// </summary>
     public class AutoDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IDictionary<TKey, TValue>
     {
         readonly IDictionary<TKey, TValue> m_Dictionary;

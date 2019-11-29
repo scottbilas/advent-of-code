@@ -199,6 +199,8 @@ namespace AoC
         public static Int4 operator /(in Int4 a, int d)
             => new Int4(a.X / d, a.Y / d, a.Z / d, a.W / d);
 
+        // TODO: should all return bool4
+
         public static bool operator <(in Int4 a, in Int4 b)
             => a.X < b.X && a.Y < b.Y && a.Z < b.Z && a.W < b.W;
         public static bool operator <(in Int4 a, int b)
