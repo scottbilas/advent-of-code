@@ -67,6 +67,7 @@ problem.time.Dump().ShouldBe(10117);
                 scaled.Save(renderPath, ImageFormat.Png);
             }
 
+            // scoop install tesseract
             var ocrName = Path.GetFileNameWithoutExtension(path) + "_ocr";
             using (var process = Process.Start(new ProcessStartInfo
             {

@@ -1,9 +1,9 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\net472\libaoc.dll</Reference>
+  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc2018.dll">C:\proj\advent-of-code\2018\libaoc\bin\Debug\net472\libaoc2018.dll</Reference>
   <NuGetReference>JonSkeet.MiscUtil</NuGetReference>
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
-  <Namespace>AoC</Namespace>
+  <Namespace>Aoc2018</Namespace>
   <Namespace>JetBrains.Annotations</Namespace>
   <Namespace>MoreLinq.Extensions</Namespace>
   <Namespace>NiceIO</Namespace>

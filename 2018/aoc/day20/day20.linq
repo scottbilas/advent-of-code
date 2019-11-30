@@ -1,7 +1,7 @@
 <Query Kind="Statements">
-  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\net472\libaoc.dll</Reference>
+  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc2018.dll">C:\proj\advent-of-code\2018\libaoc\bin\Debug\net472\libaoc2018.dll</Reference>
   <NuGetReference>Shouldly</NuGetReference>
-  <Namespace>AoC</Namespace>
+  <Namespace>Aoc2018</Namespace>
   <Namespace>Shouldly</Namespace>
   <Namespace>System.Drawing</Namespace>
 </Query>

@@ -1,11 +1,12 @@
 <Query Kind="Statements">
-  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc.dll">C:\proj\advent-of-code\libaoc\bin\Debug\net472\libaoc.dll</Reference>
+  <Reference Relative="..\..\libaoc\bin\Debug\net472\libaoc2018.dll">C:\proj\advent-of-code\2018\libaoc\bin\Debug\net472\libaoc2018.dll</Reference>
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
   <NuGetReference>YC.QuickGraph</NuGetReference>
-  <Namespace>AoC</Namespace>
+  <Namespace>Aoc2018</Namespace>
   <Namespace>JetBrains.Annotations</Namespace>
   <Namespace>MoreLinq.Extensions</Namespace>
+  <Namespace>NiceIO</Namespace>
   <Namespace>QuickGraph</Namespace>
   <Namespace>QuickGraph.Algorithms</Namespace>
   <Namespace>Shouldly</Namespace>
@@ -15,7 +16,6 @@
   <Namespace>System.Drawing</Namespace>
   <Namespace>System.Linq</Namespace>
   <Namespace>System.Text</Namespace>
-  <Namespace>NiceIO</Namespace>
 </Query>
 
 NPath scriptDir = new NPath(Util.CurrentQueryPath).Parent;
