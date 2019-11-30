@@ -47,7 +47,10 @@ namespace Unity.Coding.Tests
         [OneTimeSetUp]
         public void InitFixture()
         {
+            // TODO: put in uniquely-named subdir so can parallelize across fixtures
+
             BaseDir = TestDirectory.ToNPath().Combine("testfs");
+            DeleteTestFileSystem();
         }
 
         [OneTimeTearDown]
@@ -63,11 +66,8 @@ namespace Unity.Coding.Tests
         [TearDown]
         public void CleanupTest() => DeleteTestFileSystem();
 
-        protected void DeleteTestFileSystem(bool force = false)
+        protected void DeleteTestFileSystem()
         {
-            if (!force)
-                return;
-
             if (!BaseDir.Exists())
                 return;
 
