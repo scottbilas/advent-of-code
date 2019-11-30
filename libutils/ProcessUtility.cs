@@ -22,9 +22,6 @@ namespace Unity.Coding.Editor
             string exePath, IEnumerable<object> processArgs, string workingDirectory,
             Action<string, StdStream> onLine, IEnumerable<string> stdinLines = null)
         {
-            // getting weird behavior sometimes (exe not found) in unity if using relative path, so force it absolute here
-            exePath = Path.GetFullPath(exePath);
-
             if (processArgs == null)
                 processArgs = Enumerable.Empty<object>();
 

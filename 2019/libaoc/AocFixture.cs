@@ -1,5 +1,5 @@
-using NiceIO;
 using NUnit.Framework;
+using Unity.Coding.Utils;
 
 namespace Aoc2019
 {
