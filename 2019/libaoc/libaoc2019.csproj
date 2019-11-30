@@ -2,7 +2,7 @@
     <PropertyGroup>
         <RootNamespace>AoC</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
