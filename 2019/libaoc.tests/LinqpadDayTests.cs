@@ -14,7 +14,7 @@ namespace AllDays
         public void TestDay([Range(1, 25)] int day)
         {
             var testDir = TestContext.CurrentContext.TestDirectory.ToNPath()
-                .Combine($"../../../../aoc/day{day:00}");
+                .Combine($"../../../../aoc/day{day}");
             if (!testDir.DirectoryExists())
                 Assert.Ignore("No solution for this day yet");
 

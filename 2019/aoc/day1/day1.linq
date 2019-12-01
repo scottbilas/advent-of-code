@@ -23,7 +23,8 @@
 
 void Main()
 {
-    var inputPath = Util.CurrentQueryPath.ToNPath().Parent.Combine("input.txt");
+    var folder = Util.CurrentQueryPath.ToNPath().Parent;
+    var inputPath = folder.Combine($"../input/{folder.FileName}.input");
 
     // PART 1
 
