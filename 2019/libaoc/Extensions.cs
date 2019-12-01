@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using MoreLinq.Extensions;
+using Unity.Coding.Utils;
 
 namespace Aoc2019
 {
@@ -40,8 +41,8 @@ namespace Aoc2019
             return sliced;
         }
 
-        public static Size GetDimensions<T>(this T[,] @this)
-            => new Size(@this.GetLength(0), @this.GetLength(1));
+        public static Size GetDimensions<T>(this T[,] @this) =>
+            new Size(@this.GetLength(0), @this.GetLength(1));
         
         public static IEnumerable<string> ToLines(this char[,] @this)
         {
@@ -57,16 +58,16 @@ namespace Aoc2019
             }
         }
 
-        public static string ToText(this char[,] @this)
-            => string.Join("\n", @this.ToLines());
+        public static string ToText(this char[,] @this) =>
+            string.Join("\n", @this.ToLines());
 
-        public static int ParseInt([NotNull] this string @this)
-            => int.Parse(@this);
+        public static int ParseInt([NotNull] this string @this) =>
+            int.Parse(@this);
 
-        public static int GroupInt([NotNull] this Match @this, int groupNum)
-            => @this.Groups[groupNum].Value.ParseInt();
-        public static int GroupInt([NotNull] this Match @this, string groupName)
-            => @this.Groups[groupName].Value.ParseInt();
+        public static int GroupInt([NotNull] this Match @this, int groupNum) =>
+            @this.Groups[groupNum].Value.ParseInt();
+        public static int GroupInt([NotNull] this Match @this, string groupName) =>
+            @this.Groups[groupName].Value.ParseInt();
 
         public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this, Size max)
         {
@@ -75,8 +76,8 @@ namespace Aoc2019
                     yield return (cell: @this[x, y], x, y);
         }
 
-        public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this)
-            => @this.SelectCells(@this.GetDimensions());
+        public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this) =>
+            @this.SelectCells(@this.GetDimensions());
         
         public static IEnumerable<Point> SelectCoords<T>(this T[,] @this)
         {
@@ -131,11 +132,11 @@ namespace Aoc2019
             }
         }
 
-        public static T[,] FillNew<T>(this T[,] @this) where T : new()
-            => @this.Fill(_ => new T());
+        public static T[,] FillNew<T>(this T[,] @this) where T : new() =>
+            @this.Fill(_ => new T());
 
-        public static T[,] Fill<T>(this T[,] @this, T value)
-            => @this.Fill(_ => value);
+        public static T[,] Fill<T>(this T[,] @this, T value) =>
+            @this.Fill(_ => value);
 
         public static T[,] Fill<T>(this T[,] @this, Func<Point, T> generator)
         {
@@ -159,8 +160,8 @@ namespace Aoc2019
             return Rectangle.FromLTRB(l, t, r, b);
         }
 
-        public static Point BottomRight(in this Rectangle @this)
-            => new Point(@this.Right, @this.Bottom);
+        public static Point BottomRight(in this Rectangle @this) =>
+            new Point(@this.Right, @this.Bottom);
 
         public static IEnumerable<T> OrderByReading<T>(this IEnumerable<T> @this, Func<T, Point> selector)
         {
@@ -171,8 +172,8 @@ namespace Aoc2019
                 select item;
         }
 
-        public static IEnumerable<Point> OrderByReading(this IEnumerable<Point> @this)
-            => @this.OrderByReading(_ => _);
+        public static IEnumerable<Point> OrderByReading(this IEnumerable<Point> @this) =>
+            @this.OrderByReading(_ => _);
 
         public static IEnumerable<Point> SelectAdjacent(this Point @this)
         {
@@ -182,8 +183,8 @@ namespace Aoc2019
             yield return new Point(@this.X, @this.Y + 1);
         }
 
-        public static IEnumerable<T> SelectAdjacent<T>(this Point @this, Func<Point, T> selector)
-            => @this.SelectAdjacent().Select(selector);
+        public static IEnumerable<T> SelectAdjacent<T>(this Point @this, Func<Point, T> selector) =>
+            @this.SelectAdjacent().Select(selector);
 
         public static IEnumerable<Point> SelectAdjacentWithDiagonals(this Point @this)
         {
@@ -199,16 +200,21 @@ namespace Aoc2019
             yield return new Point(@this.X + 1, @this.Y + 1);
         }
 
-        public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Point @this, Func<Point, T> selector)
-            => @this.SelectAdjacentWithDiagonals().Select(selector);
+        public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Point @this, Func<Point, T> selector) =>
+            @this.SelectAdjacentWithDiagonals().Select(selector);
 
         /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it the given default-get delegate</summary>
-        public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, Func<TKey, TValue> getDefault)
-            => new AutoDictionary<TKey, TValue>(@this, getDefault);
+        public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, Func<TKey, TValue> getDefault) =>
+            new AutoDictionary<TKey, TValue>(@this, getDefault);
 
         /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it a default-get delegate that just returns `defaultValue`</summary>
-        public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default)
-            => new AutoDictionary<TKey, TValue>(@this, _ => defaultValue);
+        public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default) =>
+            new AutoDictionary<TKey, TValue>(@this, _ => defaultValue);
+
+        public static IEnumerable<int> ReadAllInts(this NPath @this) => @this
+            .ReadAllText()
+            .Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(int.Parse);
 
         public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)
         {

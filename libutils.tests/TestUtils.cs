@@ -38,7 +38,7 @@ namespace Unity.Coding.Tests
         NPath m_FullPath;
     }
 
-    abstract class TestFileSystemFixture
+    public abstract class TestFileSystemFixture
     {
         protected NPath BaseDir { private set; get; }
         protected string Eol { set; get; } = "\n";

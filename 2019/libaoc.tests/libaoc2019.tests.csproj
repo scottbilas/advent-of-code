@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libutils.tests\libutils.tests.csproj" />
     <ProjectReference Include="..\libaoc\libaoc2019.csproj" />
   </ItemGroup>
 
