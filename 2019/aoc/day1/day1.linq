@@ -4,6 +4,7 @@
   <Reference>&lt;RuntimeDirectory&gt;\netstandard.dll</Reference>
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
+  <NuGetReference>System.Interactive</NuGetReference>
   <NuGetReference>YC.QuickGraph</NuGetReference>
   <Namespace>Aoc2019</Namespace>
   <Namespace>JetBrains.Annotations</Namespace>
@@ -60,12 +61,6 @@ void Main()
 
 int Solve1(int mass) => mass / 3 - 2;
 
-int Solve2(int mass)
-{
-    var sum = 0;
-    
-    for (int fuel; (fuel = Solve1(mass)) >= 0; mass = fuel)
-        sum += fuel;
- 
-    return sum;
-}
+int Solve2(int mass) => EnumerableEx
+    .Generate(Solve1(mass), fuel => fuel > 0, Solve1, _ => _)
+    .Sum();
