@@ -24,7 +24,7 @@
 void Main()
 {
     var folder = Util.CurrentQueryPath.ToNPath().Parent;
-    var inputPath = folder.Combine($"../input/{folder.FileName}.input");
+    var inputPath = folder.Combine($"../input/{folder.FileName}.txt");
 
     // PART 1
 
