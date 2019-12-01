@@ -18,27 +18,24 @@ namespace AllDays
             if (!testDir.DirectoryExists())
                 Assert.Ignore("No solution for this day yet");
 
-            var scripts = testDir.Files("day*.linq").ToList();
-            if (!scripts.Any())
+            var script = testDir.Combine($"day{day}.solver.linq");
+            if (!script.FileExists())
                 Assert.Ignore("This day solved with something other than linqpad");
 
-            foreach (var script in scripts)
-            {
-                var expected = Regex
-                    .Matches(
-                        script.ChangeExtension(".txt").ReadAllText(),
-                        @"Your puzzle answer was (.*)\.")
-                    .Select(m => m.Groups[1].Value)
-                    .ToArray();
+            var expected = Regex
+                .Matches(
+                    testDir.Combine($"day{day}.results.txt").ReadAllText(),
+                    @"Your puzzle answer was (.*)\.")
+                .Select(m => m.Groups[1].Value)
+                .ToArray();
 
-                var (stdout, stderr) = (new List<string>(), new List<string>());
-                ProcessUtility.ExecuteCommandLine("lprun", new[] { "-optimize", script.FileName }, testDir, stdout, stderr);
-                if (stderr.Any())
-                    Assert.Fail(stderr.StringJoin("\n"));
+            var (stdout, stderr) = (new List<string>(), new List<string>());
+            ProcessUtility.ExecuteCommandLine("lprun", new[] { "-optimize", script.FileName }, testDir, stdout, stderr);
+            if (stderr.Any())
+                Assert.Fail(stderr.StringJoin("\n"));
 
-                var results = stdout.Select(s => s.Trim()).Where(s => s.Any()).ToArray();
-                results.ShouldBe(expected);
-            }
+            var results = stdout.Select(s => s.Trim()).Where(s => s.Any()).ToArray();
+            results.ShouldBe(expected);
         }
     }
 }
