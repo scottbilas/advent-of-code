@@ -37,14 +37,15 @@ namespace Aoc2019
                 .Fill(coord => lines[coord.Y][coord.X]);
         }
 
-        public static IEnumerable<int> SelectInts([NotNull] this string @this) => Regex
-            .Matches(@this, @"[-+]?\d+")
-            .Cast<Match>()
+        public static MatchCollection SelectMatches([NotNull] this string @this, string pattern) => Regex
+            .Matches(@this, pattern);
+
+        public static IEnumerable<int> SelectInts([NotNull] this string @this) => @this
+            .SelectMatches(@"[-+]?\d+")
             .Select(m => int.Parse(m.Value));
 
-        public static IEnumerable<float> SelectFloats([NotNull] this string @this) => Regex
-            .Matches(@this, @"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
-            .Cast<Match>()
+        public static IEnumerable<float> SelectFloats([NotNull] this string @this) => @this
+            .SelectMatches(@"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
             .Select(m => float.Parse(m.Value));
     }
 }

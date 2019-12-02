@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using MoreLinq.Extensions;
-using Unity.Coding.Utils;
 
 namespace Aoc2019
 {
@@ -210,11 +209,6 @@ namespace Aoc2019
         /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it a default-get delegate that just returns `defaultValue`</summary>
         public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default) =>
             new AutoDictionary<TKey, TValue>(@this, _ => defaultValue);
-
-        public static IEnumerable<int> ReadAllInts(this NPath @this) => @this
-            .ReadAllText()
-            .Split(new[] { ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(int.Parse);
 
         public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)
         {
