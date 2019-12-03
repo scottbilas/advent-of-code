@@ -63,8 +63,13 @@ namespace Aoc2019
             => $"{X}, {Y}";
 
         static readonly Int2 k_Zero = new Int2(0), k_One = new Int2(1);
+        static readonly Int2 k_MaxValue = new Int2(Int32.MaxValue, Int32.MaxValue);
+        static readonly Int2 k_MinValue = new Int2(Int32.MinValue, Int32.MinValue);
+
         public static ref readonly Int2 Zero => ref k_Zero;
         public static ref readonly Int2 One => ref k_One;
+        public static ref readonly Int2 MaxValue => ref k_MaxValue;
+        public static ref readonly Int2 MinValue => ref k_MinValue;
 
         public Int2 Abs()
             => new Int2(Math.Abs(X), Math.Abs(Y));
@@ -174,8 +179,13 @@ namespace Aoc2019
             => $"{X}, {Y}, {Z}";
 
         static readonly Int3 k_Zero = new Int3(0), k_One = new Int3(1);
+        static readonly Int3 k_MaxValue = new Int3(Int32.MaxValue, Int32.MaxValue, Int32.MaxValue);
+        static readonly Int3 k_MinValue = new Int3(Int32.MinValue, Int32.MinValue, Int32.MinValue);
+
         public static ref readonly Int3 Zero => ref k_Zero;
         public static ref readonly Int3 One => ref k_One;
+        public static ref readonly Int3 MaxValue => ref k_MaxValue;
+        public static ref readonly Int3 MinValue => ref k_MinValue;
 
         public Int3 Abs()
             => new Int3(Math.Abs(X), Math.Abs(Y), Math.Abs(Z));
@@ -286,8 +296,13 @@ namespace Aoc2019
             => $"{X}, {Y}, {Z}, {W}";
 
         static readonly Int4 k_Zero = new Int4(0), k_One = new Int4(1);
+        static readonly Int4 k_MaxValue = new Int4(Int32.MaxValue, Int32.MaxValue, Int32.MaxValue, Int32.MaxValue);
+        static readonly Int4 k_MinValue = new Int4(Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue);
+
         public static ref readonly Int4 Zero => ref k_Zero;
         public static ref readonly Int4 One => ref k_One;
+        public static ref readonly Int4 MaxValue => ref k_MaxValue;
+        public static ref readonly Int4 MinValue => ref k_MinValue;
 
         public Int4 Abs()
             => new Int4(Math.Abs(X), Math.Abs(Y), Math.Abs(Z), Math.Abs(W));
@@ -457,26 +472,44 @@ namespace Aoc2019
 
     public static partial class Utils
     {
+        public static int ManhattanDistance(in Int2 a) =>
+            Math.Abs(a.X) + Math.Abs(a.Y);
+        public static int ManhattanDistance(in Int3 a) =>
+            Math.Abs(a.X) + Math.Abs(a.Y) + Math.Abs(a.Z);
+        public static int ManhattanDistance(in Int4 a) =>
+            Math.Abs(a.X) + Math.Abs(a.Y) + Math.Abs(a.Z) + Math.Abs(a.W);
+        public static int ManhattanDistance(in Int2 a, in Int2 b) =>
+            Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
         public static int ManhattanDistance(in Int3 a, in Int3 b) =>
             Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z);
         public static int ManhattanDistance(in Int4 a, in Int4 b) =>
             Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y) + Math.Abs(a.Z - b.Z) + Math.Abs(a.W - b.W);
+        public static Int2 Min(in Int2 a, in Int2 b) =>
+            new Int2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
         public static Int3 Min(in Int3 a, in Int3 b) =>
             new Int3(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z));
         public static Int4 Min(in Int4 a, in Int4 b) =>
             new Int4(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z), Math.Min(a.W, b.W));
+        public static Int2 Max(in Int2 a, in Int2 b) =>
+            new Int2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y));
         public static Int3 Max(in Int3 a, in Int3 b) =>
             new Int3(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z));
         public static Int4 Max(in Int4 a, in Int4 b) =>
             new Int4(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z), Math.Max(a.W, b.W));
+        public static void Minimize(ref Int2 a, in Int2 b)
+            => a = Min(a, in b);
         public static void Minimize(ref Int3 a, in Int3 b)
             => a = Min(a, in b);
         public static void Minimize(ref Int4 a, in Int4 b)
             => a = Min(a, in b);
+        public static void Maximize(ref Int2 a, in Int2 b)
+            => a = Max(a, in b);
         public static void Maximize(ref Int3 a, in Int3 b)
             => a = Max(a, in b);
         public static void Maximize(ref Int4 a, in Int4 b)
             => a = Max(a, in b);
+        public static Int2 Midpoint(in Int2 a, in Int2 b)
+            => new Int2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
         public static Int3 Midpoint(in Int3 a, in Int3 b)
             => new Int3(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2, a.Z + (b.Z - a.Z) / 2);
         public static Int4 Midpoint(in Int4 a, in Int4 b)
@@ -491,16 +524,25 @@ namespace Aoc2019
 
     public static partial class Extensions
     {
+        public static int ManhattanDistance(this in Int2 a, in Int2 b) => Utils.ManhattanDistance(in a, in b);
         public static int ManhattanDistance(this in Int3 a, in Int3 b) => Utils.ManhattanDistance(in a, in b);
         public static int ManhattanDistance(this in Int4 a, in Int4 b) => Utils.ManhattanDistance(in a, in b);
+        public static int ManhattanDistance(this in Int2 a) => Utils.ManhattanDistance(in a);
+        public static int ManhattanDistance(this in Int3 a) => Utils.ManhattanDistance(in a);
+        public static int ManhattanDistance(this in Int4 a) => Utils.ManhattanDistance(in a);
+        public static Int2 Min(this in Int2 a, in Int2 b) => Utils.Min(in a, in b);
         public static Int3 Min(this in Int3 a, in Int3 b) => Utils.Min(in a, in b);
         public static Int4 Min(this in Int4 a, in Int4 b) => Utils.Min(in a, in b);
+        public static Int2 Max(this in Int2 a, in Int2 b) => Utils.Max(in a, in b);
         public static Int3 Max(this in Int3 a, in Int3 b) => Utils.Max(in a, in b);
         public static Int4 Max(this in Int4 a, in Int4 b) => Utils.Max(in a, in b);
+        public static void Minimize(ref this Int2 a, in Int2 b) => Utils.Minimize(ref a, in b);
         public static void Minimize(ref this Int3 a, in Int3 b) => Utils.Minimize(ref a, in b);
         public static void Minimize(ref this Int4 a, in Int4 b) => Utils.Minimize(ref a, in b);
+        public static void Maximize(ref this Int2 a, in Int2 b) => Utils.Maximize(ref a, in b);
         public static void Maximize(ref this Int3 a, in Int3 b) => Utils.Maximize(ref a, in b);
         public static void Maximize(ref this Int4 a, in Int4 b) => Utils.Maximize(ref a, in b);
+        public static Int2 Midpoint(this in Int2 a, in Int2 b) => Utils.Midpoint(in a, in b);
         public static Int3 Midpoint(this in Int3 a, in Int3 b) => Utils.Midpoint(in a, in b);
         public static Int4 Midpoint(this in Int4 a, in Int4 b) => Utils.Midpoint(in a, in b);
 

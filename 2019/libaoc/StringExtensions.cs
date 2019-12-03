@@ -37,6 +37,9 @@ namespace Aoc2019
                 .Fill(coord => lines[coord.Y][coord.X]);
         }
 
+        public static string TrimBlock(this string @this)
+            => @this.Split('\n').Select(l => l.Trim()).StringJoin('\n');
+
         public static IEnumerable<Match> SelectMatches([NotNull] this string @this, string pattern) => Regex
             .Matches(@this, pattern)
             // ReSharper disable once RedundantEnumerableCastCall (required for .net framework to link to this, because MatchCollection is not yet an IList<Match>)
