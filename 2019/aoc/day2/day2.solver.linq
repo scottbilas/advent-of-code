@@ -5,19 +5,11 @@
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
   <NuGetReference>System.Interactive</NuGetReference>
-  <NuGetReference>YC.QuickGraph</NuGetReference>
   <Namespace>Aoc2019</Namespace>
   <Namespace>JetBrains.Annotations</Namespace>
   <Namespace>MoreLinq.Extensions</Namespace>
-  <Namespace>QuickGraph</Namespace>
-  <Namespace>QuickGraph.Algorithms</Namespace>
   <Namespace>Shouldly</Namespace>
-  <Namespace>System</Namespace>
-  <Namespace>System.Collections</Namespace>
-  <Namespace>System.Collections.Generic</Namespace>
   <Namespace>System.Drawing</Namespace>
-  <Namespace>System.Linq</Namespace>
-  <Namespace>System.Text</Namespace>
   <Namespace>Unity.Coding.Editor</Namespace>
   <Namespace>Unity.Coding.Utils</Namespace>
 </Query>
