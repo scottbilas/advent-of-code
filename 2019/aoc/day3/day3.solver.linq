@@ -140,15 +140,15 @@ string Render(IEnumerable<(char, int)> wire0, IEnumerable<(char, int)> wire1)
                 board[new Int2(x    , y    )]);
 
             char c;
-            if (o == Int2.Zero)
+            if (o.Equals(Int2.Zero))
                 c = 'o';
-            else if (o == Int2.MaxValue)
+            else if (o.Equals(Int2.MaxValue))
                 c = '.';
             else if (o.X != int.MaxValue && o.Y != int.MaxValue)
                 c = 'X';
-            else if (l == Int2.MaxValue && r == Int2.MaxValue)
+            else if (l.Equals(Int2.MaxValue) && r.Equals(Int2.MaxValue))
                 c = '|';
-            else if (t == Int2.MaxValue && b == Int2.MaxValue)
+            else if (t.Equals(Int2.MaxValue) && b.Equals(Int2.MaxValue))
                 c = '-';
             else
                 c = '+';
