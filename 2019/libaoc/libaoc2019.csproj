@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <RootNamespace>AoC</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -13,6 +13,13 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\libutils\libutils.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="WideTypes.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>WideTypes.gen.cs</LastGenOutput>
+      </None>
     </ItemGroup>
 
 </Project>
