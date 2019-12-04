@@ -30,7 +30,7 @@ namespace Aoc2019
 
         public void Validate()
         {
-            if (!(Min <= Max))
+            if ((Min > Max).Any())
                 throw new Exception("Min must be <= max");
         }
 
@@ -53,7 +53,7 @@ namespace Aoc2019
         {
             Min = Min.Max(in aabb.Min);
             Max = Max.Min(in aabb.Max);
-            return Min <= Max;
+            return (Min <= Max).All();
         }
 
         public bool Contains(in Int3 point)
@@ -61,7 +61,7 @@ namespace Aoc2019
                point.X <= Max.X && point.Y <= Max.Y && point.Z <= Max.Z;
 
         public bool Contains(in AABB aabb)
-            => aabb.Min >= Min && aabb.Max <= Max;
+            => (aabb.Min >= Min).All() && (aabb.Max <= Max).All();
 
         public bool Intersects(in AABB aabb)
             => aabb.Min.X <= Max.X && Min.X <= aabb.Max.X &&
@@ -85,7 +85,7 @@ namespace Aoc2019
 
         public static AABB FromExtents(in Int3 center, in Int3 extents)
         {
-            if (!(extents > 0))
+            if ((extents <= 0).Any())
                 throw new ArgumentException("Extents cannot be negative", nameof(extents));
             return new AABB(center - extents, center + extents);
         }
