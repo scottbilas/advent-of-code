@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <RootNamespace>AoC</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -20,6 +20,12 @@
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>WideTypes.gen.cs</LastGenOutput>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="WideTypes.gen.cs">
+        <DependentUpon>WideTypes.tt</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>
