@@ -253,4 +253,18 @@ namespace Aoc2019
             throw new IndexOutOfRangeException();
         }
     }
+
+    public static class MiscStatics
+    {
+        public static void With<T0>(T0 v0, Action<T0> action) => action(v0);
+        public static void With<T0, T1>(T0 v0, T1 v1, Action<T0, T1> action) => action(v0, v1);
+        public static void With<T0, T1, T2>(T0 v0, T1 v1, T2 v2, Action<T0, T1, T2> action) => action(v0, v1, v2);
+        public static void With<T0, T1, T2, T3>(T0 v0, T1 v1, T2 v2, T3 v3, Action<T0, T1, T2, T3> action) => action(v0, v1, v2, v3);
+        public static void With<T0, T1, T2, T3, T4>(T0 v0, T1 v1, T2 v2, T3 v3, T4 v4, Action<T0, T1, T2, T3, T4> action) => action(v0, v1, v2, v3, v4);
+
+        public static T[] Arr<T>(params T[] items) => items;
+
+        public static IEnumerable<TResult> Generate<TState, TResult>(TState initialState, Func<TState, TResult> resultSelector) =>
+            EnumerableEx.Generate(initialState, _ => true, _ => _, resultSelector);
+    }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using JetBrains.Annotations;
@@ -9,8 +9,8 @@ namespace Aoc2019
     {
         readonly IEnumerable<T> m_Source;
 
-        public SmartEnumerable([NotNull] IEnumerable<T> source)
-            => m_Source = source;
+        public SmartEnumerable([NotNull] IEnumerable<T> source) =>
+            m_Source = source;
 
         public IEnumerator<Element> GetEnumerator()
         {
@@ -30,14 +30,14 @@ namespace Aoc2019
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() =>
+             GetEnumerator();
 
         [DebuggerDisplay("(#{Index} f:{IsFirst} l:{IsLast})={Value}", Type = "{ValueType}")] // << TODO make this a DebuggerTypeProxy and get rid of ValueType
         public struct Element
         {
-            internal Element(T value, int index, bool isFirst, bool isLast)
-                => (Value, Index, IsFirst, IsLast) = (value, index, isFirst, isLast);
+            internal Element(T value, int index, bool isFirst, bool isLast) =>
+                (Value, Index, IsFirst, IsLast) = (value, index, isFirst, isLast);
 
             public T Value { get; }
             public int Index { get; }
@@ -51,7 +51,7 @@ namespace Aoc2019
 
     public static partial class EnumerableExtensions
     {
-        public static SmartEnumerable<T> AsSmartEnumerable<T>([NotNull] this IEnumerable<T> @this)
-            => new SmartEnumerable<T>(@this);
+        public static SmartEnumerable<T> AsSmartEnumerable<T>([NotNull] this IEnumerable<T> @this) =>
+            new SmartEnumerable<T>(@this);
     }
 }
