@@ -264,6 +264,9 @@ namespace Aoc2019
 
         public static T[] Arr<T>(params T[] items) => items;
 
+        public static IEnumerable<T> Generate<T>(T initialState, Func<T, bool> condition, Func<T, T> iterate) =>
+            EnumerableEx.Generate(initialState, condition, iterate, _ => _);
+        
         public static IEnumerable<TResult> Generate<TState, TResult>(TState initialState, Func<TState, TResult> resultSelector) =>
             EnumerableEx.Generate(initialState, _ => true, _ => _, resultSelector);
     }

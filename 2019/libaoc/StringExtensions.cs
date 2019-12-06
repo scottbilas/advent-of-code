@@ -45,6 +45,10 @@ namespace Aoc2019
             // ReSharper disable once RedundantEnumerableCastCall (required for .net framework to link to this, because MatchCollection is not yet an IList<Match>)
             .Cast<Match>();
 
+        public static IEnumerable<string> SelectWords([NotNull] this string @this) => @this
+            .SelectMatches(@"\S+")
+            .Select(m => m.Value);
+
         public static IEnumerable<int> SelectInts([NotNull] this string @this) => @this
             .SelectMatches(@"[-+]?\d+")
             .Select(m => int.Parse(m.Value));
