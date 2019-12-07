@@ -266,8 +266,9 @@ namespace Aoc2019
 
         public static IEnumerable<T> Generate<T>(T initialState, Func<T, bool> condition, Func<T, T> iterate) =>
             EnumerableEx.Generate(initialState, condition, iterate, _ => _);
-        
-        public static IEnumerable<TResult> Generate<TState, TResult>(TState initialState, Func<TState, TResult> resultSelector) =>
-            EnumerableEx.Generate(initialState, _ => true, _ => _, resultSelector);
+        public static IEnumerable<TR> Generate<T, TR>(T initialState, Func<T, T> iterate, Func<T, TR> resultSelector) =>
+            EnumerableEx.Generate(initialState, _ => true, iterate, resultSelector);
+        public static IEnumerable<T> Generate<T>(T initialState, Func<T, T> iterate) =>
+            EnumerableEx.Generate(initialState, _ => true, iterate, _ => _);
     }
 }

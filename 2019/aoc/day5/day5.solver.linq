@@ -28,7 +28,7 @@ void Main()
 
     // *SAMPLES*
 
-    With(Generate(new Random(12345), r => r.Next()).Take(50).ToArray(),
+    With(Generate(new Random(12345), _ => _, r => r.Next()).Take(50).ToArray(),
         sample => Run(Arr(3, 0, 4, 0, 99), sample).ShouldBe(sample));
 
     // *PROBLEM*

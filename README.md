@@ -1,5 +1,12 @@
-Misc notes:
+# Advent of Code
 
-* *.linq files edited/run with LINQPad
-* Occasional global utilities like `tesseract` required (use Scoop)
-* Integration tests are in test.ps1
+These are my [Advent of Code](www.adventofcode.com) solutions.
+
+Setup:
+
+* Get Scoop: `iwr -useb get.scoop.sh | iex`
+* Add buckets: `scoop bucket add extras`
+* Get support: `scoop install tesseract linqpad`
+* Get [Rider](https://www.jetbrains.com/rider/download/)
+
+All solutions can be validated by running tests from Rider.
