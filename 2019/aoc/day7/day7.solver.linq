@@ -82,11 +82,11 @@ int Run(int which, int[] mem, IList<int> phase) =>
     which == 1 ? Run1(mem, phase) : Run2(mem, phase);
 
 int Run1(int[] mem, IList<int> phases) =>
-    phases.Aggregate(0, (signal, phase) => Run(new VM(mem, phase, () => signal)).Value);
+    phases.Aggregate(0, (signal, phase) => new VM(mem, phase, () => signal).Run().Value);
 
 int Run2(int[] mem, IList<int> phase)
 {
-    int[] signals = new int[5];
+    var signals = new int[5];
    
     var loop = Range(0, signals.Length)
         .Select(i => (
@@ -96,7 +96,7 @@ int Run2(int[] mem, IList<int> phase)
 
     foreach (var item in loop)
     {
-        var o = Run(item.vm);
+        var o = item.vm.Run();
         if (o == null)
             break;
         signals[item.dst] = o.Value;
@@ -121,80 +121,80 @@ class VM
     public int[] Mem;
     public int IP;
     public Func<int> GetInput;
-}
 
-int? Run(VM state)
-{
-    for (;;)
+    public int? Run()
     {
-        int NextMem() => state.Mem[state.IP++];
-
-        // ABCDE
-        //  1002
-        // 
-        // DE - two-digit opcode,      02 == opcode 2
-        //  C - mode of 1st parameter,  0 == position mode
-        //  B - mode of 2nd parameter,  1 == immediate mode
-        //  A - mode of 3rd parameter,  0 == position mode,
-        //                                   omitted due to being a leading zero
-
-        int op = NextMem();
-        var modes = op / 100;
-
-        int Next()
+        for (;;)
         {
-            var mode = modes % 10;
-            modes /= 10;
-
-            var item = NextMem();
-            return mode == 0 ? state.Mem[item] : item;
-        }
-
-        (int a, int b) Next2() => (Next(), Next());
-
-        switch (op % 100)
-        {
-            // add: adds together numbers read from two positions and stores the result in a third position
-            case 1:
-                With((src: Next2(), dst: NextMem()), v => state.Mem[v.dst] = v.src.a + v.src.b);
-                break;
-
-            // multiply: works exactly like opcode 1, except it multiplies the two inputs instead of adding them
-            case 2:
-                With((src: Next2(), dst: NextMem()), v => state.Mem[v.dst] = v.src.a * v.src.b);
-                break;
-
-            // input: takes a single integer as input and saves it to the position given by its only parameter
-            case 3:
-                state.Mem[NextMem()] = state.GetInput();
-                break;
-
-            // output: outputs the value of its only parameter
-            case 4:
-                return Next();
-
-            // jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-            case 5:
-                With((src: Next(), dst: Next()), v => { if (v.src != 0) state.IP = v.dst; });
-                break;
-
-            // jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-            case 6:
-                With((src: Next(), dst: Next()), v => { if (v.src == 0) state.IP = v.dst; });
-                break;
-
-            // less-than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-            case 7:
-                With((src: Next2(), dst: NextMem()), v => state.Mem[v.dst] = v.src.a < v.src.b ? 1 : 0);
-                break;
-
-            // equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter.Otherwise, it stores 0.
-            case 8:
-                With((src: Next2(), dst: NextMem()), v => state.Mem[v.dst] = v.src.a == v.src.b ? 1 : 0);
-                break;
-
-            case 99:
-                return null;
+            int NextMem() => Mem[IP++];
+    
+            // ABCDE
+            //  1002
+            // 
+            // DE - two-digit opcode,      02 == opcode 2
+            //  C - mode of 1st parameter,  0 == position mode
+            //  B - mode of 2nd parameter,  1 == immediate mode
+            //  A - mode of 3rd parameter,  0 == position mode,
+            //                                   omitted due to being a leading zero
+    
+            int op = NextMem();
+            var modes = op / 100;
+    
+            int Next()
+            {
+                var mode = modes % 10;
+                modes /= 10;
+    
+                var item = NextMem();
+                return mode == 0 ? Mem[item] : item;
+            }
+    
+            (int a, int b) Next2() => (Next(), Next());
+    
+            switch (op % 100)
+            {
+                // add: adds together numbers read from two positions and stores the result in a third position
+                case 1:
+                    With((src: Next2(), dst: NextMem()), v => Mem[v.dst] = v.src.a + v.src.b);
+                    break;
+    
+                // multiply: works exactly like opcode 1, except it multiplies the two inputs instead of adding them
+                case 2:
+                    With((src: Next2(), dst: NextMem()), v => Mem[v.dst] = v.src.a * v.src.b);
+                    break;
+    
+                // input: takes a single integer as input and saves it to the position given by its only parameter
+                case 3:
+                    Mem[NextMem()] = GetInput();
+                    break;
+    
+                // output: outputs the value of its only parameter
+                case 4:
+                    return Next();
+    
+                // jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+                case 5:
+                    With((src: Next(), dst: Next()), v => { if (v.src != 0) IP = v.dst; });
+                    break;
+    
+                // jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+                case 6:
+                    With((src: Next(), dst: Next()), v => { if (v.src == 0) IP = v.dst; });
+                    break;
+    
+                // less-than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+                case 7:
+                    With((src: Next2(), dst: NextMem()), v => Mem[v.dst] = v.src.a < v.src.b ? 1 : 0);
+                    break;
+    
+                // equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter.Otherwise, it stores 0.
+                case 8:
+                    With((src: Next2(), dst: NextMem()), v => Mem[v.dst] = v.src.a == v.src.b ? 1 : 0);
+                    break;
+    
+                case 99:
+                    return null;
+            }
         }
     }
 }
