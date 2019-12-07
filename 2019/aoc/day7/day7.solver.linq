@@ -84,17 +84,17 @@ int Run(int which, int[] mem, IList<int> phase) =>
 int Run1(int[] mem, IList<int> phases) =>
     phases.Aggregate(0, (signal, phase) => new VM(mem, phase, () => signal).Run().Value);
 
-int Run2(int[] mem, IList<int> phase)
+int Run2(int[] mem, IList<int> phases)
 {
-    var signals = new int[5];
+    var signals = new int[phases.Count];
    
-    var loop = Range(0, signals.Length)
-        .Select(i => (
-            dst:  (i + 1) % signals.Length,
-            vm : new VM(mem, phase[i], () => signals[i])))
-        .ToArray().Repeat();
+    var loop = phases
+        .Select((phase, i) => (
+            dst:  (i + 1) % phases.Count,
+            vm : new VM(mem, phase, () => signals[i])))
+        .ToArray();
 
-    foreach (var item in loop)
+    foreach (var item in loop.Repeat())
     {
         var o = item.vm.Run();
         if (o == null)
