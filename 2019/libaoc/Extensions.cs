@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using MoreLinq.Extensions;
+using Unity.Coding.Utils;
 
 namespace Aoc2019
 {
@@ -38,6 +39,17 @@ namespace Aoc2019
             var sliced = new T[count];
             @this.Copy(offset, sliced, 0, count);
             return sliced;
+        }
+
+        public static int Count<T>(this IEnumerable<T> @this, T value) where T : IEquatable<T> =>
+            @this.Count(v => v.Equals(value));
+
+        public static IReadOnlyDictionary<T, int> DistinctWithCount<T>(this IEnumerable<T> @this)
+        {
+            var dict = new Dictionary<T, int>().ToAutoDictionary();
+            foreach (var item in @this)
+                ++dict[item];
+            return dict;
         }
 
         public static Size GetDimensions<T>(this T[,] @this) =>
