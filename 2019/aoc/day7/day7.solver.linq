@@ -25,8 +25,6 @@ void Main()
 
     var mem = inputPath.ReadAllInts().ToArray();
 
-
-
 // --- PART 1 ---
 
     // *SAMPLES*
