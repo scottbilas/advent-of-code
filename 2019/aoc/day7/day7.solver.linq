@@ -25,6 +25,8 @@ void Main()
 
     var mem = inputPath.ReadAllInts().ToArray();
 
+
+
 // --- PART 1 ---
 
     // *SAMPLES*
@@ -74,12 +76,12 @@ void Main()
 
 (int signal, IList<int> phase) Solve(int which, int[] mem) =>
     new Permutations<int>(Range(which == 1 ? 0 : 5, 5).ToList())
-    .Select(phase => (signal: Run(which, mem, phase), phase))
+    .Select(phases => (signal: Run(which, mem, phases), phases))
     .MaxBy(v => v.signal)
     .First();
 
-int Run(int which, int[] mem, IList<int> phase) =>
-    which == 1 ? Run1(mem, phase) : Run2(mem, phase);
+int Run(int which, int[] mem, IList<int> phases) =>
+    which == 1 ? Run1(mem, phases) : Run2(mem, phases);
 
 int Run1(int[] mem, IList<int> phases) =>
     phases.Aggregate(0, (signal, phase) => new VM(mem, phase, () => signal).Run().Value);
