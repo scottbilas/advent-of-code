@@ -94,7 +94,7 @@ class VM
                 var item = NextMem();
                 if (mode == 2)
                     item += BaseOffset;
-                    
+
                 return forWrite || mode == 1 ? item : Mem[item];
             }
 

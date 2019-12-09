@@ -15,6 +15,12 @@ namespace Aoc2019
 
         public AutoDictionary(IDictionary<TKey, TValue> dictionary, Func<TKey, TValue> getDefault)
             => (m_Dictionary, m_GetDefault) = (dictionary, getDefault);
+        public AutoDictionary(Func<TKey, TValue> getDefault)
+            : this(new Dictionary<TKey, TValue>(), getDefault) { }
+        public AutoDictionary(IDictionary<TKey, TValue> dictionary, TValue defaultValue = default)
+            : this(dictionary, _ => defaultValue) { }
+        public AutoDictionary(TValue defaultValue = default)
+            : this(_ => defaultValue) { }
 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
             => m_Dictionary.GetEnumerator();
