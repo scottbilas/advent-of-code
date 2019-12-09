@@ -58,7 +58,13 @@ void Main()
     }
 
     var renderPath = inputPath.Parent.Combine(inputPath.Parent.FileName + ".results.png");
-    Utils.RenderForOcr(renderPath, image);
-
-    Utils.Ocr(renderPath).ShouldBe("FAHEF");
+    try
+    {
+        Utils.RenderForOcr(renderPath, image);
+        Utils.Ocr(renderPath).Dump().ShouldBe("FAHEF");
+    }
+    finally
+    {
+        renderPath.DeleteIfExists();
+    }
 }

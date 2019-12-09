@@ -1,8 +1,9 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using ImageMagick;
+using Unity.Coding.Editor;
 using Unity.Coding.Utils;
+using static Aoc2019.MiscStatics;
 
 namespace Aoc2019
 {
@@ -22,6 +23,8 @@ namespace Aoc2019
             // to detect small text, tesseract needs black on white with a border and scaled up 400%
             using (var image = new MagickImage(MagickColors.White, pixels.GetLength(0), pixels.GetLength(1)))
             {
+                image.Density = new Density(100, DensityUnit.PixelsPerInch);
+
                 using (var outPixels = image.GetPixels())
                 {
                     for (var y = 0; y < image.Height; ++y)
@@ -49,28 +52,9 @@ namespace Aoc2019
 
         public static string Ocr(NPath imagePath)
         {
-            var ocrBasePath = imagePath.Parent.Combine(imagePath.FileNameWithoutExtension + "-ocr");
-            var ocrPath = ocrBasePath.Parent.Combine(ocrBasePath.FileName + ".txt");
-
-            try
-            {
-                using (var process = Process.Start(new ProcessStartInfo
-                {
-
-                    FileName         = "tesseract", // scoop install tesseract
-                    WindowStyle      = ProcessWindowStyle.Hidden,
-                    Arguments        = $"{imagePath} {ocrBasePath}",
-                    WorkingDirectory = imagePath.Parent,
-                }))
-                {
-                    process.WaitForExit();
-                    return ocrPath.ReadAllText().Trim();
-                }
-            }
-            finally
-            {
-                ocrPath.DeleteIfExists();
-            }
+            var (stdout, stderr) = (new List<string>(), new List<string>());
+            ProcessUtility.ExecuteCommandLine("tesseract", Arr(imagePath.ToString(), "stdout"), null, stdout, stderr);
+            return stdout[0];
         }
     }
 }
