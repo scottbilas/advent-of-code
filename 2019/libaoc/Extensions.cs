@@ -41,6 +41,21 @@ namespace Aoc2019
             return sliced;
         }
 
+        public static int RemoveWhere<T>([NotNull] this List<T> @this, Func<T, bool> predicate)
+        {
+            var count = 0;
+
+            @this.SetRange(@this.Where(item =>
+            {
+                if (!predicate(item))
+                    return true;
+                ++count;
+                return false;
+            }).ToList());
+
+            return count;
+        }
+
         public static int Count<T>(this IEnumerable<T> @this, T value) where T : IEquatable<T> =>
             @this.Count(v => v.Equals(value));
 
@@ -220,7 +235,7 @@ namespace Aoc2019
 
         /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it a default-get delegate that just returns `defaultValue`</summary>
         public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default) =>
-            new AutoDictionary<TKey, TValue>(@this, _ => defaultValue);
+            new AutoDictionary<TKey, TValue>(@this, defaultValue);
 
         public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)
         {

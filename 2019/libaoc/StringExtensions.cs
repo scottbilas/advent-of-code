@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text.RegularExpressions;
 using Unity.Coding.Utils;
 using JetBrains.Annotations;
@@ -52,6 +53,10 @@ namespace Aoc2019
         public static IEnumerable<int> SelectInts([NotNull] this string @this) => @this
             .SelectMatches(@"[-+]?\d+")
             .Select(m => int.Parse(m.Value));
+
+        public static IEnumerable<BigInteger> SelectBigInts([NotNull] this string @this) => @this
+            .SelectMatches(@"[-+]?\d+")
+            .Select(m => BigInteger.Parse(m.Value));
 
         public static IEnumerable<float> SelectFloats([NotNull] this string @this) => @this
             .SelectMatches(@"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
