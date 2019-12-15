@@ -30,7 +30,7 @@ namespace AllDays
                 .ToArray();
 
             var (stdout, stderr) = (new List<string>(), new List<string>());
-            ProcessUtility.ExecuteCommandLine("lprun", new[] { "-optimize", script.FileName }, testDir, stdout, stderr);
+            ProcessUtility.ExecuteCommandLine("lprun", new[] { script.FileName }, testDir, stdout, stderr);
             if (stderr.Any())
                 Assert.Fail(stderr.StringJoin("\n"));
 
