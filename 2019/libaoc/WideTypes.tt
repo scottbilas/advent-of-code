@@ -88,9 +88,6 @@ for (var size = 2; size <= IntMax; ++size) {
         public bool IsZero => Equals(Zero);
         public bool IsOne  => Equals(One);
 
-        public <#=type#> Abs() =>
-            new <#=type#>(<#=Fields(f => $"Math.Abs({f})")#>);
-
         public static <#=type#> operator-(in <#=type#> i) =>
             new <#=type#>(<#=Fields(f => $"-i.{f}")#>);
 
@@ -201,6 +198,18 @@ for (var size = 2; size <= BoolMax; ++size) { Init("Bool", size);#>
     public static partial class Utils
     {
 <#for (var size = 2; size <= IntMax; ++size) { Init("Int", size);#>
+        public static <#=type#> Abs(in <#=type#> a) =>
+            new <#=type#>(<#=Fields(f => $"Math.Abs(a.{f})")#>);
+<#}#>
+
+<#for (var size = 2; size <= IntMax; ++size) { Init("Int", size);#>
+        public static int LengthSq(in <#=type#> a) =>
+             <#=Fields(f => $"a.{f} * a.{f}", " + ")#>;
+        public static int LengthSq(in <#=type#> a, in <#=type#> b) =>
+             <#=Fields(f => $"(a.{f} - b.{f}) * (a.{f} - b.{f})", " + ")#>;
+<#}#>
+
+<#for (var size = 2; size <= IntMax; ++size) { Init("Int", size);#>
         public static int ManhattanDistance(in <#=type#> a) =>
             <#=Fields(f => $"Math.Abs(a.{f})", " + ")#>;
         public static int ManhattanDistance(in <#=type#> a, in <#=type#> b) =>
@@ -227,6 +236,15 @@ for (var size = 2; size <= BoolMax; ++size) { Init("Bool", size);#>
 
     public static partial class Extensions
     {
+<#for (var size = 2; size <= IntMax; ++size) { Init("Int", size);#>
+        public static <#=type#> Abs(this in <#=type#> a) => Utils.Abs(a);
+<#}#>
+
+<#for (var size = 2; size <= IntMax; ++size) { Init("Int", size);#>
+        public static int LengthSq(this in <#=type#> a) => Utils.LengthSq(a);
+        public static int LengthSq(this in <#=type#> a, in <#=type#> b) => Utils.LengthSq(a, b);
+<#}#>
+
 <#for (var size = 2; size <= IntMax; ++size) { Init("Int", size);#>
         public static int ManhattanDistance(this in <#=type#> a, in <#=type#> b) => Utils.ManhattanDistance(in a, in b);
         public static int ManhattanDistance(this in <#=type#> a) => Utils.ManhattanDistance(in a);

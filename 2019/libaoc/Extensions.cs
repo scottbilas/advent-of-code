@@ -107,14 +107,14 @@ namespace Aoc2019
         public static bool Success([NotNull] this Match @this, string groupName) =>
             @this.Groups[groupName].Success;
 
-        public static IEnumerable<(T cell, Int2 pos)> SelectCells<T>(this T[,] @this, Int2 max)
+        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>(this T[,] @this, Int2 max)
         {
             for (var y = 0; y < max.Y; ++y)
                 for (var x = 0; x < max.X; ++x)
-                    yield return (cell: @this[x, y], new Int2(x, y));
+                    yield return (new Int2(x, y), cell: @this[x, y]);
         }
 
-        public static IEnumerable<(T cell, Int2 pos)> SelectCells<T>(this T[,] @this) =>
+        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>(this T[,] @this) =>
             @this.SelectCells(@this.GetDimensions());
         
         public static IEnumerable<Int2> SelectCoords<T>(this T[,] @this)
@@ -254,10 +254,29 @@ namespace Aoc2019
         {
             var (cx, cy) = @this.GetDimensions();
             var newGrid = new T[cy, cx];
-            foreach (var (cell, (x, y)) in @this.SelectCells())
+            foreach (var ((x, y), cell) in @this.SelectCells())
                 newGrid[y, x] = cell;
 
             return newGrid;
+        }
+
+        public static Int2 ReduceFraction(this Int2 @this)
+        {
+            if (@this.X == 0)
+            {
+                if (@this.Y != 0)
+                    @this.Y = @this.Y > 0 ? 1 : -1;
+            }
+            else if (@this.Y == 0)
+                @this.X = @this.X > 0 ? 1 : -1;
+            else
+            {
+                var gcd = Utils.Gcd(@this.X, @this.Y);
+                @this.X /= gcd;
+                @this.Y /= gcd;
+            }
+
+            return @this;
         }
 
         public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)

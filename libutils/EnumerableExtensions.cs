@@ -121,5 +121,15 @@ namespace Unity.Coding.Utils
         public static IList<T> EnsureList<T>([NotNull] this IEnumerable<T> items) =>
             (items as IList<T>) ?? items.ToList();
 
+        public static IEnumerable<T> DistinctBy<T, TR>([NotNull] this IEnumerable<T> @this, Func<T, TR> keySelector)
+        {
+            var knownKeys = new HashSet<TR>();
+            foreach (var item in @this)
+            {
+                if (knownKeys.Add(keySelector(item)))
+                    yield return item;
+            }
+        }
+
     }
 }

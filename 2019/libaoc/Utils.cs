@@ -2,6 +2,7 @@ using System;
 using Unity.Coding.Utils;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ImageMagick;
 using Unity.Coding.Editor;
 using static Aoc2019.MiscStatics;
@@ -73,7 +74,7 @@ namespace Aoc2019
             };
         }
 
-        public static long Gcd(long  a, long b)
+        public static long Gcd(long a, long b)
         {
             a = Math.Abs(a);
             b = Math.Abs(b);
@@ -88,15 +89,13 @@ namespace Aoc2019
             };
         }
 
-        public static long Lcm(IReadOnlyList<int> nums)
-        {
-            long result = nums[0];
+        public static int Gcd(IEnumerable<int> nums) => nums.Aggregate(Gcd);
+        public static long Gcd(IEnumerable<long> nums) => nums.Aggregate(Gcd);
 
-            for (var i = 1; i < nums.Count; ++i)
-                result = nums[i] * result / Gcd(nums[i], result);
-
-            return result;
-        }
+        public static int Lcm(IEnumerable<int> nums) =>
+            nums.Aggregate((a, b) => a * b / Gcd(a, b));
+        public static long Lcm(IEnumerable<long> nums) =>
+            nums.Aggregate((a, b) => a * b / Gcd(a, b));
 
         public static IEnumerable<int> Factors(int num)
         {
@@ -104,6 +103,5 @@ namespace Aoc2019
                 if (num % i == 0)
                     yield return i;
         }
-
     }
 }

@@ -17,6 +17,17 @@ namespace Aoc2019
             grid[2, 0].ShouldBe('c');
         }
 
+        [Test]
+        public void ReduceFraction()
+        {
+            new Int2(0, 0).ReduceFraction().ShouldBe(new Int2(0, 0));
+            new Int2(1, 0).ReduceFraction().ShouldBe(new Int2(1, 0));
+            new Int2(2, 0).ReduceFraction().ShouldBe(new Int2(1, 0));
+            new Int2(-2, 0).ReduceFraction().ShouldBe(new Int2(-1, 0));
+            new Int2(-3, 24).ReduceFraction().ShouldBe(new Int2(-1, 8));
+            new Int2(12, 33).ReduceFraction().ShouldBe(new Int2(4, 11));
+        }
+
         [Test, Ignore("Function still WIP apparently")]
         public void PatternSeekingGetItemAt_WithBasicPattern_ReturnsCorrectIndex()
         {

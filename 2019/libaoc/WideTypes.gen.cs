@@ -76,9 +76,6 @@ namespace Aoc2019
         public bool IsZero => Equals(Zero);
         public bool IsOne  => Equals(One);
 
-        public Int2 Abs() =>
-            new Int2(Math.Abs(X), Math.Abs(Y));
-
         public static Int2 operator-(in Int2 i) =>
             new Int2(-i.X, -i.Y);
 
@@ -196,9 +193,6 @@ namespace Aoc2019
 
         public bool IsZero => Equals(Zero);
         public bool IsOne  => Equals(One);
-
-        public Int3 Abs() =>
-            new Int3(Math.Abs(X), Math.Abs(Y), Math.Abs(Z));
 
         public static Int3 operator-(in Int3 i) =>
             new Int3(-i.X, -i.Y, -i.Z);
@@ -318,9 +312,6 @@ namespace Aoc2019
 
         public bool IsZero => Equals(Zero);
         public bool IsOne  => Equals(One);
-
-        public Int4 Abs() =>
-            new Int4(Math.Abs(X), Math.Abs(Y), Math.Abs(Z), Math.Abs(W));
 
         public static Int4 operator-(in Int4 i) =>
             new Int4(-i.X, -i.Y, -i.Z, -i.W);
@@ -532,6 +523,26 @@ namespace Aoc2019
 
     public static partial class Utils
     {
+        public static Int2 Abs(in Int2 a) =>
+            new Int2(Math.Abs(a.X), Math.Abs(a.Y));
+        public static Int3 Abs(in Int3 a) =>
+            new Int3(Math.Abs(a.X), Math.Abs(a.Y), Math.Abs(a.Z));
+        public static Int4 Abs(in Int4 a) =>
+            new Int4(Math.Abs(a.X), Math.Abs(a.Y), Math.Abs(a.Z), Math.Abs(a.W));
+
+        public static int LengthSq(in Int2 a) =>
+             a.X * a.X + a.Y * a.Y;
+        public static int LengthSq(in Int2 a, in Int2 b) =>
+             (a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y);
+        public static int LengthSq(in Int3 a) =>
+             a.X * a.X + a.Y * a.Y + a.Z * a.Z;
+        public static int LengthSq(in Int3 a, in Int3 b) =>
+             (a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y) + (a.Z - b.Z) * (a.Z - b.Z);
+        public static int LengthSq(in Int4 a) =>
+             a.X * a.X + a.Y * a.Y + a.Z * a.Z + a.W * a.W;
+        public static int LengthSq(in Int4 a, in Int4 b) =>
+             (a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y) + (a.Z - b.Z) * (a.Z - b.Z) + (a.W - b.W) * (a.W - b.W);
+
         public static int ManhattanDistance(in Int2 a) =>
             Math.Abs(a.X) + Math.Abs(a.Y);
         public static int ManhattanDistance(in Int2 a, in Int2 b) =>
@@ -575,6 +586,17 @@ namespace Aoc2019
 
     public static partial class Extensions
     {
+        public static Int2 Abs(this in Int2 a) => Utils.Abs(a);
+        public static Int3 Abs(this in Int3 a) => Utils.Abs(a);
+        public static Int4 Abs(this in Int4 a) => Utils.Abs(a);
+
+        public static int LengthSq(this in Int2 a) => Utils.LengthSq(a);
+        public static int LengthSq(this in Int2 a, in Int2 b) => Utils.LengthSq(a, b);
+        public static int LengthSq(this in Int3 a) => Utils.LengthSq(a);
+        public static int LengthSq(this in Int3 a, in Int3 b) => Utils.LengthSq(a, b);
+        public static int LengthSq(this in Int4 a) => Utils.LengthSq(a);
+        public static int LengthSq(this in Int4 a, in Int4 b) => Utils.LengthSq(a, b);
+
         public static int ManhattanDistance(this in Int2 a, in Int2 b) => Utils.ManhattanDistance(in a, in b);
         public static int ManhattanDistance(this in Int2 a) => Utils.ManhattanDistance(in a);
         public static int ManhattanDistance(this in Int3 a, in Int3 b) => Utils.ManhattanDistance(in a, in b);
