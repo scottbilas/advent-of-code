@@ -1,5 +1,4 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\..\temp\bin\aoc2019\Debug\netstandard2.1\aoc2019.dll">C:\proj\advent-of-code\temp\bin\aoc2019\Debug\netstandard2.1\aoc2019.dll</Reference>
   <Reference Relative="..\..\..\temp\bin\aoc2019\Debug\netstandard2.1\libaoc2019.dll">C:\proj\advent-of-code\temp\bin\aoc2019\Debug\netstandard2.1\libaoc2019.dll</Reference>
   <Reference Relative="..\..\..\temp\bin\aoc2019\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\temp\bin\aoc2019\Debug\netstandard2.1\libutils.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\netstandard.dll</Reference>

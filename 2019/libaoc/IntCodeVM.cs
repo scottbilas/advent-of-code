@@ -257,7 +257,7 @@ namespace Aoc2019
                     case ParamMode.Position:
                         return $"[{Value}]";
                     case ParamMode.Immediate:
-                        return $"#{Value}";
+                        return Value.ToString();
                     case ParamMode.Relative:
                         return Value < 0 ? $"[R-{-Value}]" : $"[R+{Value}]";
                 }
@@ -284,7 +284,7 @@ namespace Aoc2019
                     ? "   <data> "
                     : $"{RawOperation,5}:{OperationText} ";
                 var paramText = Params != null ? Params.Select(p => p.Value).StringJoin(' ') : "";
-                text += $"{paramText,-10} | {GetComment(this)}";
+                text += $"{paramText,-14} | {GetComment(this)}";
 
                 return text;
             }
