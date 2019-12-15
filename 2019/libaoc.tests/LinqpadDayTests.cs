@@ -14,9 +14,9 @@ namespace AllDays
         public void TestDay([Range(1, 25)] int day)
         {
             var testDir = TestContext.CurrentContext.TestDirectory.ToNPath()
-                .Combine($"../../../../aoc/day{day}");
+                .Combine($"../../../../../2019/aoc/day{day}");
             if (!testDir.DirectoryExists())
-                Assert.Ignore("No solution for this day yet");
+                Assert.Ignore($"No solution for this day yet ({testDir})");
 
             var script = testDir.Combine($"day{day}.solver.linq");
             if (!script.FileExists())
@@ -35,7 +35,10 @@ namespace AllDays
                 Assert.Fail(stderr.StringJoin("\n"));
 
             var results = stdout.Select(s => s.Trim()).Where(s => s.Any()).ToArray();
-            results.ShouldBe(expected);
+            if (results.Any() && results[0].Contains("Exception"))
+                Assert.Fail(results.StringJoin("\n"));
+            else
+                results.ShouldBe(expected);
         }
     }
 }

@@ -1,7 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <RootNamespace>aoc</RootNamespace>
     <TargetFrameworks>netstandard2.1;netcoreapp3.1</TargetFrameworks>
+    <RootNamespace>Aoc2019</RootNamespace>
+    <OutputPath>..\..\temp\bin\$(MSBuildProjectName)\$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

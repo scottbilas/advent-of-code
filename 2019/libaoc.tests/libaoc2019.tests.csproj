@@ -2,7 +2,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
-    <OutputType>Library</OutputType>
+    <RootNamespace>AoC2019</RootNamespace>
+    <OutputPath>..\..\temp\bin\$(MSBuildProjectName)\$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
