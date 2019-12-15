@@ -153,7 +153,7 @@ namespace Aoc2019
         }
     }
 
-    class UtilsTests
+    partial class UtilsTests
     {
         [Test]
         public void Midpoint3_Basics_ReturnsValid()

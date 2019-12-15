@@ -92,8 +92,8 @@ namespace Aoc2019
         public static int Gcd(IEnumerable<int> nums) => nums.Aggregate(Gcd);
         public static long Gcd(IEnumerable<long> nums) => nums.Aggregate(Gcd);
 
-        public static int Lcm(IEnumerable<int> nums) =>
-            nums.Aggregate((a, b) => a * b / Gcd(a, b));
+        public static long Lcm(IEnumerable<int> nums) =>
+            Lcm(nums.Select(n => (long)n)); // too likely for big numbers to arise
         public static long Lcm(IEnumerable<long> nums) =>
             nums.Aggregate((a, b) => a * b / Gcd(a, b));
 
