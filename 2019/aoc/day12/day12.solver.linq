@@ -31,21 +31,23 @@ void Main()
 
     // *SAMPLES*
 
-    var sample = @"
+    var sample1 = @"
         <x=-1, y=0, z=2>
         <x=2, y=-10, z=-7>
         <x=4, y=-8, z=8>
         <x=3, y=5, z=-1>
         ";
 
-    Solve1(10, sample).ShouldBe(179);
-        
-    Solve1(100, @"
+    Solve1(10, sample1).ShouldBe(179);
+
+    var sample2 = @"
         <x=-8, y=-10, z=0>
         <x=5, y=5, z=10>
         <x=2, y=-7, z=3>
         <x=9, y=-8, z=-3>
-        ").ShouldBe(1940);
+        ";
+        
+    Solve1(100, sample2).ShouldBe(1940);
 
     // *PROBLEM*
 
@@ -55,14 +57,8 @@ void Main()
 
     // *SAMPLES*
 
-    Solve2(sample).ShouldBe(2772);
-
-    Solve2(@"
-        <x=-8, y=-10, z=0>
-        <x=5, y=5, z=10>
-        <x=2, y=-7, z=3>
-        <x=9, y=-8, z=-3>
-        ").ShouldBe(4686774924);
+    Solve2(sample1).ShouldBe(2772);
+    Solve2(sample2).ShouldBe(4686774924);
 
     // *PROBLEM*
 
