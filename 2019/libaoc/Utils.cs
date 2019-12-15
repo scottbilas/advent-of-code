@@ -94,8 +94,11 @@ namespace Aoc2019
 
         public static long Lcm(IEnumerable<int> nums) =>
             Lcm(nums.Select(n => (long)n)); // too likely for big numbers to arise
-        public static long Lcm(IEnumerable<long> nums) =>
-            nums.Aggregate((a, b) => a * b / Gcd(a, b));
+
+        public static long Lcm(IEnumerable<long> nums)
+        {
+            checked { return nums.Aggregate((a, b) => a * b / Gcd(a, b)); }
+        }
 
         public static IEnumerable<int> Factors(int num)
         {
