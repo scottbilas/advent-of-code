@@ -25,8 +25,8 @@ void Main()
     var inputPath = folder.Combine($"{folder.FileName}.input.txt");
 
     var pixels = inputPath.ReadAllText().Trim();
-    var size = new Size(25, 6);
-    var layerLen = size.Width * size.Height;
+    var size = new Int2(25, 6);
+    var layerLen = size.X * size.Y;
     var layerCount = pixels.Length / layerLen;
 
 // --- PART 1 ---
@@ -36,35 +36,20 @@ void Main()
                 .Select(i => pixels[i])
                 .DistinctWithCount())
             .MinBy(counts => counts['0']).First(),
-        counts => (counts['1'] * counts['2']).Dump().ShouldBe(1330));
+        counts => (counts['1'] * counts['2']))
+        .Dump().ShouldBe(1330);
 
 // --- PART 2 ---
 
-    var image = new bool[size.Width, size.Height];
-    for (var y = 0; y < size.Height; ++y)
+    Utils.OcrSmallText(size, pos =>
     {
-        for (var x = 0; x < size.Width; ++x)
+        for (var layer = 0; layer < layerCount; ++layer)
         {
-            for (var layer = 0; layer < layerCount; ++layer)
-            {
-                var pixel = pixels[layer * layerLen + (size.Width * y) + x];
-                if (pixel != '2')
-                {
-                    image[x, y] = pixel == '1';
-                    break;
-                }
-            }
+            var pixel = pixels[layer * layerLen + (size.X * pos.Y) + pos.X];
+            if (pixel != '2')
+                return pixel == '1';
         }
-    }
 
-    var renderPath = inputPath.Parent.Combine(inputPath.Parent.FileName + ".results.png");
-    try
-    {
-        Utils.RenderForOcr(renderPath, image);
-        Utils.Ocr(renderPath).Dump().ShouldBe("FAHEF");
-    }
-    finally
-    {
-        renderPath.DeleteIfExists();
-    }
+        return false;
+    }).Dump().ShouldBe("FAHEF");
 }

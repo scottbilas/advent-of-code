@@ -1,6 +1,7 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\libaoc\bin\Debug\netstandard2.1\libaoc2019.dll">C:\proj\advent-of-code\2019\libaoc\bin\Debug\netstandard2.1\libaoc2019.dll</Reference>
-  <Reference Relative="..\..\libaoc\bin\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\2019\libaoc\bin\Debug\netstandard2.1\libutils.dll</Reference>
+  <Reference Relative="..\bin\Debug\netstandard2.1\aoc2019.dll">C:\proj\advent-of-code\2019\aoc\bin\Debug\netstandard2.1\aoc2019.dll</Reference>
+  <Reference Relative="..\bin\Debug\netstandard2.1\libaoc2019.dll">C:\proj\advent-of-code\2019\aoc\bin\Debug\netstandard2.1\libaoc2019.dll</Reference>
+  <Reference Relative="..\bin\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\2019\aoc\bin\Debug\netstandard2.1\libutils.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\netstandard.dll</Reference>
   <NuGetReference>morelinq</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
@@ -87,86 +88,5 @@ void Main()
 int[] Run(int[] mem, int[] input) =>
     input.Select(i => Run(mem, i)).ToArray();
 
-int Run(int[] mem, int input)
-{
-    mem = mem.ToArray();
-
-    var lastOutput = 0;
-
-    for (var ip = 0; ; )
-    {
-        int NextMem() => mem[ip++];
-
-        // ABCDE
-        //  1002
-        // 
-        // DE - two-digit opcode,      02 == opcode 2
-        //  C - mode of 1st parameter,  0 == position mode
-        //  B - mode of 2nd parameter,  1 == immediate mode
-        //  A - mode of 3rd parameter,  0 == position mode,
-        //                                   omitted due to being a leading zero
-
-        int op = NextMem();
-        if (op == 99)
-            return lastOutput;
-
-        var modes = op / 100;
-        
-        int Next()
-        {
-            var mode = modes % 10;
-            modes /= 10;
-
-            var item = NextMem();
-            return mode == 0 ? mem[item] : item;
-        }
-        
-        (int a, int b) Next2() => (Next(), Next());
-        
-        switch (op % 100)
-        {
-            // add: adds together numbers read from two positions and stores the result in a third position
-            case 1:
-                With((src: Next2(), dst: NextMem()), v => mem[v.dst] = v.src.a + v.src.b);
-                break;
-
-            // multiply: works exactly like opcode 1, except it multiplies the two inputs instead of adding them
-            case 2:
-                With((src: Next2(), dst: NextMem()), v => mem[v.dst] = v.src.a * v.src.b);
-                break;
-
-            // input: takes a single integer as input and saves it to the position given by its only parameter
-            case 3:
-                mem[NextMem()] = input;
-                break;
-
-            // output: outputs the value of its only parameter
-            case 4:
-                lastOutput.ShouldBe(0, "nonzero means something went wrong in sim");
-                lastOutput = Next();
-                break;
-
-            // jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-            case 5:
-                With((src: Next(), dst: Next()), v => { if (v.src != 0) ip = v.dst; });
-                break;
-
-            // jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-            case 6:
-                With((src: Next(), dst: Next()), v => { if (v.src == 0) ip = v.dst; });
-                break;
-
-            // less-than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-            case 7:
-                With((src: Next2(), dst: NextMem()), v => mem[v.dst] = v.src.a < v.src.b ? 1 : 0);
-                break;
-
-            // equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter.Otherwise, it stores 0.
-            case 8:
-                With((src: Next2(), dst: NextMem()), v => mem[v.dst] = v.src.a == v.src.b ? 1 : 0);
-                break;
-                
-            default: throw new InvalidOperationException();
-        }
-    }
-}
+int Run(int[] mem, int input) =>
+    new IntCodeVM(mem, () => input).Run().Last();

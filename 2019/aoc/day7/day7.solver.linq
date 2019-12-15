@@ -1,4 +1,5 @@
 <Query Kind="Program">
+  <Reference Relative="..\bin\Debug\netstandard2.1\aoc2019.dll">C:\proj\advent-of-code\2019\aoc\bin\Debug\netstandard2.1\aoc2019.dll</Reference>
   <Reference Relative="..\..\libaoc\bin\Debug\netstandard2.1\libaoc2019.dll">C:\proj\advent-of-code\2019\libaoc\bin\Debug\netstandard2.1\libaoc2019.dll</Reference>
   <Reference Relative="..\..\libaoc\bin\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\2019\libaoc\bin\Debug\netstandard2.1\libutils.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\netstandard.dll</Reference>
@@ -82,119 +83,36 @@ int Run(int which, int[] mem, IList<int> phases) =>
     which == 1 ? Run1(mem, phases) : Run2(mem, phases);
 
 int Run1(int[] mem, IList<int> phases) =>
-    phases.Aggregate(0, (signal, phase) => new VM(mem, phase, () => signal).Run().Value);
+    phases.Aggregate(0, (signal, phase) => CreateVM(mem, phase, () => signal).Run().First());
 
 int Run2(int[] mem, IList<int> phases)
 {
     var signals = new int[phases.Count];
-   
+
     var loop = phases
         .Select((phase, i) => (
-            dst:  (i + 1) % phases.Count,
-            vm : new VM(mem, phase, () => signals[i])))
+            dst: (i + 1) % phases.Count,
+            vm: CreateVM(mem, phase, () => signals[i])))
         .ToArray();
 
     foreach (var item in loop.Repeat())
     {
-        var o = item.vm.Run();
+        var o = item.vm.Run().FirstOrNull();
         if (o == null)
             break;
-        signals[item.dst] = o.Value;
+        signals[item.dst] = (int)o.Value;
     }
     
     return signals[0];
 }
 
-class VM
+IntCodeVM CreateVM(int[] mem, int phase, Func<int> nextInput)
 {
-    public VM(int[] mem, int phase, Func<int> getInput)
+    var vm = new IntCodeVM(mem);
+    vm.NextInput = () =>
     {
-        Mem = mem.ToArray();
-
-        GetInput = () =>
-        {
-            GetInput = getInput;
-            return phase;
-        };
-    }
-    
-    public int[] Mem;
-    public int IP;
-    public Func<int> GetInput;
-
-    public int? Run()
-    {
-        for (;;)
-        {
-            int NextMem() => Mem[IP++];
-    
-            // ABCDE
-            //  1002
-            // 
-            // DE - two-digit opcode,      02 == opcode 2
-            //  C - mode of 1st parameter,  0 == position mode
-            //  B - mode of 2nd parameter,  1 == immediate mode
-            //  A - mode of 3rd parameter,  0 == position mode,
-            //                                   omitted due to being a leading zero
-    
-            int op = NextMem();
-            var modes = op / 100;
-    
-            int Next()
-            {
-                var mode = modes % 10;
-                modes /= 10;
-    
-                var item = NextMem();
-                return mode == 0 ? Mem[item] : item;
-            }
-    
-            (int a, int b) Next2() => (Next(), Next());
-    
-            switch (op % 100)
-            {
-                // add: adds together numbers read from two positions and stores the result in a third position
-                case 1:
-                    With((src: Next2(), dst: NextMem()), v => Mem[v.dst] = v.src.a + v.src.b);
-                    break;
-    
-                // multiply: works exactly like opcode 1, except it multiplies the two inputs instead of adding them
-                case 2:
-                    With((src: Next2(), dst: NextMem()), v => Mem[v.dst] = v.src.a * v.src.b);
-                    break;
-    
-                // input: takes a single integer as input and saves it to the position given by its only parameter
-                case 3:
-                    Mem[NextMem()] = GetInput();
-                    break;
-    
-                // output: outputs the value of its only parameter
-                case 4:
-                    return Next();
-    
-                // jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-                case 5:
-                    With((src: Next(), dst: Next()), v => { if (v.src != 0) IP = v.dst; });
-                    break;
-    
-                // jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-                case 6:
-                    With((src: Next(), dst: Next()), v => { if (v.src == 0) IP = v.dst; });
-                    break;
-    
-                // less-than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-                case 7:
-                    With((src: Next2(), dst: NextMem()), v => Mem[v.dst] = v.src.a < v.src.b ? 1 : 0);
-                    break;
-    
-                // equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter.Otherwise, it stores 0.
-                case 8:
-                    With((src: Next2(), dst: NextMem()), v => Mem[v.dst] = v.src.a == v.src.b ? 1 : 0);
-                    break;
-    
-                case 99:
-                    return null;
-            }
-        }
-    }
+        vm.NextInput = nextInput;
+        return phase;
+    };
+    return vm;
 }
