@@ -89,14 +89,6 @@ namespace Unity.Coding.Utils
             => @this.Select(item => (T?)item).SingleOrDefault();
 
         [NotNull]
-        public static HashSet<T> ToHashSet<T>([NotNull] this IEnumerable<T> @this, IEqualityComparer<T> comparer)
-            => new HashSet<T>(@this, comparer);
-
-        [NotNull]
-        public static HashSet<T> ToHashSet<T>([NotNull] this IEnumerable<T> @this)
-            => new HashSet<T>(@this);
-
-        [NotNull]
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>([NotNull] this IEnumerable<(TKey key, TValue value)> @this)
             => @this.ToDictionary(item => item.key, item => item.value);
 
@@ -125,5 +117,9 @@ namespace Unity.Coding.Utils
 
         public static IEnumerable<T> SelectMany<T>([NotNull] this IEnumerable<IEnumerable<T>> @this)
             => @this.SelectMany(_ => _);
+
+        public static IList<T> EnsureList<T>([NotNull] this IEnumerable<T> items) =>
+            (items as IList<T>) ?? items.ToList();
+
     }
 }

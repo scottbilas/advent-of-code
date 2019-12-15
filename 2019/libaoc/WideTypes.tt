@@ -47,6 +47,9 @@ for (var size = 2; size <= IntMax; ++size) {
             }
         }
 
+        public void Deconstruct(<#=Vars(v => $"out int {v}", ", ")#>) =>
+            (<#=Vars()#>) = (<#=Fields()#>);
+
         public bool Equals(<#=type#> other) =>
             <#=Fields(f => $"{f} == other.{f}", " && ")#>;
 
@@ -82,8 +85,14 @@ for (var size = 2; size <= IntMax; ++size) {
         public static ref readonly <#=type#> MaxValue => ref k_MaxValue;
         public static ref readonly <#=type#> MinValue => ref k_MinValue;
 
+        public bool IsZero => Equals(Zero);
+        public bool IsOne  => Equals(One);
+
         public <#=type#> Abs() =>
             new <#=type#>(<#=Fields(f => $"Math.Abs({f})")#>);
+
+        public static <#=type#> operator-(in <#=type#> i) =>
+            new <#=type#>(<#=Fields(f => $"-i.{f}")#>);
 
         public static <#=type#> operator +(in <#=type#> a, in <#=type#> b) =>
             new <#=type#>(<#=Fields(f => $"a.{f} + b.{f}")#>);
@@ -261,8 +270,12 @@ string Listify<T>(IEnumerable<T> items, string delim = ", ") =>
 
 string Fields<T>(Func<char, T> selector, string delim = ", ") =>
     Listify(fields, selector, delim);
+string Fields(string delim = ", ") =>
+    Listify(fields, delim);
 string Vars<T>(Func<char, T> selector, string delim = ", ") =>
     Listify(vars, selector, delim);
+string Vars(string delim = ", ") =>
+    Listify(vars, delim);
 string Repeat<T>(int count, T str, string delim = ", ") =>
     Listify(Enumerable.Repeat(str, count), delim);
 

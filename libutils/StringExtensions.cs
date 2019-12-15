@@ -54,6 +54,10 @@ namespace Unity.Coding.Utils
         }
 
         [NotNull]
+        public static IEnumerable<string> SelectStrings<T>([NotNull] this IEnumerable<T> @this) => @this
+            .Select(v => v.ToString());
+
+        [NotNull]
         public static string StringJoin([NotNull] this IEnumerable @this, [NotNull] string separator)
             => string.Join(separator, @this.Cast<object>());
 

@@ -37,6 +37,9 @@ namespace Aoc2019
             }
         }
 
+        public void Deconstruct(out int x, out int y) =>
+            (x, y) = (X, Y);
+
         public bool Equals(Int2 other) =>
             X == other.X && Y == other.Y;
 
@@ -70,8 +73,14 @@ namespace Aoc2019
         public static ref readonly Int2 MaxValue => ref k_MaxValue;
         public static ref readonly Int2 MinValue => ref k_MinValue;
 
+        public bool IsZero => Equals(Zero);
+        public bool IsOne  => Equals(One);
+
         public Int2 Abs() =>
             new Int2(Math.Abs(X), Math.Abs(Y));
+
+        public static Int2 operator-(in Int2 i) =>
+            new Int2(-i.X, -i.Y);
 
         public static Int2 operator +(in Int2 a, in Int2 b) =>
             new Int2(a.X + b.X, a.Y + b.Y);
@@ -148,6 +157,9 @@ namespace Aoc2019
             }
         }
 
+        public void Deconstruct(out int x, out int y, out int z) =>
+            (x, y, z) = (X, Y, Z);
+
         public bool Equals(Int3 other) =>
             X == other.X && Y == other.Y && Z == other.Z;
 
@@ -182,8 +194,14 @@ namespace Aoc2019
         public static ref readonly Int3 MaxValue => ref k_MaxValue;
         public static ref readonly Int3 MinValue => ref k_MinValue;
 
+        public bool IsZero => Equals(Zero);
+        public bool IsOne  => Equals(One);
+
         public Int3 Abs() =>
             new Int3(Math.Abs(X), Math.Abs(Y), Math.Abs(Z));
+
+        public static Int3 operator-(in Int3 i) =>
+            new Int3(-i.X, -i.Y, -i.Z);
 
         public static Int3 operator +(in Int3 a, in Int3 b) =>
             new Int3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
@@ -260,6 +278,9 @@ namespace Aoc2019
             }
         }
 
+        public void Deconstruct(out int x, out int y, out int z, out int w) =>
+            (x, y, z, w) = (X, Y, Z, W);
+
         public bool Equals(Int4 other) =>
             X == other.X && Y == other.Y && Z == other.Z && W == other.W;
 
@@ -295,8 +316,14 @@ namespace Aoc2019
         public static ref readonly Int4 MaxValue => ref k_MaxValue;
         public static ref readonly Int4 MinValue => ref k_MinValue;
 
+        public bool IsZero => Equals(Zero);
+        public bool IsOne  => Equals(One);
+
         public Int4 Abs() =>
             new Int4(Math.Abs(X), Math.Abs(Y), Math.Abs(Z), Math.Abs(W));
+
+        public static Int4 operator-(in Int4 i) =>
+            new Int4(-i.X, -i.Y, -i.Z, -i.W);
 
         public static Int4 operator +(in Int4 a, in Int4 b) =>
             new Int4(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);

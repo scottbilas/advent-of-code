@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using Combinatorics.Collections;
 using JetBrains.Annotations;
 using MoreLinq.Extensions;
 using Unity.Coding.Utils;
@@ -19,13 +21,13 @@ namespace Aoc2019
         public static IEnumerable<TR> Batch<T, TR>([NotNull] this IEnumerable<T> @this, int batchSize, [NotNull] Func<IReadOnlyList<T>, TR> selector) =>
             BatchExtension.Batch(@this, batchSize, b => selector(b.ToList()));
         /// <summary>Stream enumerable batches into 2-tuples</summary>
-        public static IEnumerable<ValueTuple<T, T>> Batch2<T>([NotNull] this IEnumerable<T> @this) =>
+        public static IEnumerable<(T a, T b)> Batch2<T>([NotNull] this IEnumerable<T> @this) =>
             @this.Batch(2).Select(b => b.First2());
         /// <summary>Stream enumerable batches into 3-tuples</summary>
-        public static IEnumerable<ValueTuple<T, T, T>> Batch3<T>([NotNull] this IEnumerable<T> @this) =>
+        public static IEnumerable<(T a, T b, T c)> Batch3<T>([NotNull] this IEnumerable<T> @this) =>
             @this.Batch(3).Select(b => b.First3());
         /// <summary>Stream enumerable batches into 4-tuples</summary>
-        public static IEnumerable<ValueTuple<T, T, T, T>> Batch4<T>([NotNull] this IEnumerable<T> @this) =>
+        public static IEnumerable<(T a, T b, T c, T d)> Batch4<T>([NotNull] this IEnumerable<T> @this) =>
             @this.Batch(4).Select(b => b.First4());
 
         public static void Copy<T>(this IReadOnlyList<T> @this, int srcOffset, T[] dst, int dstOffset, int count)
@@ -67,18 +69,18 @@ namespace Aoc2019
             return dict;
         }
 
-        public static Size GetDimensions<T>(this T[,] @this) =>
-            new Size(@this.GetLength(0), @this.GetLength(1));
+        public static Int2 GetDimensions<T>(this T[,] @this) =>
+            new Int2(@this.GetLength(0), @this.GetLength(1));
         
         public static IEnumerable<string> ToLines(this char[,] @this)
         {
             var size = @this.GetDimensions();
             
             var sb = new StringBuilder();
-            for (var y = 0; y < size.Height; ++y)
+            for (var y = 0; y < size.Y; ++y)
             {
                 sb.Clear();
-                for (var x = 0; x < size.Width; ++x)
+                for (var x = 0; x < size.X; ++x)
                     sb.Append(@this[x, y]);
                 yield return sb.ToString();
             }
@@ -90,27 +92,37 @@ namespace Aoc2019
         public static int ParseInt([NotNull] this string @this) =>
             int.Parse(@this);
 
-        public static int GroupInt([NotNull] this Match @this, int groupNum) =>
+        public static int Int([NotNull] this Match @this, int groupNum) =>
             @this.Groups[groupNum].Value.ParseInt();
-        public static int GroupInt([NotNull] this Match @this, string groupName) =>
+        public static int Int([NotNull] this Match @this, string groupName) =>
             @this.Groups[groupName].Value.ParseInt();
 
-        public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this, Size max)
+        public static string Text([NotNull] this Match @this, int groupNum) =>
+            @this.Groups[groupNum].Value;
+        public static string Text([NotNull] this Match @this, string groupName) =>
+            @this.Groups[groupName].Value;
+
+        public static bool Success([NotNull] this Match @this, int groupNum) =>
+            @this.Groups[groupNum].Success;
+        public static bool Success([NotNull] this Match @this, string groupName) =>
+            @this.Groups[groupName].Success;
+
+        public static IEnumerable<(T cell, Int2 pos)> SelectCells<T>(this T[,] @this, Int2 max)
         {
-            for (var y = 0; y < max.Height; ++y)
-                for (var x = 0; x < max.Width; ++x)
-                    yield return (cell: @this[x, y], x, y);
+            for (var y = 0; y < max.Y; ++y)
+                for (var x = 0; x < max.X; ++x)
+                    yield return (cell: @this[x, y], new Int2(x, y));
         }
 
-        public static IEnumerable<(T cell, int x, int y)> SelectCells<T>(this T[,] @this) =>
+        public static IEnumerable<(T cell, Int2 pos)> SelectCells<T>(this T[,] @this) =>
             @this.SelectCells(@this.GetDimensions());
         
-        public static IEnumerable<Point> SelectCoords<T>(this T[,] @this)
+        public static IEnumerable<Int2> SelectCoords<T>(this T[,] @this)
         {
             var size = @this.GetDimensions();
-            for (var y = 0; y < size.Height; ++y)
-                for (var x = 0; x < size.Width; ++x)
-                    yield return new Point(x, y);
+            for (var y = 0; y < size.Y; ++y)
+                for (var x = 0; x < size.X; ++x)
+                    yield return new Int2(x, y);
         }
 
         public static ValueTuple<T, T> First2<T>([NotNull] this IEnumerable<T> @this)
@@ -164,14 +176,14 @@ namespace Aoc2019
         public static T[,] Fill<T>(this T[,] @this, T value) =>
             @this.Fill(_ => value);
 
-        public static T[,] Fill<T>(this T[,] @this, Func<Point, T> generator)
+        public static T[,] Fill<T>(this T[,] @this, Func<Int2, T> generator)
         {
             foreach (var coord in @this.SelectCoords())
                 @this[coord.X, coord.Y] = generator(coord);
 
             return @this;
         }
-        
+
         public static Rectangle Bounds(this IEnumerable<Rectangle> @this)
         {
             var (l, t, r, b) = (int.MaxValue, int.MaxValue, int.MinValue, int.MinValue);  
@@ -237,6 +249,17 @@ namespace Aoc2019
         public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TValue defaultValue = default) =>
             new AutoDictionary<TKey, TValue>(@this, defaultValue);
 
+        /// <summary>Rotate a grid - useful for Dump() in LINQPad to match x,y</summary>
+        public static T[,] Transpose<T>([NotNull] this T[,] @this)
+        {
+            var (cx, cy) = @this.GetDimensions();
+            var newGrid = new T[cy, cx];
+            foreach (var (cell, (x, y)) in @this.SelectCells())
+                newGrid[y, x] = cell;
+
+            return newGrid;
+        }
+
         public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)
         {
             // TODO: use proper deque
@@ -289,7 +312,14 @@ namespace Aoc2019
         public static void With<T0, T1, T2, T3>(T0 v0, T1 v1, T2 v2, T3 v3, Action<T0, T1, T2, T3> action) => action(v0, v1, v2, v3);
         public static void With<T0, T1, T2, T3, T4>(T0 v0, T1 v1, T2 v2, T3 v3, T4 v4, Action<T0, T1, T2, T3, T4> action) => action(v0, v1, v2, v3, v4);
 
+        public static TR With<T0, TR>(T0 v0, Func<T0, TR> action) => action(v0);
+        public static TR With<T0, T1, TR>(T0 v0, T1 v1, Func<T0, T1, TR> action) => action(v0, v1);
+        public static TR With<T0, T1, T2, TR>(T0 v0, T1 v1, T2 v2, Func<T0, T1, T2, TR> action) => action(v0, v1, v2);
+        public static TR With<T0, T1, T2, T3, TR>(T0 v0, T1 v1, T2 v2, T3 v3, Func<T0, T1, T2, T3, TR> action) => action(v0, v1, v2, v3);
+        public static TR With<T0, T1, T2, T3, T4, TR>(T0 v0, T1 v1, T2 v2, T3 v3, T4 v4, Func<T0, T1, T2, T3, T4, TR> action) => action(v0, v1, v2, v3, v4);
+
         public static T[] Arr<T>(params T[] items) => items;
+        public static BigInteger[] BArr(params BigInteger[] items) => items;
 
         public static IEnumerable<T> Generate<T>(T initialState, Func<T, bool> condition, Func<T, T> iterate) =>
             EnumerableEx.Generate(initialState, condition, iterate, _ => _);
@@ -297,5 +327,31 @@ namespace Aoc2019
             EnumerableEx.Generate(initialState, _ => true, iterate, resultSelector);
         public static IEnumerable<T> Generate<T>(T initialState, Func<T, T> iterate) =>
             EnumerableEx.Generate(initialState, _ => true, iterate, _ => _);
+
+        public static (long index, T value) BinarySearch<T>(long lower, long upper, Func<long, T> valueProducer, Func<T, long> comparer)
+        {
+            while (lower <= upper)
+            {
+                var mid = (lower + upper) / 2;
+
+                var value = valueProducer(mid);
+                var test = comparer(value);
+
+                if (test < 0)
+                    upper = mid - 1;
+                else if (test > 0)
+                    lower = mid + 1;
+                else
+                    return (mid, value);
+            }
+
+            return (upper, valueProducer(upper));
+        }
+
+        public static Combinations<T> Combinations<T>([NotNull] this IEnumerable<T> items, int count) =>
+            new Combinations<T>(items.EnsureList(), 2);
+
+        public static IEnumerable<(T a, T b)> Combinations2<T>([NotNull] this IEnumerable<T> items) =>
+            Combinations(items, 2).Select(l => (l[0], l[1]));
     }
 }
