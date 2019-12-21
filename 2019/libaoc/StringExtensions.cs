@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using System.Text.RegularExpressions;
 using Combinatorics.Collections;
 using Unity.Coding.Utils;
@@ -149,5 +150,22 @@ namespace Aoc2019
         public static IEnumerable<float> SelectFloats([NotNull] this string @this) => @this
             .SelectMatches(@"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
             .Select(m => float.Parse(m.Value));
+
+        public static string ToStringRepeat([NotNull] this string text, int repeatCount)
+        {
+            var sb = new StringBuilder(text.Length * repeatCount);
+            for (var i = 0; i < repeatCount; ++i)
+                sb.Append(text);
+            return sb.ToString();
+        }
+
+        public static string ToString([NotNull] IEnumerable<char> @this) =>
+            new string(@this.ToArray());
+
+        public static int[] ToDigits([NotNull] this string @this) => @this.Select(c => c - '0').ToArray();
+
+        public static string FromDigits([NotNull] this IEnumerable<int> @this, int offset, int count) => FromDigits(@this.Skip(offset).Take(count));
+        public static string FromDigits([NotNull] this IEnumerable<int> @this, int offset) => FromDigits(@this.Skip(offset));
+        public static string FromDigits([NotNull] this IEnumerable<int> @this) => new string(@this.Select(i => (char)(i + '0')).ToArray());
     }
 }

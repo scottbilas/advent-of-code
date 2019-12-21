@@ -90,15 +90,33 @@ namespace Aoc2019
         }
 
         public static int Gcd(IEnumerable<int> nums) => nums.Aggregate(Gcd);
+        public static int Gcd(params int[] nums) => Gcd(nums.AsEnumerable());
         public static long Gcd(IEnumerable<long> nums) => nums.Aggregate(Gcd);
+        public static long Gcd(params long[] nums) => Gcd(nums.AsEnumerable());
 
-        public static long Lcm(IEnumerable<int> nums) =>
-            Lcm(nums.Select(n => (long)n)); // too likely for big numbers to arise
+        public static int Lcm(params int[] nums) => Lcm(nums.AsEnumerable());
+        public static long Lcm(params long[] nums) => Lcm(nums.AsEnumerable());
+
+        public static int Lcm(int a, int b)
+        {
+            checked { return a * b / Gcd(a, b); }
+        }
+
+        public static long Lcm(long a, long b)
+        {
+            checked { return a / Gcd(a, b) * b; }
+        }
+
+        public static int Lcm(IEnumerable<int> nums)
+        {
+            checked { return nums.Aggregate((a, b) => a / Gcd(a, b) * b); }
+        }
 
         public static long Lcm(IEnumerable<long> nums)
         {
-            checked { return nums.Aggregate((a, b) => a * b / Gcd(a, b)); }
+            checked { return nums.Aggregate((a, b) => a / Gcd(a, b) * b); }
         }
+
 
         public static IEnumerable<int> Factors(int num)
         {
