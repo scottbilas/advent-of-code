@@ -1,6 +1,6 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\..\temp\bin\aoc2019\Debug\netstandard2.1\libaoc2019.dll">C:\proj\advent-of-code\temp\bin\aoc2019\Debug\netstandard2.1\libaoc2019.dll</Reference>
-  <Reference Relative="..\..\..\temp\bin\aoc2019\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\temp\bin\aoc2019\Debug\netstandard2.1\libutils.dll</Reference>
+  <Reference Relative="..\..\..\temp\bin\libaoc2019\Debug\netstandard2.1\libaoc2019.dll">C:\proj\advent-of-code\temp\bin\libaoc2019\Debug\netstandard2.1\libaoc2019.dll</Reference>
+  <Reference Relative="..\..\..\temp\bin\libaoc2019\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\temp\bin\libaoc2019\Debug\netstandard2.1\libutils.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\netstandard.dll</Reference>
   <NuGetReference>Combinatorics</NuGetReference>
   <NuGetReference>morelinq</NuGetReference>
@@ -120,7 +120,7 @@ int Solve1(int steps, string startingPositions)
 
 long Solve2(string startingPositions)
 {
-    var found = new int[3]; // xyz
+    var found = new long[3]; // xyz
 
     var sim = new Sim(startingPositions);
     for (var step = 1; ; ++step)
