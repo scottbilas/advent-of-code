@@ -92,6 +92,9 @@ namespace Unity.Coding.Utils
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>([NotNull] this IEnumerable<(TKey key, TValue value)> @this)
             => @this.ToDictionary(item => item.key, item => item.value);
 
+        [NotNull]
+        public static Queue<T> ToQueue<T>([NotNull] this IEnumerable<T> @this) => new Queue<T>(@this);
+
         #if DOTNET_GREATER_EQUAL_4_71
         public static IEnumerable<T> Append<T>([NotNull] this IEnumerable<T> @this, T value)
         {
@@ -99,8 +102,10 @@ namespace Unity.Coding.Utils
                 yield return i;
             yield return value;
         }
-
         #endif
+
+        public static IEnumerable<T> Append<T>([NotNull] this IEnumerable<T> @this, params T[] values) =>
+            @this.Concat(values);
 
         #if DOTNET_GREATER_EQUAL_4_71
         public static IEnumerable<T> Prepend<T>([NotNull] this IEnumerable<T> @this, T value)
@@ -109,8 +114,10 @@ namespace Unity.Coding.Utils
             foreach (var i in @this)
                 yield return i;
         }
-
         #endif
+
+        public static IEnumerable<T> Prepend<T>([NotNull] this IEnumerable<T> @this, params T[] values) =>
+            @this.Prepend(values);
 
         public static bool IsNullOrEmpty<T>([CanBeNull] this IEnumerable<T> @this)
             => @this == null || !@this.Any();

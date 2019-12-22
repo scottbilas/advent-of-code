@@ -182,8 +182,8 @@ for (var size = 2; size <= BoolMax; ++size) { Init("Bool", size);#>
         public static bool operator ==(in <#=type#> left, in <#=type#> right) => left.Equals(right);
         public static bool operator !=(in <#=type#> left, in <#=type#> right) => !left.Equals(right);
 
-        public override string ToString() =>
-            $"<#=Fields(f => "{" + f + "}")#>";
+        public override string ToString() => $"<#=Fields(f => "{" + f + "}")#>";
+        public object ToDump() => ToString(); // linqpad
 
         static readonly <#=type#> k_False = new <#=type#>(false), k_True = new <#=type#>(true);
 

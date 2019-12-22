@@ -159,7 +159,7 @@ namespace Aoc2019
             return sb.ToString();
         }
 
-        public static string ToString([NotNull] IEnumerable<char> @this) =>
+        public static string ToStringFromChars([NotNull] this IEnumerable<char> @this) =>
             new string(@this.ToArray());
 
         public static int[] ToDigits([NotNull] this string @this) => @this.Select(c => c - '0').ToArray();

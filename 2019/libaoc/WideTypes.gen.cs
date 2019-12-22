@@ -403,8 +403,8 @@ namespace Aoc2019
         public static bool operator ==(in Bool2 left, in Bool2 right) => left.Equals(right);
         public static bool operator !=(in Bool2 left, in Bool2 right) => !left.Equals(right);
 
-        public override string ToString() =>
-            $"{X}, {Y}";
+        public override string ToString() => $"{X}, {Y}";
+        public object ToDump() => ToString(); // linqpad
 
         static readonly Bool2 k_False = new Bool2(false), k_True = new Bool2(true);
 
@@ -456,8 +456,8 @@ namespace Aoc2019
         public static bool operator ==(in Bool3 left, in Bool3 right) => left.Equals(right);
         public static bool operator !=(in Bool3 left, in Bool3 right) => !left.Equals(right);
 
-        public override string ToString() =>
-            $"{X}, {Y}, {Z}";
+        public override string ToString() => $"{X}, {Y}, {Z}";
+        public object ToDump() => ToString(); // linqpad
 
         static readonly Bool3 k_False = new Bool3(false), k_True = new Bool3(true);
 
@@ -509,8 +509,8 @@ namespace Aoc2019
         public static bool operator ==(in Bool4 left, in Bool4 right) => left.Equals(right);
         public static bool operator !=(in Bool4 left, in Bool4 right) => !left.Equals(right);
 
-        public override string ToString() =>
-            $"{X}, {Y}, {Z}, {W}";
+        public override string ToString() => $"{X}, {Y}, {Z}, {W}";
+        public object ToDump() => ToString(); // linqpad
 
         static readonly Bool4 k_False = new Bool4(false), k_True = new Bool4(true);
 

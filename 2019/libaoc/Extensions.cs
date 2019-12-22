@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -107,14 +108,14 @@ namespace Aoc2019
         public static bool Success([NotNull] this Match @this, string groupName) =>
             @this.Groups[groupName].Success;
 
-        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>(this T[,] @this, Int2 max)
+        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>([NotNull] this T[,] @this, Int2 max)
         {
             for (var y = 0; y < max.Y; ++y)
                 for (var x = 0; x < max.X; ++x)
                     yield return (new Int2(x, y), cell: @this[x, y]);
         }
 
-        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>(this T[,] @this) =>
+        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>([NotNull] this T[,] @this) =>
             @this.SelectCells(@this.GetDimensions());
         
         public static IEnumerable<Int2> SelectCoords<T>(this T[,] @this)
@@ -123,6 +124,31 @@ namespace Aoc2019
             for (var y = 0; y < size.Y; ++y)
                 for (var x = 0; x < size.X; ++x)
                     yield return new Int2(x, y);
+        }
+
+        public static IEnumerable<(Int2 pos, T cell)> SelectBorderCells<T>([NotNull] this T[,] @this, int borderWidth = 1) =>
+            @this.SelectBorderCoords(borderWidth).Select(pos => (pos, @this[pos.X, pos.Y]));
+
+        public static IEnumerable<(int x, int y, T cell)> SelectXy<T>([NotNull] this IEnumerable<(Int2 pos, T cell)> @this) =>
+            @this.Select(c => (c.pos.X, c.pos.Y, c.cell));
+
+        public static IEnumerable<Int2> SelectBorderCoords<T>([NotNull] this T[,] @this, int borderWidth = 1)
+        {
+            var (cx, cy) = @this.GetDimensions();
+
+            for (var b = 0; b < borderWidth; ++b)
+            {
+                for (var x = 0; x < cx; ++x)
+                {
+                    yield return new Int2(x, b);
+                    yield return new Int2(x, cy - b - 1);
+                }
+                for (var y = borderWidth; y < cy - borderWidth; ++y)
+                {
+                    yield return new Int2(b, y);
+                    yield return new Int2(cx - b - 1, y);
+                }
+            }
         }
 
         public static ValueTuple<T, T> First2<T>([NotNull] this IEnumerable<T> @this)
@@ -260,6 +286,43 @@ namespace Aoc2019
             return newGrid;
         }
 
+        public static T[,] AddBorder<T>([NotNull] this T[,] @this, T borderValue, int borderWidth = 1)
+        {
+            var (cx, cy) = @this.GetDimensions();
+            var newGrid = new T[cx + borderWidth * 2, cy + borderWidth * 2];
+            foreach (var (x, y) in newGrid.SelectBorderCoords(borderWidth))
+                newGrid[x, y] = borderValue;
+            foreach (var (pos, c) in @this.SelectCells())
+                newGrid[pos.X + borderWidth, pos.Y + borderWidth] = c;
+            return newGrid;
+        }
+
+        public static Size ToSize(this Int2 @this) => new Size(@this.X, @this.Y);
+
+        public static T At<T>(this T[,] @this, Int2 pos) => @this[pos.X, pos.Y];
+
+        public static Bitmap ToBitmap<T>([NotNull] this T[,] @this, Func<T, Color> selector, int scaleFactor = 4)
+        {
+            var (cx, cy) = @this.GetDimensions();
+            var bitmap = new Bitmap(cx, cy);
+            foreach (var (x, y, c) in @this.SelectCells().SelectXy())
+                bitmap.SetPixel(x, y, selector(c));
+
+            if (scaleFactor != 1)
+            {
+                var scaled = new Bitmap(cx * scaleFactor, cy * scaleFactor);
+
+                using var graphics = Graphics.FromImage(scaled);
+                graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+                graphics.DrawImage(bitmap, 0, 0, scaled.Width, scaled.Height);
+
+                bitmap.Dispose();
+                bitmap = scaled;
+            }
+
+            return bitmap;
+        }
+
         public static Int2 ReduceFraction(this Int2 @this)
         {
             if (@this.X == 0)
@@ -278,6 +341,9 @@ namespace Aoc2019
 
             return @this;
         }
+
+        public static TTo Translate<TFrom, TTo>([NotNull] this TFrom @this, params (TFrom, TTo)[] map) =>
+            map.Single(v => v.Item1.Equals(@this)).Item2;
 
         public static T PatternSeekingGetItemAt<T>([NotNull] this IEnumerable<T> @this, int index, int minRepeat = 10)
         {
