@@ -59,6 +59,27 @@ namespace Aoc2019
         public static string OcrSmallText(bool[,] pixels) =>
             OcrSmallText(pixels.GetDimensions(), pos => pixels[pos.X, pos.Y]);
 
+        public static byte[] RenderGraphViz(string dot)
+        {
+            var dotPath = NPath.SystemTemp.Combine(Guid.NewGuid() + ".dot");
+            var renderPath = dotPath.ChangeExtension(".png");
+            var invertPath = dotPath.ChangeExtension(".i.png");
+
+            try
+            {
+                dotPath.WriteAllText(dot);
+                ProcessUtility.ExecuteCommandLine("dot", $"-Tpng {dotPath} -o {renderPath}".Split(' '), null, null, null);
+                ProcessUtility.ExecuteCommandLine("magick", $"{renderPath} -channel RGB -negate {invertPath}".Split(' '), null, null, null);
+                return invertPath.ReadAllBytes();
+            }
+            finally
+            {
+                dotPath.DeleteIfExists();
+                renderPath.DeleteIfExists();
+                invertPath.DeleteIfExists();
+            }
+        }
+
         public static int Gcd(int a, int b)
         {
             a = Math.Abs(a);
@@ -117,12 +138,14 @@ namespace Aoc2019
             checked { return nums.Aggregate((a, b) => a / Gcd(a, b) * b); }
         }
 
-
         public static IEnumerable<int> Factors(int num)
         {
             for (var i = (int)Math.Sqrt(num) + 1; i >= 1; --i)
                 if (num % i == 0)
                     yield return i;
         }
+
+        public static void Minimize(ref int a, int b) => a = Math.Min(a, b);
+        public static void Maximize(ref int a, int b) => a = Math.Max(a, b);
     }
 }
