@@ -151,6 +151,15 @@ namespace Aoc2019
             }
         }
 
+        public static TValue? GetValueOrNull<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TKey key) where TValue : struct =>
+            @this.TryGetValue(key, out var value) ? value : (TValue?)null;
+
+        public static bool IsLetter(this char @this) => char.IsLetter(@this);
+        public static bool IsLower(this char @this) => char.IsLower(@this);
+        public static bool IsUpper(this char @this) => char.IsUpper(@this);
+        public static char ToLower(this char @this) => char.ToLower(@this);
+        public static char ToUpper(this char @this) => char.ToUpper(@this);
+
         public static ValueTuple<T, T> First2<T>([NotNull] this IEnumerable<T> @this)
         {
             using (var e = @this.GetEnumerator())
