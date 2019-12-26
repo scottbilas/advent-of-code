@@ -73,7 +73,7 @@ namespace Aoc2019
         public static Int2 GetDimensions<T>(this T[,] @this) =>
             new Int2(@this.GetLength(0), @this.GetLength(1));
         
-        public static IEnumerable<string> ToLines(this char[,] @this)
+        public static IEnumerable<string> ToLines<T>(this T[,] @this)
         {
             var size = @this.GetDimensions();
             
@@ -87,11 +87,14 @@ namespace Aoc2019
             }
         }
 
-        public static string ToText(this char[,] @this) =>
+        public static string ToText<T>(this T[,] @this) =>
             string.Join("\n", @this.ToLines());
 
         public static int ParseInt([NotNull] this string @this) =>
             int.Parse(@this);
+
+        public static IEnumerable<int> ParseInts([NotNull] this IEnumerable<string> @this) =>
+            @this.Select(int.Parse);
 
         public static int Int([NotNull] this Match @this, int groupNum) =>
             @this.Groups[groupNum].Value.ParseInt();
@@ -154,11 +157,11 @@ namespace Aoc2019
         public static TValue? GetValueOrNull<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TKey key) where TValue : struct =>
             @this.TryGetValue(key, out var value) ? value : (TValue?)null;
 
-        public static bool IsLetter(this char @this) => char.IsLetter(@this);
-        public static bool IsLower(this char @this) => char.IsLower(@this);
-        public static bool IsUpper(this char @this) => char.IsUpper(@this);
-        public static char ToLower(this char @this) => char.ToLower(@this);
-        public static char ToUpper(this char @this) => char.ToUpper(@this);
+        public static bool IsAsciiLetter(this char @this) => @this.IsAsciiLower() || @this.IsAsciiUpper();
+        public static bool IsAsciiLower(this char @this) => @this >= 'a' && @this <= 'z';
+        public static bool IsAsciiUpper(this char @this) => @this >= 'A' && @this <= 'Z';
+        public static char ToAsciiLower(this char @this) => @this.IsAsciiUpper() ? (char)(@this - 'A' + 'a') : @this;
+        public static char ToAsciiUpper(this char @this) => @this.IsAsciiLower() ? (char)(@this - 'a' + 'A') : @this;
 
         public static ValueTuple<T, T> First2<T>([NotNull] this IEnumerable<T> @this)
         {
@@ -256,7 +259,18 @@ namespace Aoc2019
             yield return new Point(@this.X, @this.Y + 1);
         }
 
+        public static IEnumerable<Int2> SelectAdjacent(this Int2 @this)
+        {
+            yield return new Int2(@this.X, @this.Y - 1);
+            yield return new Int2(@this.X - 1, @this.Y);
+            yield return new Int2(@this.X + 1, @this.Y);
+            yield return new Int2(@this.X, @this.Y + 1);
+        }
+
         public static IEnumerable<T> SelectAdjacent<T>(this Point @this, Func<Point, T> selector) =>
+            @this.SelectAdjacent().Select(selector);
+
+        public static IEnumerable<T> SelectAdjacent<T>(this Int2 @this, Func<Int2, T> selector) =>
             @this.SelectAdjacent().Select(selector);
 
         public static IEnumerable<Point> SelectAdjacentWithDiagonals(this Point @this)
@@ -273,7 +287,24 @@ namespace Aoc2019
             yield return new Point(@this.X + 1, @this.Y + 1);
         }
 
+        public static IEnumerable<Int2> SelectAdjacentWithDiagonals(this Int2 @this)
+        {
+            yield return new Int2(@this.X - 1, @this.Y - 1);
+            yield return new Int2(@this.X, @this.Y - 1);
+            yield return new Int2(@this.X + 1, @this.Y - 1);
+
+            yield return new Int2(@this.X - 1, @this.Y);
+            yield return new Int2(@this.X + 1, @this.Y);
+
+            yield return new Int2(@this.X - 1, @this.Y + 1);
+            yield return new Int2(@this.X, @this.Y + 1);
+            yield return new Int2(@this.X + 1, @this.Y + 1);
+        }
+
         public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Point @this, Func<Point, T> selector) =>
+            @this.SelectAdjacentWithDiagonals().Select(selector);
+
+        public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Int2 @this, Func<Int2, T> selector) =>
             @this.SelectAdjacentWithDiagonals().Select(selector);
 
         /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it the given default-get delegate</summary>
@@ -308,7 +339,8 @@ namespace Aoc2019
 
         public static Size ToSize(this Int2 @this) => new Size(@this.X, @this.Y);
 
-        public static T At<T>(this T[,] @this, Int2 pos) => @this[pos.X, pos.Y];
+        public static T GetAt<T>(this T[,] @this, in Int2 pos) => @this[pos.X, pos.Y];
+        public static T SetAt<T>(this T[,] @this, in Int2 pos, T value) => @this[pos.X, pos.Y] = value;
 
         public static Bitmap ToBitmap<T>([NotNull] this T[,] @this, Func<T, Color> selector, int scaleFactor = 4)
         {

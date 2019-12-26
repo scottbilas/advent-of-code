@@ -3,6 +3,7 @@
     <RootNamespace>Aoc2019</RootNamespace>
     <OutputPath>..\..\temp\bin\$(MSBuildProjectName)\$(Configuration)</OutputPath>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,5 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Include="RoyT.AStar" Version="2.1.0" />
+    <PackageReference Include="Shouldly" Version="3.0.2" />
   </ItemGroup>
 </Project>

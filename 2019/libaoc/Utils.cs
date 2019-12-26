@@ -59,24 +59,36 @@ namespace Aoc2019
         public static string OcrSmallText(bool[,] pixels) =>
             OcrSmallText(pixels.GetDimensions(), pos => pixels[pos.X, pos.Y]);
 
-        public static byte[] RenderGraphViz(string dot)
+        public static void RenderGraphViz(NPath png, string dot, params string[] extraArgs)
         {
             var dotPath = NPath.SystemTemp.Combine(Guid.NewGuid() + ".dot");
             var renderPath = dotPath.ChangeExtension(".png");
-            var invertPath = dotPath.ChangeExtension(".i.png");
 
             try
             {
                 dotPath.WriteAllText(dot);
-                ProcessUtility.ExecuteCommandLine("dot", $"-Tpng {dotPath} -o {renderPath}".Split(' '), null, null, null);
-                ProcessUtility.ExecuteCommandLine("magick", $"{renderPath} -channel RGB -negate {invertPath}".Split(' '), null, null, null);
-                return invertPath.ReadAllBytes();
+                ProcessUtility.ExecuteCommandLine("dot", $"-Gdpi=175 -Nfontname=Roboto -Efontname=Roboto -Tpng {dotPath} -o {renderPath}".Split(' ').Concat(extraArgs), null, null, null);
+                ProcessUtility.ExecuteCommandLine("magick", $"{renderPath} -channel RGB -negate {png}".Split(' '), null, null, null);
             }
             finally
             {
                 dotPath.DeleteIfExists();
                 renderPath.DeleteIfExists();
-                invertPath.DeleteIfExists();
+            }
+        }
+
+        public static byte[] RenderGraphViz(string dot, params string[] extraArgs)
+        {
+            var pngPath = NPath.SystemTemp.Combine(Guid.NewGuid() + ".png");
+
+            try
+            {
+                RenderGraphViz(pngPath, dot, extraArgs);
+                return pngPath.ReadAllBytes();
+            }
+            finally
+            {
+                pngPath.DeleteIfExists();
             }
         }
 
