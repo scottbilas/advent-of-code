@@ -122,8 +122,7 @@ void Render(char[,] grid)
         return Color.Pink;
     }
 
-    using (var b = grid.AddBorder('.', 2).ToBitmap(select, 20))
-        b.Dump();
+    Util.Image(grid.ToPng(select, 20, 10)).Dump();
 }
 
 (Dir r, Dir l, Int2 o)[] Moves = new[]
@@ -148,7 +147,7 @@ char[,] Sim(string[] program, char[,] grid, Int2 pos, Dir dir)
             for (var i = 0; i < count; ++i)
             {
                 pos += Moves[(int)dir].o;
-                if (grid.At(pos) != '.')
+                if (grid.GetAt(pos) != '.')
                     grid[pos.X, pos.Y] = name;
                 else
                     grid[pos.X, pos.Y] = 'X';

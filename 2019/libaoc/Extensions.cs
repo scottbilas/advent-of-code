@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -341,28 +340,6 @@ namespace Aoc2019
 
         public static T GetAt<T>(this T[,] @this, in Int2 pos) => @this[pos.X, pos.Y];
         public static T SetAt<T>(this T[,] @this, in Int2 pos, T value) => @this[pos.X, pos.Y] = value;
-
-        public static Bitmap ToBitmap<T>([NotNull] this T[,] @this, Func<T, Color> selector, int scaleFactor = 4)
-        {
-            var (cx, cy) = @this.GetDimensions();
-            var bitmap = new Bitmap(cx, cy);
-            foreach (var (x, y, c) in @this.SelectCells().SelectXy())
-                bitmap.SetPixel(x, y, selector(c));
-
-            if (scaleFactor != 1)
-            {
-                var scaled = new Bitmap(cx * scaleFactor, cy * scaleFactor);
-
-                using var graphics = Graphics.FromImage(scaled);
-                graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-                graphics.DrawImage(bitmap, 0, 0, scaled.Width, scaled.Height);
-
-                bitmap.Dispose();
-                bitmap = scaled;
-            }
-
-            return bitmap;
-        }
 
         public static Int2 ReduceFraction(this Int2 @this)
         {
