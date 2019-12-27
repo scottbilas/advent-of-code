@@ -51,10 +51,10 @@ IDictionary<Int2, Color> Solve(Color startColor, BigInteger[] mem)
 
     grid[pos] = startColor;
 
-    var vm = new IntCodeVM(mem, () => grid[pos] == Color.Black ? 0 : 1);
+    var vm = new BigIntegerCodeVM(mem, () => grid[pos] == Color.Black ? 0 : 1);
     foreach (var (newColor, newDir) in vm.Run().Batch2())
     {
-        grid[pos] = (Color)newColor;
+        grid[pos] = (Color)(int)newColor;
         dir = newDir == 1 ? DirRight[(int)dir] : DirLeft[(int)dir];
         pos += Move[(int)dir];
     }

@@ -1,6 +1,6 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\..\temp\bin\libaoc2019\Debug\netstandard2.1\libaoc2019.dll">C:\proj\advent-of-code\temp\bin\aoc2019\Debug\netstandard2.1\libaoc2019.dll</Reference>
-  <Reference Relative="..\..\..\temp\bin\libaoc2019\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\temp\bin\aoc2019\Debug\netstandard2.1\libutils.dll</Reference>
+  <Reference Relative="..\..\..\temp\bin\libaoc2019\Debug\netstandard2.1\libaoc2019.dll">C:\proj\advent-of-code\temp\bin\libaoc2019\Debug\netstandard2.1\libaoc2019.dll</Reference>
+  <Reference Relative="..\..\..\temp\bin\libaoc2019\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\temp\bin\libaoc2019\Debug\netstandard2.1\libutils.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\netstandard.dll</Reference>
   <NuGetReference>Combinatorics</NuGetReference>
   <NuGetReference>morelinq</NuGetReference>
@@ -32,7 +32,7 @@ void Main()
 
     {
         const int k_Expected = 7734;
-        var vm = new IntCodeVM(BArr(109, 19, 204, -34, 99));
+        var vm = new BigIntegerCodeVM(BArr(109, 19, 204, -34, 99));
         vm.Mem[1985] = k_Expected;
         vm.BaseOffset = 2000;
 
@@ -59,5 +59,5 @@ void Main()
     Run(2, mem).Single().Dump().ShouldBe(51135);
 }
 
-IEnumerable<BigInteger> Run(BigInteger[] mem) => new IntCodeVM(mem).BRun();
-IEnumerable<BigInteger> Run(int input, BigInteger[] mem) => new IntCodeVM(mem, () => input).BRun();
+IEnumerable<BigInteger> Run(BigInteger[] mem) => new BigIntegerCodeVM(mem).Run();
+IEnumerable<BigInteger> Run(int input, BigInteger[] mem) => new BigIntegerCodeVM(mem, () => input).Run();

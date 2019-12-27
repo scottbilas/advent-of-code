@@ -23,6 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="IntCodeVM.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IntCodeVM.gen.cs</LastGenOutput>
+    </None>
     <None Update="WideTypes.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>WideTypes.gen.cs</LastGenOutput>
@@ -30,6 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="IntCodeVM.gen.cs">
+      <DependentUpon>IntCodeVM.tt</DependentUpon>
+    </Compile>
     <Compile Update="WideTypes.gen.cs">
       <DependentUpon>WideTypes.tt</DependentUpon>
     </Compile>

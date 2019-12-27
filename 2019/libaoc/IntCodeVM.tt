@@ -1,3 +1,7 @@
+<#@ output extension=".gen.cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,44 +10,55 @@ using Unity.Coding.Utils;
 
 namespace Aoc2019
 {
-    public class IntCodeVM
+<#
+foreach (var type in new[] { "int", "BigInteger" }) {
+    var name = char.ToUpper(type[0]) + type.Substring(1);
+#>
+    public class <#=name#>CodeVM
     {
-        public IntCodeVM(IEnumerable<BigInteger> mem, Func<int> nextInput)
+        public <#=name#>CodeVM(IEnumerable<<#=type#>> mem, Func<int> nextInput)
             : this(mem) => NextInput = nextInput;
 
-        public IntCodeVM(IEnumerable<int> mem, Func<int> nextInput)
-            : this(mem) => NextInput = nextInput;
-
-        public IntCodeVM(IEnumerable<int> mem)
-            : this(mem.Select(m => (BigInteger)m).ToList()) { }
-
-        public IntCodeVM(IEnumerable<BigInteger> mem)
+        public <#=name#>CodeVM(IEnumerable<<#=type#>> mem)
         {
             var ip = 0;
             foreach (var m in mem)
                 Mem[ip++] = m;
         }
 
-        public IDictionary<BigInteger, BigInteger> Mem = new AutoDictionary<BigInteger, BigInteger>();
-        public BigInteger MemPtr, BaseOffset;
+        public <#=name#>CodeVM(IDictionary<<#=type#>, <#=type#>> mem) =>
+            Mem = new Dictionary<<#=type#>, <#=type#>>(mem).ToAutoDictionary();
+
+        public IDictionary<<#=type#>, <#=type#>> Mem = new AutoDictionary<<#=type#>, <#=type#>>();
+        public <#=type#> MemPtr, BaseOffset;
         public Func<int> NextInput;
 
-        BigInteger NextMem() => Mem[MemPtr++];
+        <#=type#> NextMem() => Mem[MemPtr++];
 
         public IEnumerable<string> Disassemble()
         {
             var disasm = new List<Instruction>();
-            var count = BRun(disasm).Count();
+            var count = Run(disasm).Count();
             if (count != 0)
                 throw new InvalidOperationException("unexpected yield while disassembling");
 
             return disasm.SelectStrings();
         }
 
-        public IEnumerable<int> Run() =>
-            BRun().Select(bi => (int)bi);
+        public IEnumerable<<#=type#>> Run(params int[] inputs)
+        {
+            var index = 0;
+            var oldFunc = NextInput;
 
-        public IEnumerable<BigInteger> BRun(List<Instruction> disasm = null)
+            NextInput = () => inputs[index++];
+
+            foreach (var i in Run())
+                yield return i;
+
+            NextInput = oldFunc;
+        }
+
+        public IEnumerable<<#=type#>> Run(List<Instruction> disasm = null)
         {
             for (; ; )
             {
@@ -62,7 +77,7 @@ namespace Aoc2019
                     RawOperation = instr,
                 });
 
-                BigInteger Next(bool forWrite)
+                <#=type#> Next(bool forWrite)
                 {
                     var mode = modes % 10;
                     modes /= 10;
@@ -74,8 +89,8 @@ namespace Aoc2019
                     return forWrite || mode == 1 ? item : Mem[item];
                 }
 
-                BigInteger NextRead() => Next(false);
-                BigInteger NextWrite() => Next(true);
+                <#=type#> NextRead() => Next(false);
+                <#=type#> NextWrite() => Next(true);
 
                 Param NextDisasm(string name)
                 {
@@ -84,7 +99,7 @@ namespace Aoc2019
                     return new Param { Name = name, Mode = (ParamMode)mode, Value = NextMem() };
                 }
 
-                void SrcSrcDst(Action<((BigInteger a, BigInteger b) src, BigInteger dst)> action, string opName, Func<Instruction, string> getComment)
+                void SrcSrcDst(Action<((<#=type#> a, <#=type#> b) src, <#=type#> dst)> action, string opName, Func<Instruction, string> getComment)
                 {
                     if (instruction == null)
                         action(((NextRead(), NextRead()), NextWrite()));
@@ -96,7 +111,7 @@ namespace Aoc2019
                     }
                 }
 
-                void SrcTgt(Action<(BigInteger src, BigInteger tgt)> action, string opName, Func<Instruction, string> getComment)
+                void SrcTgt(Action<(<#=type#> src, <#=type#> tgt)> action, string opName, Func<Instruction, string> getComment)
                 {
                     if (instruction == null)
                         action((NextRead(), NextRead()));
@@ -107,7 +122,7 @@ namespace Aoc2019
                         instruction.Params = new[] { NextDisasm("src"), NextDisasm("tgt") };
                     }
                 }
-                void Src(Action<BigInteger> action, string opName, Func<Instruction, string> getComment)
+                void Src(Action<<#=type#>> action, string opName, Func<Instruction, string> getComment)
                 {
                     if (instruction == null)
                         action(NextRead());
@@ -119,7 +134,7 @@ namespace Aoc2019
                     }
                 }
 
-                void InpDst(Action<(int inp, BigInteger dst)> action, string opName, Func<Instruction, string> getComment)
+                void InpDst(Action<(int inp, <#=type#> dst)> action, string opName, Func<Instruction, string> getComment)
                 {
                     if (instruction == null)
                         action((NextInput(), NextWrite()));
@@ -248,27 +263,21 @@ namespace Aoc2019
         {
             public string Name;
             public ParamMode Mode;
-            public BigInteger Value;
+            public <#=type#> Value;
 
-            public override string ToString()
-            {
-                switch (Mode)
+            public override string ToString() =>
+                Mode switch
                 {
-                    case ParamMode.Position:
-                        return $"[{Value}]";
-                    case ParamMode.Immediate:
-                        return Value.ToString();
-                    case ParamMode.Relative:
-                        return Value < 0 ? $"[R-{-Value}]" : $"[R+{Value}]";
-                }
-
-                throw new InvalidOperationException();
-            }
+                    ParamMode.Position  => $"[{Value}]",
+                    ParamMode.Immediate => Value.ToString(),
+                    ParamMode.Relative  => (Value < 0 ? $"[R-{-Value}]" : $"[R+{Value}]"),
+                    _ => throw new InvalidOperationException()
+                };
         }
 
         public class Instruction
         {
-            public BigInteger MemPtr;
+            public <#=type#> MemPtr;
             public int RawOperation;
             public Operation Operation;
             public string OperationText;
@@ -290,4 +299,6 @@ namespace Aoc2019
             }
         }
     }
+
+<#}#>
 }
