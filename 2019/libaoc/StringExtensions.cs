@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
-using Combinatorics.Collections;
 using Unity.Coding.Utils;
 using JetBrains.Annotations;
 
@@ -27,12 +25,12 @@ namespace Aoc2019
                 : new [] { @this };
         }
 
-        public static char[,] ToGrid([NotNull] this string @this)
+        public static char[,] ToGrid([NotNull] this string @this, bool trim = true)
         {
             var lines = @this
                 .Trim()
                 .Split('\n')
-                .Select(l => l.Trim())
+                .Select(l => trim ? l.Trim() : l)
                 .ToList();
 
             if (lines.Any(l => l.Length != lines[0].Length))
@@ -167,5 +165,10 @@ namespace Aoc2019
         public static string FromDigits([NotNull] this IEnumerable<int> @this, int offset, int count) => FromDigits(@this.Skip(offset).Take(count));
         public static string FromDigits([NotNull] this IEnumerable<int> @this, int offset) => FromDigits(@this.Skip(offset));
         public static string FromDigits([NotNull] this IEnumerable<int> @this) => new string(@this.Select(i => (char)(i + '0')).ToArray());
+
+        public static char? TryGetAt([NotNull] this string @this, int offset) =>
+            offset >= 0 && offset < @this.Length ? (char?)@this[offset] : null;
+        public static char TryGetAt([NotNull] this string @this, int offset, char defValue) =>
+            @this.TryGetAt(offset) ?? defValue;
     }
 }

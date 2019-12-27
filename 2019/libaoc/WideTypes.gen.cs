@@ -18,7 +18,7 @@ namespace Aoc2019
             (X, Y) = (v, v);
         public Int2(IEnumerable<int> xy) =>
             (X, Y) = xy.First2();
-        public Int2(ValueTuple<int, int> xy) =>
+        public Int2((int, int) xy) =>
             (X, Y) = xy;
 
         public unsafe int this[int index]
@@ -61,8 +61,8 @@ namespace Aoc2019
         public static Bool2 operator !=(in Int2 left, in Int2 right) =>
             new Bool2(left.X != right.X, left.Y != right.Y);
 
-        public override string ToString() =>
-            $"{X}, {Y}";
+        public override string ToString() => $"{X}, {Y}";
+        public object ToDump() => ToString(); // linqpad
 
         static readonly Int2 k_Zero = new Int2(0), k_One = new Int2(1);
         static readonly Int2 k_MaxValue = new Int2(Int32.MaxValue, Int32.MaxValue);
@@ -135,7 +135,7 @@ namespace Aoc2019
             (X, Y, Z) = (v, v, v);
         public Int3(IEnumerable<int> xyz) =>
             (X, Y, Z) = xyz.First3();
-        public Int3(ValueTuple<int, int, int> xyz) =>
+        public Int3((int, int, int) xyz) =>
             (X, Y, Z) = xyz;
 
         public unsafe int this[int index]
@@ -179,8 +179,8 @@ namespace Aoc2019
         public static Bool3 operator !=(in Int3 left, in Int3 right) =>
             new Bool3(left.X != right.X, left.Y != right.Y, left.Z != right.Z);
 
-        public override string ToString() =>
-            $"{X}, {Y}, {Z}";
+        public override string ToString() => $"{X}, {Y}, {Z}";
+        public object ToDump() => ToString(); // linqpad
 
         static readonly Int3 k_Zero = new Int3(0), k_One = new Int3(1);
         static readonly Int3 k_MaxValue = new Int3(Int32.MaxValue, Int32.MaxValue, Int32.MaxValue);
@@ -253,7 +253,7 @@ namespace Aoc2019
             (X, Y, Z, W) = (v, v, v, v);
         public Int4(IEnumerable<int> xyzw) =>
             (X, Y, Z, W) = xyzw.First4();
-        public Int4(ValueTuple<int, int, int, int> xyzw) =>
+        public Int4((int, int, int, int) xyzw) =>
             (X, Y, Z, W) = xyzw;
 
         public unsafe int this[int index]
@@ -298,8 +298,8 @@ namespace Aoc2019
         public static Bool4 operator !=(in Int4 left, in Int4 right) =>
             new Bool4(left.X != right.X, left.Y != right.Y, left.Z != right.Z, left.W != right.W);
 
-        public override string ToString() =>
-            $"{X}, {Y}, {Z}, {W}";
+        public override string ToString() => $"{X}, {Y}, {Z}, {W}";
+        public object ToDump() => ToString(); // linqpad
 
         static readonly Int4 k_Zero = new Int4(0), k_One = new Int4(1);
         static readonly Int4 k_MaxValue = new Int4(Int32.MaxValue, Int32.MaxValue, Int32.MaxValue, Int32.MaxValue);
@@ -372,7 +372,7 @@ namespace Aoc2019
             (X, Y) = (v, v);
         public Bool2(IEnumerable<bool> xy) =>
             (X, Y) = xy.First2();
-        public Bool2(ValueTuple<bool, bool> xy) =>
+        public Bool2((bool, bool) xy) =>
             (X, Y) = xy;
 
         public unsafe bool this[int index]
@@ -425,7 +425,7 @@ namespace Aoc2019
             (X, Y, Z) = (v, v, v);
         public Bool3(IEnumerable<bool> xyz) =>
             (X, Y, Z) = xyz.First3();
-        public Bool3(ValueTuple<bool, bool, bool> xyz) =>
+        public Bool3((bool, bool, bool) xyz) =>
             (X, Y, Z) = xyz;
 
         public unsafe bool this[int index]
@@ -478,7 +478,7 @@ namespace Aoc2019
             (X, Y, Z, W) = (v, v, v, v);
         public Bool4(IEnumerable<bool> xyzw) =>
             (X, Y, Z, W) = xyzw.First4();
-        public Bool4(ValueTuple<bool, bool, bool, bool> xyzw) =>
+        public Bool4((bool, bool, bool, bool) xyzw) =>
             (X, Y, Z, W) = xyzw;
 
         public unsafe bool this[int index]

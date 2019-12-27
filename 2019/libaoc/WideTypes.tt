@@ -28,7 +28,7 @@ for (var size = 2; size <= IntMax; ++size) {
             (<#=fieldList#>) = (<#=Repeat(size, "v")#>);
         public <#=type#>(IEnumerable<int> <#=combinedVars#>) =>
             (<#=fieldList#>) = <#=combinedVars#>.First<#=size#>();
-        public <#=type#>(ValueTuple<<#=Repeat(size, "int")#>> <#=combinedVars#>) =>
+        public <#=type#>((<#=Repeat(size, "int")#>) <#=combinedVars#>) =>
             (<#=fieldList#>) = <#=combinedVars#>;
 
         public unsafe int this[int index]
@@ -73,8 +73,8 @@ for (var size = 2; size <= IntMax; ++size) {
         public static <#=btype#> operator !=(in <#=type#> left, in <#=type#> right) =>
             new <#=btype#>(<#=Fields(f => $"left.{f} != right.{f}")#>);
 
-        public override string ToString() =>
-            $"<#=Fields(f => "{" + f + "}")#>";
+        public override string ToString() => $"<#=Fields(f => "{" + f + "}")#>";
+        public object ToDump() => ToString(); // linqpad
 
         static readonly <#=type#> k_Zero = new <#=type#>(0), k_One = new <#=type#>(1);
         static readonly <#=type#> k_MaxValue = new <#=type#>(<#=Repeat(size, "Int32.MaxValue")#>);
@@ -151,7 +151,7 @@ for (var size = 2; size <= BoolMax; ++size) { Init("Bool", size);#>
             (<#=fieldList#>) = (<#=Repeat(size, "v")#>);
         public <#=type#>(IEnumerable<bool> <#=combinedVars#>) =>
             (<#=fieldList#>) = <#=combinedVars#>.First<#=size#>();
-        public <#=type#>(ValueTuple<<#=Repeat(size, "bool")#>> <#=combinedVars#>) =>
+        public <#=type#>((<#=Repeat(size, "bool")#>) <#=combinedVars#>) =>
             (<#=fieldList#>) = <#=combinedVars#>;
 
         public unsafe bool this[int index]

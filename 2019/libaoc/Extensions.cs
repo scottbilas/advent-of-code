@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -110,48 +109,26 @@ namespace Aoc2019
         public static bool Success([NotNull] this Match @this, string groupName) =>
             @this.Groups[groupName].Success;
 
-        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>([NotNull] this T[,] @this, Int2 max)
-        {
-            for (var y = 0; y < max.Y; ++y)
-                for (var x = 0; x < max.X; ++x)
-                    yield return (new Int2(x, y), cell: @this[x, y]);
-        }
+        public static RectInt2 GetRect<T>([NotNull] this T[,] @this) =>
+            @this.GetDimensions().SizeToRect();
+
+        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>([NotNull] this T[,] @this, IEnumerable<Int2> coords) =>
+            coords.Select(pos => (pos, @this[pos.X, pos.Y]));
+
+        public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>([NotNull] this T[,] @this, in RectInt2 rect) =>
+            @this.SelectCells(rect.SelectCoords());
 
         public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>([NotNull] this T[,] @this) =>
-            @this.SelectCells(@this.GetDimensions());
-        
-        public static IEnumerable<Int2> SelectCoords<T>(this T[,] @this)
-        {
-            var size = @this.GetDimensions();
-            for (var y = 0; y < size.Y; ++y)
-                for (var x = 0; x < size.X; ++x)
-                    yield return new Int2(x, y);
-        }
+            @this.SelectCells(@this.GetRect());
+
+        public static IEnumerable<Int2> SelectCoords<T>(this T[,] @this) =>
+            @this.GetRect().SelectCoords();
 
         public static IEnumerable<(Int2 pos, T cell)> SelectBorderCells<T>([NotNull] this T[,] @this, int borderWidth = 1) =>
-            @this.SelectBorderCoords(borderWidth).Select(pos => (pos, @this[pos.X, pos.Y]));
+            @this.GetRect().SelectBorderCoords(borderWidth).Select(pos => (pos, @this[pos.X, pos.Y]));
 
         public static IEnumerable<(int x, int y, T cell)> SelectXy<T>([NotNull] this IEnumerable<(Int2 pos, T cell)> @this) =>
             @this.Select(c => (c.pos.X, c.pos.Y, c.cell));
-
-        public static IEnumerable<Int2> SelectBorderCoords<T>([NotNull] this T[,] @this, int borderWidth = 1)
-        {
-            var (cx, cy) = @this.GetDimensions();
-
-            for (var b = 0; b < borderWidth; ++b)
-            {
-                for (var x = 0; x < cx; ++x)
-                {
-                    yield return new Int2(x, b);
-                    yield return new Int2(x, cy - b - 1);
-                }
-                for (var y = borderWidth; y < cy - borderWidth; ++y)
-                {
-                    yield return new Int2(b, y);
-                    yield return new Int2(cx - b - 1, y);
-                }
-            }
-        }
 
         public static TValue? GetValueOrNull<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TKey key) where TValue : struct =>
             @this.TryGetValue(key, out var value) ? value : (TValue?)null;
@@ -221,24 +198,7 @@ namespace Aoc2019
             return @this;
         }
 
-        public static Rectangle Bounds(this IEnumerable<Rectangle> @this)
-        {
-            var (l, t, r, b) = (int.MaxValue, int.MaxValue, int.MinValue, int.MinValue);  
-            foreach (var rect in @this)
-            {
-                l = Math.Min(l, rect.Left);
-                t = Math.Min(t, rect.Top);
-                r = Math.Max(r, rect.Right);
-                b = Math.Max(b, rect.Bottom);
-            }
-
-            return Rectangle.FromLTRB(l, t, r, b);
-        }
-
-        public static Point BottomRight(in this Rectangle @this) =>
-            new Point(@this.Right, @this.Bottom);
-
-        public static IEnumerable<T> OrderByReading<T>(this IEnumerable<T> @this, Func<T, Point> selector)
+        public static IEnumerable<T> OrderByReading<T>(this IEnumerable<T> @this, Func<T, Int2> selector)
         {
             return
                 from item in @this
@@ -247,16 +207,8 @@ namespace Aoc2019
                 select item;
         }
 
-        public static IEnumerable<Point> OrderByReading(this IEnumerable<Point> @this) =>
+        public static IEnumerable<Int2> OrderByReading(this IEnumerable<Int2> @this) =>
             @this.OrderByReading(_ => _);
-
-        public static IEnumerable<Point> SelectAdjacent(this Point @this)
-        {
-            yield return new Point(@this.X, @this.Y - 1);
-            yield return new Point(@this.X - 1, @this.Y);
-            yield return new Point(@this.X + 1, @this.Y);
-            yield return new Point(@this.X, @this.Y + 1);
-        }
 
         public static IEnumerable<Int2> SelectAdjacent(this Int2 @this)
         {
@@ -266,25 +218,8 @@ namespace Aoc2019
             yield return new Int2(@this.X, @this.Y + 1);
         }
 
-        public static IEnumerable<T> SelectAdjacent<T>(this Point @this, Func<Point, T> selector) =>
-            @this.SelectAdjacent().Select(selector);
-
         public static IEnumerable<T> SelectAdjacent<T>(this Int2 @this, Func<Int2, T> selector) =>
             @this.SelectAdjacent().Select(selector);
-
-        public static IEnumerable<Point> SelectAdjacentWithDiagonals(this Point @this)
-        {
-            yield return new Point(@this.X - 1, @this.Y - 1);
-            yield return new Point(@this.X, @this.Y - 1);
-            yield return new Point(@this.X + 1, @this.Y - 1);
-            
-            yield return new Point(@this.X - 1, @this.Y);
-            yield return new Point(@this.X + 1, @this.Y);
-            
-            yield return new Point(@this.X - 1, @this.Y + 1);
-            yield return new Point(@this.X, @this.Y + 1);
-            yield return new Point(@this.X + 1, @this.Y + 1);
-        }
 
         public static IEnumerable<Int2> SelectAdjacentWithDiagonals(this Int2 @this)
         {
@@ -299,9 +234,6 @@ namespace Aoc2019
             yield return new Int2(@this.X, @this.Y + 1);
             yield return new Int2(@this.X + 1, @this.Y + 1);
         }
-
-        public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Point @this, Func<Point, T> selector) =>
-            @this.SelectAdjacentWithDiagonals().Select(selector);
 
         public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Int2 @this, Func<Int2, T> selector) =>
             @this.SelectAdjacentWithDiagonals().Select(selector);
@@ -329,14 +261,12 @@ namespace Aoc2019
         {
             var (cx, cy) = @this.GetDimensions();
             var newGrid = new T[cx + borderWidth * 2, cy + borderWidth * 2];
-            foreach (var (x, y) in newGrid.SelectBorderCoords(borderWidth))
+            foreach (var (x, y) in newGrid.GetRect().SelectBorderCoords(borderWidth))
                 newGrid[x, y] = borderValue;
             foreach (var (pos, c) in @this.SelectCells())
                 newGrid[pos.X + borderWidth, pos.Y + borderWidth] = c;
             return newGrid;
         }
-
-        public static Size ToSize(this Int2 @this) => new Size(@this.X, @this.Y);
 
         public static T GetAt<T>(this T[,] @this, in Int2 pos) => @this[pos.X, pos.Y];
         public static T SetAt<T>(this T[,] @this, in Int2 pos, T value) => @this[pos.X, pos.Y] = value;
@@ -382,7 +312,7 @@ namespace Aoc2019
                 {
                     // $$$$ don't use list[] or Equals(), work with indices and deltas..
                     var ok = true;
-                    var match = list[list.Count - 1];
+                    var match = list[^1];
                     for (var repeat = 1; repeat < minRepeat; ++repeat)
                     {
                         if (!Equals(list[list.Count - 1 - repeat], match))
@@ -394,7 +324,7 @@ namespace Aoc2019
 
                     if (ok)
                     {
-                        var delta = list[list.Count - 1] - list[list.Count - 2];
+                        var delta = list[^1] - list[^2];
                         if ((index - i) % delta == 0)
                             return item;
                     }

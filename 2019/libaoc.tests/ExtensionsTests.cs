@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using NUnit.Framework;
 using Shouldly;
 using static Aoc2019.MiscStatics;
@@ -39,6 +38,34 @@ namespace Aoc2019
                 (0, 2, 'k'), (1, 2, 'l'),              (3, 2, 'n'), (4, 2, 'o'),
                 (0, 3, 'p'), (1, 3, 'q'), (2, 3, 'r'), (3, 3, 's'), (4, 3, 't'),
                 (0, 4, 'u'), (1, 4, 'v'), (2, 4, 'w'), (3, 4, 'x'), (4, 4, 'y')));
+        }
+
+        [Test]
+        public void SelectDeflate_WithSameWidthAndHeight()
+        {
+            var grid = @"
+                abcde
+                fghij
+                klmno
+                pqrst
+                uvwxy".ToGrid();
+            grid.SelectCells(grid.GetRect().Deflate(1)).SelectXy().ShouldBe(ignoreOrder: true, expected: Arr(
+                             (1, 1, 'g'), (2, 1, 'h'), (3, 1, 'i'),
+                             (1, 2, 'l'), (2, 2, 'm'), (3, 2, 'n'),
+                             (1, 3, 'q'), (2, 3, 'r'), (3, 3, 's')));
+        }
+
+        [Test]
+        public void SelectDeflate_WithDifferentWidthAndHeight()
+        {
+            var grid = @"
+                abcde
+                fghij
+                klmno
+                pqrst
+                uvwxy".ToGrid();
+            grid.SelectCells(grid.GetRect().Deflate(1, 2)).SelectXy().ShouldBe(ignoreOrder: true, expected: Arr(
+                (1, 2, 'l'), (2, 2, 'm'), (3, 2, 'n')));
         }
 
         [Test]
