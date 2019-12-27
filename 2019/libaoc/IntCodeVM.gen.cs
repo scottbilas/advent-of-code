@@ -4,28 +4,29 @@ using System.Linq;
 using System.Numerics;
 using Unity.Coding.Utils;
 
+// ReSharper disable RedundantCast
+
 namespace Aoc2019
 {
     public class IntCodeVM
     {
-        public IntCodeVM(IEnumerable<int> mem, Func<int> nextInput)
-            : this(mem) => NextInput = nextInput;
-
-        public IntCodeVM(IEnumerable<int> mem)
-        {
-            var ip = 0;
-            foreach (var m in mem)
-                Mem[ip++] = m;
-        }
-
-        public IntCodeVM(IDictionary<int, int> mem) =>
-            Mem = new Dictionary<int, int>(mem).ToAutoDictionary();
-
-        public IDictionary<int, int> Mem = new AutoDictionary<int, int>();
         public int MemPtr, BaseOffset;
         public Func<int> NextInput;
 
-        int NextMem() => Mem[MemPtr++];
+        int[] m_ArrayMem;
+        IDictionary<int, int> m_ExtraMem = new AutoDictionary<int, int>();
+
+        public IntCodeVM(IEnumerable<int> mem, Func<int> nextInput = null)
+        {
+            m_ArrayMem = mem.ToArray();
+            NextInput = nextInput;
+        }
+
+        public int GetMemAt(int ptr) =>
+            ptr < m_ArrayMem.Length ? m_ArrayMem[(int)ptr] : m_ExtraMem[ptr];
+        public int SetMemAt(int ptr, int value) =>
+            ptr < m_ArrayMem.Length ? m_ArrayMem[(int)ptr] = value : m_ExtraMem[ptr] = value;
+        int NextMem() => GetMemAt(MemPtr++);
 
         public IEnumerable<string> Disassemble()
         {
@@ -52,9 +53,9 @@ namespace Aoc2019
 
         public IEnumerable<int> Run(List<Instruction> disasm = null)
         {
-            for (; ; )
+            for (;;)
             {
-                if (MemPtr < 0 || MemPtr >= Mem.Count)
+                if (MemPtr == m_ArrayMem.Length)
                     break;
 
                 var instr = (int)NextMem();
@@ -78,7 +79,7 @@ namespace Aoc2019
                     if (mode == 2)
                         item += BaseOffset;
 
-                    return forWrite || mode == 1 ? item : Mem[item];
+                    return forWrite || mode == 1 ? item : GetMemAt(item);
                 }
 
                 int NextRead() => Next(false);
@@ -144,25 +145,25 @@ namespace Aoc2019
 
                     case Operation.Add:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a + v.src.b,
+                            v => SetMemAt(v.dst, v.src.a + v.src.b),
                             "add", i => $"{i.Param("dst")} = {i.Param("src.a")} + {i.Param("src.b")}");
                         break;
 
                     case Operation.Multiply:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a * v.src.b,
+                            v => SetMemAt(v.dst, v.src.a * v.src.b),
                             "mul", i => $"{i.Param("dst")} = {i.Param("src.a")} * {i.Param("src.b")}");
                         break;
 
                     case Operation.LessThan:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a < v.src.b ? 1 : 0,
+                            v => SetMemAt(v.dst, v.src.a < v.src.b ? 1 : 0),
                             "les", i => $"{i.Param("dst")} = {i.Param("src.a")} < {i.Param("src.b")}");
                         break;
 
                     case Operation.Equals:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a == v.src.b ? 1 : 0,
+                            v => SetMemAt(v.dst, v.src.a == v.src.b ? 1 : 0),
                             "equ", i => $"{i.Param("dst")} = {i.Param("src.a")} == {i.Param("src.b")}");
                         break;
 
@@ -187,7 +188,7 @@ namespace Aoc2019
                         break;
 
                     case Operation.Input:
-                        InpDst(v => Mem[v.dst] = v.inp, "inp", i => $"{i.Param("dst")} = input");
+                        InpDst(v => SetMemAt(v.dst, v.inp), "inp", i => $"{i.Param("dst")} = input");
                         break;
 
                     case Operation.Output:
@@ -294,24 +295,23 @@ namespace Aoc2019
 
     public class BigIntegerCodeVM
     {
-        public BigIntegerCodeVM(IEnumerable<BigInteger> mem, Func<int> nextInput)
-            : this(mem) => NextInput = nextInput;
-
-        public BigIntegerCodeVM(IEnumerable<BigInteger> mem)
-        {
-            var ip = 0;
-            foreach (var m in mem)
-                Mem[ip++] = m;
-        }
-
-        public BigIntegerCodeVM(IDictionary<BigInteger, BigInteger> mem) =>
-            Mem = new Dictionary<BigInteger, BigInteger>(mem).ToAutoDictionary();
-
-        public IDictionary<BigInteger, BigInteger> Mem = new AutoDictionary<BigInteger, BigInteger>();
         public BigInteger MemPtr, BaseOffset;
         public Func<int> NextInput;
 
-        BigInteger NextMem() => Mem[MemPtr++];
+        BigInteger[] m_ArrayMem;
+        IDictionary<BigInteger, BigInteger> m_ExtraMem = new AutoDictionary<BigInteger, BigInteger>();
+
+        public BigIntegerCodeVM(IEnumerable<BigInteger> mem, Func<int> nextInput = null)
+        {
+            m_ArrayMem = mem.ToArray();
+            NextInput = nextInput;
+        }
+
+        public BigInteger GetMemAt(BigInteger ptr) =>
+            ptr < m_ArrayMem.Length ? m_ArrayMem[(int)ptr] : m_ExtraMem[ptr];
+        public BigInteger SetMemAt(BigInteger ptr, BigInteger value) =>
+            ptr < m_ArrayMem.Length ? m_ArrayMem[(int)ptr] = value : m_ExtraMem[ptr] = value;
+        BigInteger NextMem() => GetMemAt(MemPtr++);
 
         public IEnumerable<string> Disassemble()
         {
@@ -338,9 +338,9 @@ namespace Aoc2019
 
         public IEnumerable<BigInteger> Run(List<Instruction> disasm = null)
         {
-            for (; ; )
+            for (;;)
             {
-                if (MemPtr < 0 || MemPtr >= Mem.Count)
+                if (MemPtr == m_ArrayMem.Length)
                     break;
 
                 var instr = (int)NextMem();
@@ -364,7 +364,7 @@ namespace Aoc2019
                     if (mode == 2)
                         item += BaseOffset;
 
-                    return forWrite || mode == 1 ? item : Mem[item];
+                    return forWrite || mode == 1 ? item : GetMemAt(item);
                 }
 
                 BigInteger NextRead() => Next(false);
@@ -430,25 +430,25 @@ namespace Aoc2019
 
                     case Operation.Add:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a + v.src.b,
+                            v => SetMemAt(v.dst, v.src.a + v.src.b),
                             "add", i => $"{i.Param("dst")} = {i.Param("src.a")} + {i.Param("src.b")}");
                         break;
 
                     case Operation.Multiply:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a * v.src.b,
+                            v => SetMemAt(v.dst, v.src.a * v.src.b),
                             "mul", i => $"{i.Param("dst")} = {i.Param("src.a")} * {i.Param("src.b")}");
                         break;
 
                     case Operation.LessThan:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a < v.src.b ? 1 : 0,
+                            v => SetMemAt(v.dst, v.src.a < v.src.b ? 1 : 0),
                             "les", i => $"{i.Param("dst")} = {i.Param("src.a")} < {i.Param("src.b")}");
                         break;
 
                     case Operation.Equals:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a == v.src.b ? 1 : 0,
+                            v => SetMemAt(v.dst, v.src.a == v.src.b ? 1 : 0),
                             "equ", i => $"{i.Param("dst")} = {i.Param("src.a")} == {i.Param("src.b")}");
                         break;
 
@@ -473,7 +473,7 @@ namespace Aoc2019
                         break;
 
                     case Operation.Input:
-                        InpDst(v => Mem[v.dst] = v.inp, "inp", i => $"{i.Param("dst")} = input");
+                        InpDst(v => SetMemAt(v.dst, v.inp), "inp", i => $"{i.Param("dst")} = input");
                         break;
 
                     case Operation.Output:

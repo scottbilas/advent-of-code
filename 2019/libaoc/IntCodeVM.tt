@@ -8,6 +8,8 @@ using System.Linq;
 using System.Numerics;
 using Unity.Coding.Utils;
 
+// ReSharper disable RedundantCast
+
 namespace Aoc2019
 {
 <#
@@ -16,24 +18,23 @@ foreach (var type in new[] { "int", "BigInteger" }) {
 #>
     public class <#=name#>CodeVM
     {
-        public <#=name#>CodeVM(IEnumerable<<#=type#>> mem, Func<int> nextInput)
-            : this(mem) => NextInput = nextInput;
-
-        public <#=name#>CodeVM(IEnumerable<<#=type#>> mem)
-        {
-            var ip = 0;
-            foreach (var m in mem)
-                Mem[ip++] = m;
-        }
-
-        public <#=name#>CodeVM(IDictionary<<#=type#>, <#=type#>> mem) =>
-            Mem = new Dictionary<<#=type#>, <#=type#>>(mem).ToAutoDictionary();
-
-        public IDictionary<<#=type#>, <#=type#>> Mem = new AutoDictionary<<#=type#>, <#=type#>>();
         public <#=type#> MemPtr, BaseOffset;
         public Func<int> NextInput;
 
-        <#=type#> NextMem() => Mem[MemPtr++];
+        <#=type#>[] m_ArrayMem;
+        IDictionary<<#=type#>, <#=type#>> m_ExtraMem = new AutoDictionary<<#=type#>, <#=type#>>();
+
+        public <#=name#>CodeVM(IEnumerable<<#=type#>> mem, Func<int> nextInput = null)
+        {
+            m_ArrayMem = mem.ToArray();
+            NextInput = nextInput;
+        }
+
+        public <#=type#> GetMemAt(<#=type#> ptr) =>
+            ptr < m_ArrayMem.Length ? m_ArrayMem[(int)ptr] : m_ExtraMem[ptr];
+        public <#=type#> SetMemAt(<#=type#> ptr, <#=type#> value) =>
+            ptr < m_ArrayMem.Length ? m_ArrayMem[(int)ptr] = value : m_ExtraMem[ptr] = value;
+        <#=type#> NextMem() => GetMemAt(MemPtr++);
 
         public IEnumerable<string> Disassemble()
         {
@@ -60,9 +61,9 @@ foreach (var type in new[] { "int", "BigInteger" }) {
 
         public IEnumerable<<#=type#>> Run(List<Instruction> disasm = null)
         {
-            for (; ; )
+            for (;;)
             {
-                if (MemPtr < 0 || MemPtr >= Mem.Count)
+                if (MemPtr == m_ArrayMem.Length)
                     break;
 
                 var instr = (int)NextMem();
@@ -86,7 +87,7 @@ foreach (var type in new[] { "int", "BigInteger" }) {
                     if (mode == 2)
                         item += BaseOffset;
 
-                    return forWrite || mode == 1 ? item : Mem[item];
+                    return forWrite || mode == 1 ? item : GetMemAt(item);
                 }
 
                 <#=type#> NextRead() => Next(false);
@@ -152,25 +153,25 @@ foreach (var type in new[] { "int", "BigInteger" }) {
 
                     case Operation.Add:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a + v.src.b,
+                            v => SetMemAt(v.dst, v.src.a + v.src.b),
                             "add", i => $"{i.Param("dst")} = {i.Param("src.a")} + {i.Param("src.b")}");
                         break;
 
                     case Operation.Multiply:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a * v.src.b,
+                            v => SetMemAt(v.dst, v.src.a * v.src.b),
                             "mul", i => $"{i.Param("dst")} = {i.Param("src.a")} * {i.Param("src.b")}");
                         break;
 
                     case Operation.LessThan:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a < v.src.b ? 1 : 0,
+                            v => SetMemAt(v.dst, v.src.a < v.src.b ? 1 : 0),
                             "les", i => $"{i.Param("dst")} = {i.Param("src.a")} < {i.Param("src.b")}");
                         break;
 
                     case Operation.Equals:
                         SrcSrcDst(
-                            v => Mem[v.dst] = v.src.a == v.src.b ? 1 : 0,
+                            v => SetMemAt(v.dst, v.src.a == v.src.b ? 1 : 0),
                             "equ", i => $"{i.Param("dst")} = {i.Param("src.a")} == {i.Param("src.b")}");
                         break;
 
@@ -195,7 +196,7 @@ foreach (var type in new[] { "int", "BigInteger" }) {
                         break;
 
                     case Operation.Input:
-                        InpDst(v => Mem[v.dst] = v.inp, "inp", i => $"{i.Param("dst")} = input");
+                        InpDst(v => SetMemAt(v.dst, v.inp), "inp", i => $"{i.Param("dst")} = input");
                         break;
 
                     case Operation.Output:

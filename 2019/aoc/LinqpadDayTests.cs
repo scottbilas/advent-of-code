@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
-using Aoc2019;
 using NUnit.Framework;
 using Shouldly;
 using Unity.Coding.Editor;
 using Unity.Coding.Utils;
 
-namespace AllDays
+namespace Aoc2019
 {
-    class LinqpadTests : AocFixture
+    class Day0xTests : AocFixture
     {
         [Test, Parallelizable(ParallelScope.Children)]
         public void TestDay([Range(1, 25)] int day)

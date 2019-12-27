@@ -33,7 +33,7 @@ void Main()
     {
         const int k_Expected = 7734;
         var vm = new BigIntegerCodeVM(BArr(109, 19, 204, -34, 99));
-        vm.Mem[1985] = k_Expected;
+        vm.SetMemAt(1985, k_Expected);
         vm.BaseOffset = 2000;
 
         vm.Run().Single().ShouldBe(k_Expected);
