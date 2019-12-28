@@ -15,6 +15,12 @@ namespace Aoc2019
         public static IEnumerable<float> ReadAllFloats(this NPath @this) => @this.ReadAllText().SelectFloats();
         public static char[,] ReadGrid(this NPath @this) => @this.ReadAllText().ToGrid();
 
+        public static NPath WriteAllBytes(this NPath @this, byte[] data)
+        {
+            File.WriteAllBytes(@this, data);
+            return @this;
+        }
+
         public static string ToUri(this NPath @this) => new Uri(@this.ToString()).AbsoluteUri;
     }
 }
