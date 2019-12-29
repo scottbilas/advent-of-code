@@ -113,6 +113,9 @@ namespace Aoc2019
             }
         }
 
+        public static string ReplaceMatches([NotNull] this string @this, string pattern, string replacement) =>
+            Regex.Replace(@this, pattern, replacement);
+
         public static IEnumerable<Match> SelectMatches([NotNull] this string @this, string pattern) => Regex
             .Matches(@this, pattern)
             // ReSharper disable once RedundantEnumerableCastCall (required for .net framework to link to this, because MatchCollection is not yet an IList<Match>)

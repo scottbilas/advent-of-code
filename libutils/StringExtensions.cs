@@ -65,6 +65,9 @@ namespace Unity.Coding.Utils
         public static string StringJoin([NotNull] this IEnumerable @this, char separator)
             => string.Join(new string(separator, 1), @this.Cast<object>());
 
+        public static string StringJoin([NotNull] this IEnumerable @this)
+            => string.Join("", @this.Cast<object>());
+
         [NotNull]
         public static string StringJoin<T, TSelected>([NotNull] this IEnumerable<T> @this, [NotNull] Func<T, TSelected> selector, [NotNull] string separator)
             => string.Join(separator, @this.Select(selector));
