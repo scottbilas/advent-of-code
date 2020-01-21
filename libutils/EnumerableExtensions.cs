@@ -138,5 +138,10 @@ namespace Unity.Coding.Utils
             }
         }
 
+        public static bool IsDistinct<T>([NotNull] this IEnumerable<T> @this)
+        {
+            var seen = new HashSet<T>();
+            return @this.All(item => seen.Add(item));
+        }
     }
 }
