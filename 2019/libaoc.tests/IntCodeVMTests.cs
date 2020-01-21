@@ -34,5 +34,12 @@ namespace Aoc2019
             var disasm = new IntCodeVM(@"C:\proj\advent-of-code\2019\aoc\day5\day5.input.txt".ToNPath().ReadAllInts()).Disassemble();
             Console.WriteLine(disasm.StringJoin("\n"));
         }
+
+        [Test]
+        public void Test4()
+        {
+            var disasm = new BigIntCodeVM(@"C:\proj\advent-of-code\2019\aoc\day25\day25.input.txt".ToNPath().ReadAllBigInts()).Disassemble();
+            Console.WriteLine(disasm.StringJoin("\n"));
+        }
     }
 }
