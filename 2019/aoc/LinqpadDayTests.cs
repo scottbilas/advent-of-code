@@ -12,6 +12,8 @@ namespace Aoc2019
         [Test, Parallelizable(ParallelScope.Children)]
         public void TestDay([Range(1, 25)] int day)
         {
+            day.ShouldNotBe(22, "day 22 still WIP");
+
             var testDir = AocDir.Combine($"day{day}");
             if (!testDir.DirectoryExists())
                 Assert.Ignore($"No solution for this day yet ({testDir})");
@@ -23,7 +25,7 @@ namespace Aoc2019
             var expected = ExtractResults(day);
 
             var (stdout, stderr) = (new List<string>(), new List<string>());
-            ProcessUtility.ExecuteCommandLine("lprun", new[] { "-recompile", script.FileName }, testDir, stdout, stderr);
+            ProcessUtility.ExecuteCommandLine("lprun", new[] { "-optimize", "-recompile", script.FileName }, testDir, stdout, stderr);
             if (stderr.Any())
                 Assert.Fail(stderr.StringJoin("\n"));
 

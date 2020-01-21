@@ -10,6 +10,7 @@ namespace Aoc2019
 {
     public class IntCodeVM
     {
+        public bool Paused;
         public int MemPtr, BaseOffset;
         public Func<int> NextInput;
 
@@ -53,14 +54,14 @@ namespace Aoc2019
 
         public IEnumerable<int> Run(List<Instruction> disasm = null)
         {
-            for (;;)
+            while (!Paused)
             {
                 if (MemPtr == m_ArrayMem.Length)
                     break;
 
-                var instr = (int)NextMem();
+                var instr = NextMem();
                 var modes = instr / 100;
-                var operation = (Operation)(instr % 100);
+                var operation = (Operation)(int)(instr % 100);
 
                 Instruction instruction = null;
                 disasm?.Add(instruction = new Instruction
@@ -87,7 +88,7 @@ namespace Aoc2019
 
                 Param NextDisasm(string name)
                 {
-                    var mode = modes % 10;
+                    var mode = (int)(modes % 10);
                     modes /= 10;
                     return new Param { Name = name, Mode = (ParamMode)mode, Value = NextMem() };
                 }
@@ -293,15 +294,16 @@ namespace Aoc2019
         }
     }
 
-    public class BigIntegerCodeVM
+    public class BigIntCodeVM
     {
+        public bool Paused;
         public BigInteger MemPtr, BaseOffset;
-        public Func<int> NextInput;
+        public Func<BigInteger> NextInput;
 
         BigInteger[] m_ArrayMem;
         IDictionary<BigInteger, BigInteger> m_ExtraMem = new AutoDictionary<BigInteger, BigInteger>();
 
-        public BigIntegerCodeVM(IEnumerable<BigInteger> mem, Func<int> nextInput = null)
+        public BigIntCodeVM(IEnumerable<BigInteger> mem, Func<BigInteger> nextInput = null)
         {
             m_ArrayMem = mem.ToArray();
             NextInput = nextInput;
@@ -323,7 +325,7 @@ namespace Aoc2019
             return disasm.SelectStrings();
         }
 
-        public IEnumerable<BigInteger> Run(params int[] inputs)
+        public IEnumerable<BigInteger> Run(params BigInteger[] inputs)
         {
             var index = 0;
             var oldFunc = NextInput;
@@ -338,14 +340,14 @@ namespace Aoc2019
 
         public IEnumerable<BigInteger> Run(List<Instruction> disasm = null)
         {
-            for (;;)
+            while (!Paused)
             {
-                if (MemPtr == m_ArrayMem.Length)
+                if (MemPtr >= m_ArrayMem.Length)
                     break;
 
-                var instr = (int)NextMem();
+                var instr = NextMem();
                 var modes = instr / 100;
-                var operation = (Operation)(instr % 100);
+                var operation = (Operation)(int)(instr % 100);
 
                 Instruction instruction = null;
                 disasm?.Add(instruction = new Instruction
@@ -372,7 +374,7 @@ namespace Aoc2019
 
                 Param NextDisasm(string name)
                 {
-                    var mode = modes % 10;
+                    var mode = (int)(modes % 10);
                     modes /= 10;
                     return new Param { Name = name, Mode = (ParamMode)mode, Value = NextMem() };
                 }
@@ -412,7 +414,7 @@ namespace Aoc2019
                     }
                 }
 
-                void InpDst(Action<(int inp, BigInteger dst)> action, string opName, Func<Instruction, string> getComment)
+                void InpDst(Action<(BigInteger inp, BigInteger dst)> action, string opName, Func<Instruction, string> getComment)
                 {
                     if (instruction == null)
                         action((NextInput(), NextWrite()));
@@ -500,7 +502,14 @@ namespace Aoc2019
                     default:
                         if (instruction == null)
                             throw new InvalidOperationException();
-                        instruction.GetComment = i => $"{i.Param("data")}";
+                        instruction.GetComment = i =>
+                        {
+                            var data = i.Param("data");
+                            var text = data.ToString();
+                            if (instr >= 32 && instr < 127)
+                                text += $" '{(char)instr}'";
+                            return text;
+                        };
                         instruction.Operation = Operation.Data;
                         instruction.OperationText = "dat";
                         instruction.Params = new[] { new Param { Name = "data", Mode = ParamMode.Immediate, Value = instr } };
@@ -549,14 +558,14 @@ namespace Aoc2019
                     ParamMode.Position  => $"[{Value}]",
                     ParamMode.Immediate => Value.ToString(),
                     ParamMode.Relative  => (Value < 0 ? $"[R-{-Value}]" : $"[R+{Value}]"),
-                    _ => throw new InvalidOperationException()
+                    _ => $"???{Value}" //throw new InvalidOperationException()
                 };
         }
 
         public class Instruction
         {
             public BigInteger MemPtr;
-            public int RawOperation;
+            public BigInteger RawOperation;
             public Operation Operation;
             public string OperationText;
             public Param[] Params;
@@ -567,10 +576,17 @@ namespace Aoc2019
             public override string ToString()
             {
                 var text = $"{MemPtr:00000}  ";
-                text += Operation == Operation.Data
-                    ? "   <data> "
-                    : $"{RawOperation,5}:{OperationText} ";
-                var paramText = Params != null ? Params.Select(p => p.Value).StringJoin(' ') : "";
+                var paramText = "";
+
+                if (Operation == Operation.Data)
+                    text += "   <data> ";
+                else
+                {
+                    text += $"{RawOperation,5}:{OperationText} ";
+                    if (Params != null)
+                        paramText = Params.Select(p => p.Value).StringJoin(' ');
+                }
+
                 text += $"{paramText,-14} | {GetComment(this)}";
 
                 return text;

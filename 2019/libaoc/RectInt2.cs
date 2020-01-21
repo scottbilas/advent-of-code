@@ -8,6 +8,9 @@ namespace Aoc2019
     {
         public Int2 TopLeft, BottomRight;
 
+        public static RectInt2 FromSize(Int2 size) =>
+            new RectInt2 { BottomRight = size };
+
         public static RectInt2 FromPosSize(Int2 pos, Int2 size) =>
             new RectInt2 { TopLeft = pos, BottomRight = pos + size };
         public static RectInt2 FromPosSize(int x, int y, int width, int height) =>
@@ -58,12 +61,23 @@ namespace Aoc2019
         public static RectInt2 BoundsToRect(this (Int2 topLeft, Int2 bottomRight) @this) =>
             RectInt2.FromBounds(@this.topLeft, @this.bottomRight);
 
+        public static IEnumerable<Int2> SelectCoords(this Int2 @this) =>
+            RectInt2.FromSize(@this).SelectCoords();
+
         public static IEnumerable<Int2> SelectCoords(this RectInt2 @this)
         {
             for (var y = @this.Top; y < @this.Bottom; ++y)
                 for (var x = @this.Left; x < @this.Right; ++x)
                     yield return new Int2(x, y);
         }
+
+        // TODO: move all this stuff to a IVector or something and write algorithms against the interface using where T : struct, IVector2 etc.
+        public static IEnumerable<Int2> SelectBorderCoords(this Int2 @this, Int2 border) =>
+            RectInt2.FromSize(@this).SelectBorderCoords(border);
+        public static IEnumerable<Int2> SelectBorderCoords(this Int2 @this, int border) =>
+            RectInt2.FromSize(@this).SelectBorderCoords(new Int2(border));
+        public static IEnumerable<Int2> SelectBorderCoords(this Int2 @this) =>
+            @this.SelectBorderCoords(Int2.One);
 
         public static IEnumerable<Int2> SelectBorderCoords(this RectInt2 @this, Int2 border)
         {
@@ -87,6 +101,8 @@ namespace Aoc2019
 
         public static IEnumerable<Int2> SelectBorderCoords(this RectInt2 @this, int border) =>
             @this.SelectBorderCoords(new Int2(border));
+        public static IEnumerable<Int2> SelectBorderCoords(this RectInt2 @this) =>
+            @this.SelectBorderCoords(Int2.One);
 
         public static RectInt2 Inflate(this RectInt2 @this, int left, int top, int right, int bottom) =>
             RectInt2.FromBounds(@this.Left - left, @this.Top - top, @this.Right + right, @this.Bottom + bottom);

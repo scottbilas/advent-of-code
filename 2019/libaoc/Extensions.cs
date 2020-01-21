@@ -8,6 +8,7 @@ using Combinatorics.Collections;
 using JetBrains.Annotations;
 using MoreLinq.Extensions;
 using Unity.Coding.Utils;
+using static Aoc2019.MiscStatics;
 
 namespace Aoc2019
 {
@@ -68,10 +69,12 @@ namespace Aoc2019
             return dict;
         }
 
-        public static Int2 GetDimensions<T>(this T[,] @this) =>
+        public static T[,] ToGrid<T>([NotNull] this T[,] @this) => (T[,])@this.Clone();
+
+        public static Int2 GetDimensions<T>([NotNull] this T[,] @this) =>
             new Int2(@this.GetLength(0), @this.GetLength(1));
         
-        public static IEnumerable<string> ToLines<T>(this T[,] @this)
+        public static IEnumerable<string> ToLines<T>([NotNull] this T[,] @this)
         {
             var size = @this.GetDimensions();
             
@@ -90,9 +93,16 @@ namespace Aoc2019
 
         public static int ParseInt([NotNull] this string @this) =>
             int.Parse(@this);
+        public static int TryParseInt([NotNull] this string @this, int defaultValue = default) =>
+            @this.TryParseInt(out var result) ? result : defaultValue;
+        public static bool TryParseInt([NotNull] this string @this, out int result) =>
+            int.TryParse(@this, out result);
 
         public static IEnumerable<int> ParseInts([NotNull] this IEnumerable<string> @this) =>
             @this.Select(int.Parse);
+
+        public static IList<Group> GetGroups([NotNull] this Match @this) =>
+            new TypedListProxy<Group>(@this.Groups);
 
         public static int Int([NotNull] this Match @this, int groupNum) =>
             @this.Groups[groupNum].Value.ParseInt();
@@ -103,6 +113,16 @@ namespace Aoc2019
             @this.Groups[groupNum].Value;
         public static string Text([NotNull] this Match @this, string groupName) =>
             @this.Groups[groupName].Value;
+
+        public static IEnumerable<string> SelectText([NotNull] this Match @this, int groupNum) =>
+            @this.Groups[groupNum].Captures.Select(c => c.Value);
+        public static IEnumerable<string> SelectText([NotNull] this Match @this, string groupName) =>
+            @this.Groups[groupName].Captures.Select(c => c.Value);
+
+        public static IEnumerable<T> Select<T>([NotNull] this Match @this, int groupNum, Func<string, T> selector) =>
+            @this.SelectText(groupNum).Select(selector);
+        public static IEnumerable<T> Select<T>([NotNull] this Match @this, string groupName, Func<string, T> selector) =>
+            @this.SelectText(groupName).Select(selector);
 
         public static bool Success([NotNull] this Match @this, int groupNum) =>
             @this.Groups[groupNum].Success;
@@ -120,6 +140,12 @@ namespace Aoc2019
 
         public static IEnumerable<(Int2 pos, T cell)> SelectCells<T>([NotNull] this T[,] @this) =>
             @this.SelectCells(@this.GetRect());
+
+        public static IEnumerable<T> Select<T>([NotNull] this T[,] @this, in RectInt2 rect) =>
+            @this.SelectCells(rect).Select(c => c.cell);
+
+        public static IEnumerable<T> Select<T>([NotNull] this T[,] @this) =>
+            @this.Select(@this.GetRect());
 
         public static IEnumerable<Int2> SelectCoords<T>(this T[,] @this) =>
             @this.GetRect().SelectCoords();
@@ -210,29 +236,26 @@ namespace Aoc2019
         public static IEnumerable<Int2> OrderByReading(this IEnumerable<Int2> @this) =>
             @this.OrderByReading(_ => _);
 
-        public static IEnumerable<Int2> SelectAdjacent(this Int2 @this)
-        {
-            yield return new Int2(@this.X, @this.Y - 1);
-            yield return new Int2(@this.X - 1, @this.Y);
-            yield return new Int2(@this.X + 1, @this.Y);
-            yield return new Int2(@this.X, @this.Y + 1);
-        }
+        public static IEnumerable<Int2> SelectAdjacent(this Int2 @this) =>
+            Dirs.Select(d => @this + d.GetMove());
+
+        public static IEnumerable<Int2> SelectValidAdjacent(this Int2 @this, Int2 size) =>
+            @this.SelectAdjacent().Where(p => (p >= Int2.Zero).All() && (p < size).All());
 
         public static IEnumerable<T> SelectAdjacent<T>(this Int2 @this, Func<Int2, T> selector) =>
             @this.SelectAdjacent().Select(selector);
 
         public static IEnumerable<Int2> SelectAdjacentWithDiagonals(this Int2 @this)
         {
-            yield return new Int2(@this.X - 1, @this.Y - 1);
-            yield return new Int2(@this.X, @this.Y - 1);
-            yield return new Int2(@this.X + 1, @this.Y - 1);
-
+            // TODO: DirsWDiag (DDirs?)
             yield return new Int2(@this.X - 1, @this.Y);
+            yield return new Int2(@this.X - 1, @this.Y - 1);
+            yield return new Int2(@this.X,     @this.Y - 1);
+            yield return new Int2(@this.X + 1, @this.Y - 1);
             yield return new Int2(@this.X + 1, @this.Y);
-
-            yield return new Int2(@this.X - 1, @this.Y + 1);
-            yield return new Int2(@this.X, @this.Y + 1);
             yield return new Int2(@this.X + 1, @this.Y + 1);
+            yield return new Int2(@this.X,     @this.Y + 1);
+            yield return new Int2(@this.X - 1, @this.Y + 1);
         }
 
         public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Int2 @this, Func<Int2, T> selector) =>
@@ -337,7 +360,7 @@ namespace Aoc2019
         }
     }
 
-    public static class MiscStatics
+    public static partial class MiscStatics
     {
         public static void With<T0>(T0 v0, Action<T0> action) => action(v0);
         public static void With<T0, T1>(T0 v0, T1 v1, Action<T0, T1> action) => action(v0, v1);
@@ -381,10 +404,15 @@ namespace Aoc2019
             return (upper, valueProducer(upper));
         }
 
-        public static Combinations<T> Combinations<T>([NotNull] this IEnumerable<T> items, int count) =>
-            new Combinations<T>(items.EnsureList(), 2);
+        public static Combinations<T> Combinations<T>([NotNull] this IEnumerable<T> @this, int desiredSetSize) =>
+            new Combinations<T>(@this.EnsureList(), desiredSetSize);
 
-        public static IEnumerable<(T a, T b)> Combinations2<T>([NotNull] this IEnumerable<T> items) =>
-            Combinations(items, 2).Select(l => (l[0], l[1]));
+        public static IEnumerable<IList<T>> Combinations<T>([NotNull] this IEnumerable<T> @this, int minDesiredSetSize, int maxDesiredSetSize) =>
+            With(@this.EnsureList(), l => Enumerable
+                .Range(minDesiredSetSize, maxDesiredSetSize - minDesiredSetSize + 1)
+                .SelectMany(i => new Combinations<T>(l, i)));
+
+        public static IEnumerable<(T a, T b)> Combinations2<T>([NotNull] this IEnumerable<T> @this) =>
+            @this.Combinations(2).Select(l => (l[0], l[1]));
     }
 }

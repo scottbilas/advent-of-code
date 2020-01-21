@@ -182,6 +182,11 @@ for (var size = 2; size <= BoolMax; ++size) { Init("Bool", size);#>
         public static bool operator ==(in <#=type#> left, in <#=type#> right) => left.Equals(right);
         public static bool operator !=(in <#=type#> left, in <#=type#> right) => !left.Equals(right);
 
+        public static <#=type#> operator |(in <#=type#> left, in <#=type#> right) =>
+            new <#=type#>(<#=Fields(f => $"left.{f} || right.{f}")#>);
+        public static <#=type#> operator &(in <#=type#> left, in <#=type#> right) =>
+            new <#=type#>(<#=Fields(f => $"left.{f} && right.{f}")#>);
+
         public override string ToString() => $"<#=Fields(f => "{" + f + "}")#>";
         public object ToDump() => ToString(); // linqpad
 
@@ -231,6 +236,8 @@ for (var size = 2; size <= BoolMax; ++size) { Init("Bool", size);#>
 <#for (var size = 2; size <= IntMax; ++size) { Init("Int", size);#>
         public static <#=type#> Midpoint(in <#=type#> a, in <#=type#> b) =>
             new <#=type#>(<#=Fields(f => $"a.{f} + (b.{f} - a.{f}) / 2")#>);
+        public static <#=type#> Midpoint(in <#=type#> a) =>
+            Midpoint(a, <#=type#>.Zero);
 <#}#>
     }
 
@@ -262,6 +269,7 @@ for (var size = 2; size <= BoolMax; ++size) { Init("Bool", size);#>
 
 <#for (var size = 2; size <= IntMax; ++size) { Init("Int", size);#>
         public static <#=type#> Midpoint(this in <#=type#> a, in <#=type#> b) => Utils.Midpoint(in a, in b);
+        public static <#=type#> Midpoint(this in <#=type#> a) => Utils.Midpoint(in a);
 <#}#>
     }
 }

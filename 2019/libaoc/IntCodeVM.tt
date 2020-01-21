@@ -1,7 +1,5 @@
 <#@ output extension=".gen.cs" #>
 <#@ assembly name="System.Core" #>
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Collections.Generic" #>
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,17 +12,18 @@ namespace Aoc2019
 {
 <#
 foreach (var type in new[] { "int", "BigInteger" }) {
-    var name = char.ToUpper(type[0]) + type.Substring(1);
+    var name = type == "int" ? "Int" : "BigInt";
 #>
     public class <#=name#>CodeVM
     {
+        public bool Paused;
         public <#=type#> MemPtr, BaseOffset;
-        public Func<int> NextInput;
+        public Func<<#=type#>> NextInput;
 
         <#=type#>[] m_ArrayMem;
         IDictionary<<#=type#>, <#=type#>> m_ExtraMem = new AutoDictionary<<#=type#>, <#=type#>>();
 
-        public <#=name#>CodeVM(IEnumerable<<#=type#>> mem, Func<int> nextInput = null)
+        public <#=name#>CodeVM(IEnumerable<<#=type#>> mem, Func<<#=type#>> nextInput = null)
         {
             m_ArrayMem = mem.ToArray();
             NextInput = nextInput;
@@ -46,7 +45,7 @@ foreach (var type in new[] { "int", "BigInteger" }) {
             return disasm.SelectStrings();
         }
 
-        public IEnumerable<<#=type#>> Run(params int[] inputs)
+        public IEnumerable<<#=type#>> Run(params <#=type#>[] inputs)
         {
             var index = 0;
             var oldFunc = NextInput;
@@ -61,14 +60,14 @@ foreach (var type in new[] { "int", "BigInteger" }) {
 
         public IEnumerable<<#=type#>> Run(List<Instruction> disasm = null)
         {
-            for (;;)
+            while (!Paused)
             {
                 if (MemPtr == m_ArrayMem.Length)
                     break;
 
-                var instr = (int)NextMem();
+                var instr = NextMem();
                 var modes = instr / 100;
-                var operation = (Operation)(instr % 100);
+                var operation = (Operation)(int)(instr % 100);
 
                 Instruction instruction = null;
                 disasm?.Add(instruction = new Instruction
@@ -95,7 +94,7 @@ foreach (var type in new[] { "int", "BigInteger" }) {
 
                 Param NextDisasm(string name)
                 {
-                    var mode = modes % 10;
+                    var mode = (int)(modes % 10);
                     modes /= 10;
                     return new Param { Name = name, Mode = (ParamMode)mode, Value = NextMem() };
                 }
@@ -135,7 +134,7 @@ foreach (var type in new[] { "int", "BigInteger" }) {
                     }
                 }
 
-                void InpDst(Action<(int inp, <#=type#> dst)> action, string opName, Func<Instruction, string> getComment)
+                void InpDst(Action<(<#=type#> inp, <#=type#> dst)> action, string opName, Func<Instruction, string> getComment)
                 {
                     if (instruction == null)
                         action((NextInput(), NextWrite()));
@@ -279,7 +278,7 @@ foreach (var type in new[] { "int", "BigInteger" }) {
         public class Instruction
         {
             public <#=type#> MemPtr;
-            public int RawOperation;
+            public <#=type#> RawOperation;
             public Operation Operation;
             public string OperationText;
             public Param[] Params;

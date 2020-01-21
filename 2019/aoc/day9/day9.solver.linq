@@ -32,7 +32,7 @@ void Main()
 
     {
         const int k_Expected = 7734;
-        var vm = new BigIntegerCodeVM(BArr(109, 19, 204, -34, 99));
+        var vm = new BigIntCodeVM(BArr(109, 19, 204, -34, 99));
         vm.SetMemAt(1985, k_Expected);
         vm.BaseOffset = 2000;
 
@@ -59,5 +59,5 @@ void Main()
     Run(2, mem).Single().Dump().ShouldBe(51135);
 }
 
-IEnumerable<BigInteger> Run(BigInteger[] mem) => new BigIntegerCodeVM(mem).Run();
-IEnumerable<BigInteger> Run(int input, BigInteger[] mem) => new BigIntegerCodeVM(mem, () => input).Run();
+IEnumerable<BigInteger> Run(BigInteger[] mem) => new BigIntCodeVM(mem).Run();
+IEnumerable<BigInteger> Run(int input, BigInteger[] mem) => new BigIntCodeVM(mem, () => input).Run();

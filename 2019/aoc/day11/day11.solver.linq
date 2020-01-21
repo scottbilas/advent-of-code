@@ -51,7 +51,7 @@ IDictionary<Int2, Color> Solve(Color startColor, BigInteger[] mem)
 
     grid[pos] = startColor;
 
-    var vm = new BigIntegerCodeVM(mem, () => grid[pos] == Color.Black ? 0 : 1);
+    var vm = new BigIntCodeVM(mem, () => grid[pos] == Color.Black ? 0 : 1);
     foreach (var (newColor, newDir) in vm.Run().Batch2())
     {
         grid[pos] = (Color)(int)newColor;

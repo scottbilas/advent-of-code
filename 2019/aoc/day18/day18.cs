@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Combinatorics.Collections;
 using QuickGraph;
 using QuickGraph.Graphviz;
 using RoyT.AStar;
 using Unity.Coding.Utils;
+using static System.Linq.Enumerable;
 using static Aoc2019.MiscStatics;
 
 namespace Aoc2019.Day18
@@ -41,10 +43,8 @@ namespace Aoc2019.Day18
 
     class VaultGraph
     {
-        class Node : List<(char pos, int steps)> {}
-
         int m_StartCount, m_KeyCount;
-        Node[] m_Graph = new Node[k_TotalChars];
+        (char pos, int steps)[][] m_Graph;
 
         static VaultGraph()
         {
@@ -71,8 +71,15 @@ namespace Aoc2019.Day18
         public static ulong ToBit(char c) => k_ToBit[c];
         public static char FromIndex(int i) => k_FromIndex[i];
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static void SetBit(ref ulong bits, char pos) => bits |= ToBit(pos);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static void SetBit(ref ulong bits, char pos0, char pos1) => bits |= ToBit(pos0) | ToBit(pos1);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static void ClearBit(ref ulong bits, char pos) => bits &= ~ToBit(pos);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static void ClearBit(ref ulong bits, char pos0, char pos1) => bits &= ~(ToBit(pos0) | ToBit(pos1));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool TestBit(ulong bits, char pos) => (bits & ToBit(pos)) != 0;
 
         public VaultGraph(char[,] grid)
@@ -106,8 +113,7 @@ namespace Aoc2019.Day18
 
             // run paths from everything to everything to build simplified graph
 
-            for (var i = 0; i < m_Graph.Length; ++i)
-                m_Graph[i] = new Node();
+            var graph = Range(0, k_TotalChars).Select(_ => new List<(char, int)>()).ToArray();
 
             foreach (var (a, b) in
                 new Combinations<char>(items.Keys.Ordered().ToList(), 2)
@@ -120,41 +126,49 @@ namespace Aoc2019.Day18
                 if (p.Length > 0)
                 {
                     var steps = p.Length - 1;
-                    m_Graph[ToIndex(a)].Add((b, steps));
-                    m_Graph[ToIndex(b)].Add((a, steps));
+                    graph[ToIndex(a)].Add((b, steps));
+                    graph[ToIndex(b)].Add((a, steps));
                 }
                 board.BlockCell(apos);
                 board.BlockCell(bpos);
             }
+
+            m_Graph = graph.Select(l => l.ToArray()).ToArray();
         }
 
         unsafe struct MoveState
         {
-            // need to write custom hash otherwise it's slow as ef (like 20x slower)
-            public int CalcHashCode(int moverCount, ulong removed)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public int CalcHashCode()
             {
                 var hash = new HashCode();
-                hash.Add(Steps);
-                hash.Add(removed);
 
-                for (var i = 0; i < moverCount; ++i)
-                    hash.Add(Pos[i]);
+                hash.Add(Removed);
+                hash.Add(Steps);
+
+                for (var i = 0; ; ++i)
+                {
+                    var pos = Pos[i];
+                    if (pos == 0)
+                        break;
+                    hash.Add(pos);
+                }
 
                 return hash.ToHashCode();
             }
 
-            public fixed char Pos[10];
+            public ulong Removed;
             public int Steps;
+            public fixed char Pos[10];
         }
 
         public unsafe int FindMinimumSteps()
         {
             var minSteps = int.MaxValue;
-            var removed = 0ul;
             var removedCount = 0;
-            var cache = new Dictionary<int /*state hash*/, int /*steps*/>();
+            var cache = new HashSet<int>();
 
-            var walkQueue = new Queue<(char pos, int steps)>();
+            var walkQueue = new Stack<(char pos, int steps)>();
             var solveStack = new Stack<(int mover, char to, int steps)>();
 
             void Move(MoveState moveState)
@@ -177,13 +191,13 @@ namespace Aoc2019.Day18
 
                             var totalStepsTo = walkFrom.steps + stepsTo;
 
-                            if (TestBit(removed, to)) // pass through and continue search
-                                walkQueue.Enqueue((to, totalStepsTo));
+                            if (TestBit(moveState.Removed, to)) // pass through and continue search
+                                walkQueue.Push((to, totalStepsTo));
                             else if (to.IsAsciiLower())
                                 solveStack.Push((mover, to, totalStepsTo));
                         }
                     }
-                    while (walkQueue.TryDequeue(out walkFrom));
+                    while (walkQueue.TryPop(out walkFrom));
                 }
 
                 // iterate through removing each found key, recursing to branch
@@ -203,35 +217,32 @@ namespace Aoc2019.Day18
                         targetState.Pos[mover] = to;
                         targetState.Steps = steps;
 
-                        var hash = targetState.CalcHashCode(m_StartCount, removed);
-                        var hadCache = cache.TryGetValue(hash, out var cacheSteps);
-                        if (!hadCache || cacheSteps > steps)
+                        var hash = targetState.CalcHashCode();
+                        if (!cache.Contains(hash))
                         {
-                            SetBit(ref removed, to);
-                            SetBit(ref removed, to.ToAsciiUpper());
+                            SetBit(ref targetState.Removed, to, to.ToAsciiUpper());
                             ++removedCount;
 
                             Move(targetState);
 
                             --removedCount;
-                            ClearBit(ref removed, to.ToAsciiUpper());
-                            ClearBit(ref removed, to);
+                            ClearBit(ref targetState.Removed, to, to.ToAsciiUpper());
 
-                            cache[hash] = steps;
+                            cache.Add(hash);
                         }
                     }
                 }
             }
 
-            var pos = new MoveState();
+            var initialState = new MoveState();
             for (var i = 0; i < m_StartCount; ++i)
             {
                 var c = FromIndex(i);
-                pos.Pos[i] = c;
-                SetBit(ref removed, c);
+                initialState.Pos[i] = c;
+                SetBit(ref initialState.Removed, c);
             }
 
-            Move(pos);
+            Move(initialState);
 
             return minSteps;
         }

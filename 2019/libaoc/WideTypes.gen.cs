@@ -403,6 +403,11 @@ namespace Aoc2019
         public static bool operator ==(in Bool2 left, in Bool2 right) => left.Equals(right);
         public static bool operator !=(in Bool2 left, in Bool2 right) => !left.Equals(right);
 
+        public static Bool2 operator |(in Bool2 left, in Bool2 right) =>
+            new Bool2(left.X || right.X, left.Y || right.Y);
+        public static Bool2 operator &(in Bool2 left, in Bool2 right) =>
+            new Bool2(left.X && right.X, left.Y && right.Y);
+
         public override string ToString() => $"{X}, {Y}";
         public object ToDump() => ToString(); // linqpad
 
@@ -456,6 +461,11 @@ namespace Aoc2019
         public static bool operator ==(in Bool3 left, in Bool3 right) => left.Equals(right);
         public static bool operator !=(in Bool3 left, in Bool3 right) => !left.Equals(right);
 
+        public static Bool3 operator |(in Bool3 left, in Bool3 right) =>
+            new Bool3(left.X || right.X, left.Y || right.Y, left.Z || right.Z);
+        public static Bool3 operator &(in Bool3 left, in Bool3 right) =>
+            new Bool3(left.X && right.X, left.Y && right.Y, left.Z && right.Z);
+
         public override string ToString() => $"{X}, {Y}, {Z}";
         public object ToDump() => ToString(); // linqpad
 
@@ -508,6 +518,11 @@ namespace Aoc2019
 
         public static bool operator ==(in Bool4 left, in Bool4 right) => left.Equals(right);
         public static bool operator !=(in Bool4 left, in Bool4 right) => !left.Equals(right);
+
+        public static Bool4 operator |(in Bool4 left, in Bool4 right) =>
+            new Bool4(left.X || right.X, left.Y || right.Y, left.Z || right.Z, left.W || right.W);
+        public static Bool4 operator &(in Bool4 left, in Bool4 right) =>
+            new Bool4(left.X && right.X, left.Y && right.Y, left.Z && right.Z, left.W && right.W);
 
         public override string ToString() => $"{X}, {Y}, {Z}, {W}";
         public object ToDump() => ToString(); // linqpad
@@ -578,10 +593,16 @@ namespace Aoc2019
 
         public static Int2 Midpoint(in Int2 a, in Int2 b) =>
             new Int2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
+        public static Int2 Midpoint(in Int2 a) =>
+            Midpoint(Int2.Zero, a);
         public static Int3 Midpoint(in Int3 a, in Int3 b) =>
             new Int3(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2, a.Z + (b.Z - a.Z) / 2);
+        public static Int3 Midpoint(in Int3 a) =>
+            Midpoint(Int3.Zero, a);
         public static Int4 Midpoint(in Int4 a, in Int4 b) =>
             new Int4(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2, a.Z + (b.Z - a.Z) / 2, a.W + (b.W - a.W) / 2);
+        public static Int4 Midpoint(in Int4 a) =>
+            Midpoint(Int4.Zero, a);
     }
 
     public static partial class Extensions
@@ -619,7 +640,10 @@ namespace Aoc2019
         public static void Maximize(ref this Int4 a, in Int4 b) => Utils.Maximize(ref a, in b);
 
         public static Int2 Midpoint(this in Int2 a, in Int2 b) => Utils.Midpoint(in a, in b);
+        public static Int2 Midpoint(this in Int2 a) => Utils.Midpoint(in a);
         public static Int3 Midpoint(this in Int3 a, in Int3 b) => Utils.Midpoint(in a, in b);
+        public static Int3 Midpoint(this in Int3 a) => Utils.Midpoint(in a);
         public static Int4 Midpoint(this in Int4 a, in Int4 b) => Utils.Midpoint(in a, in b);
+        public static Int4 Midpoint(this in Int4 a) => Utils.Midpoint(in a);
     }
 }
