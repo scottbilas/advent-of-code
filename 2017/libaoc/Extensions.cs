@@ -119,6 +119,11 @@ namespace Aoc2017
         public static IEnumerable<string> SelectText([NotNull] this Match @this, string groupName) =>
             @this.Groups[groupName].Captures.Select(c => c.Value);
 
+        public static string[] Texts([NotNull] this Match @this, int groupNum) =>
+            @this.SelectText(groupNum).ToArray();
+        public static string[] Texts([NotNull] this Match @this, string groupName) =>
+            @this.SelectText(groupName).ToArray();
+
         public static IEnumerable<T> Select<T>([NotNull] this Match @this, int groupNum, Func<string, T> selector) =>
             @this.SelectText(groupNum).Select(selector);
         public static IEnumerable<T> Select<T>([NotNull] this Match @this, string groupName, Func<string, T> selector) =>

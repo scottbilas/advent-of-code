@@ -41,7 +41,15 @@ namespace Aoc2017
             return oldCount;
         }
 
-        public static int AddRange<T>([NotNull] this List<T> @this, int numItemsToAdd, T value = default)
+        public static int AddRange<T>([NotNull] this ICollection<T> @this, IEnumerable<T> itemsToAdd)
+        {
+            var old = @this.Count;
+            foreach (var item in itemsToAdd)
+                @this.Add(item);
+            return old;
+        }
+
+        public static int AddRange<T>([NotNull] this ICollection<T> @this, int numItemsToAdd, T value = default)
         {
             var old = @this.Count;
             for (var i = 0; i < numItemsToAdd; ++i)
@@ -49,7 +57,7 @@ namespace Aoc2017
             return old;
         }
 
-        public static int AddRange<T>([NotNull] this List<T> @this, int numItemsToAdd, Func<T> generator)
+        public static int AddRange<T>([NotNull] this ICollection<T> @this, int numItemsToAdd, Func<T> generator)
         {
             var old = @this.Count;
             for (var i = 0; i < numItemsToAdd; ++i)
