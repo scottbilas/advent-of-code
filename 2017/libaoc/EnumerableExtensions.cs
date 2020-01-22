@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -22,6 +23,9 @@ namespace Aoc2017
 
             return -1;
         }
+
+        public static bool IsValidIndex([NotNull] this ICollection @this, int index) =>
+            index >= 0 && index < @this.Count;
 
         public static IEnumerable<T> Except<T>([NotNull] this IEnumerable<T> @this, T value) =>
             @this.Where(v => !v.Equals(value));
