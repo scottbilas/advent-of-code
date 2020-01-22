@@ -7,9 +7,13 @@
   <NuGetReference>RoyT.AStar</NuGetReference>
   <NuGetReference>Shouldly</NuGetReference>
   <NuGetReference>System.Interactive</NuGetReference>
+  <NuGetReference>YC.QuickGraph</NuGetReference>
   <Namespace>Aoc2017</Namespace>
   <Namespace>Combinatorics.Collections</Namespace>
   <Namespace>JetBrains.Annotations</Namespace>
+  <Namespace>QuickGraph</Namespace>
+  <Namespace>QuickGraph.Algorithms</Namespace>
+  <Namespace>QuickGraph.Graphviz</Namespace>
   <Namespace>RoyT.AStar</Namespace>
   <Namespace>Shouldly</Namespace>
   <Namespace>static Aoc2017.MiscStatics</Namespace>
@@ -20,9 +24,6 @@
   <Namespace>System.Numerics</Namespace>
   <Namespace>Unity.Coding.Editor</Namespace>
   <Namespace>Unity.Coding.Utils</Namespace>
-  <Namespace>QuickGraph</Namespace>
-  <Namespace>QuickGraph.Graphviz</Namespace>
-  <Namespace>QuickGraph.Algorithms</Namespace>
 </Query>
 
 static readonly NPath ScriptDir = Util.CurrentQueryPath.ToNPath().Parent;
