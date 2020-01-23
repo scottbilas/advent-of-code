@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
-    <RootNamespace>AoC2017</RootNamespace>
+    <RootNamespace>Aoc2017</RootNamespace>
     <OutputPath>..\..\temp\bin\$(MSBuildProjectName)\$(Configuration)</OutputPath>
   </PropertyGroup>
 

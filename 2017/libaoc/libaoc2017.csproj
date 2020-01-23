@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <RootNamespace>AoC2017</RootNamespace>
+    <RootNamespace>Aoc2017</RootNamespace>
     <OutputPath>..\..\temp\bin\$(MSBuildProjectName)\$(Configuration)</OutputPath>
   </PropertyGroup>
 
