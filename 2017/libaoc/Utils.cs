@@ -9,6 +9,8 @@ using static Aoc2017.MiscStatics;
 
 namespace Aoc2017
 {
+    public sealed class Void { }
+
     public static partial class Utils
     {
         public static void Swap<T>(ref T left, ref T right)

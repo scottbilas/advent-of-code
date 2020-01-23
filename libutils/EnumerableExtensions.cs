@@ -42,6 +42,10 @@ namespace Unity.Coding.Utils
         public static IEnumerable<T> OrEmpty<T>([CanBeNull] this IEnumerable<T> @this)
             => @this ?? Enumerable.Empty<T>();
 
+        [NotNull]
+        public static IReadOnlyList<T> OrEmpty<T>([CanBeNull] this IReadOnlyList<T> @this)
+            => @this ?? Array.Empty<T>();
+
         public static T SingleOr<T>([NotNull] this IEnumerable<T> @this, T defaultValue)
         {
             using (var e = @this.GetEnumerator())
