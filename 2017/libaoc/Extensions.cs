@@ -419,5 +419,8 @@ namespace Aoc2017
 
         public static IEnumerable<(T a, T b)> Combinations2<T>([NotNull] this IEnumerable<T> @this) =>
             @this.Combinations(2).Select(l => (l[0], l[1]));
+
+        public static IReadOnlyList<T> AsReadOnlyList<T>(this IReadOnlyList<T> source) =>
+            source;
     }
 }
