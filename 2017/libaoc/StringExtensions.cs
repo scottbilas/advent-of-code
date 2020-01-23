@@ -128,7 +128,7 @@ namespace Aoc2017
             .SelectMatches( pattern).ToArray();
 
         public static IEnumerable<string> SelectWords([NotNull] this string @this) => @this
-            .SelectMatches(@"\S+")
+            .SelectMatches(@"\w+")
             .Select(m => m.Value);
 
         public static string[] Words([NotNull] this string @this) => @this
