@@ -54,7 +54,7 @@ namespace Unity.Coding.Utils
         }
 
         [NotNull]
-        public static IEnumerable<string> SelectStrings<T>([NotNull] this IEnumerable<T> @this) => @this
+        public static IEnumerable<string> SelectToStrings<T>([NotNull] this IEnumerable<T> @this) => @this
             .Select(v => v.ToString());
 
         [NotNull]
