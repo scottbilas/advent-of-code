@@ -36,6 +36,8 @@ namespace Aoc2017
         public IReadOnlyList<Tree<TKey>> Children => ChildList.OrEmpty();
         public List<Tree<TKey>> ChildList { get; set; }
         public TKey Key { get; set; }
+
+        public override string ToString() => Key + (Children.Any() ? $" ({Children.Count})" : "");
     }
 
     public class Tree<TKey, TTag> : ITree<Tree<TKey, TTag>>, ITreeKey<TKey>, ITreeTag<TTag>
@@ -45,59 +47,66 @@ namespace Aoc2017
         public List<Tree<TKey, TTag>> ChildList { get; set; }
         public TKey Key { get; set; }
         public TTag Tag { get; set; }
+
+        public override string ToString() => $"{Key} [{Tag}]" + (Children.Any() ? $" ({Children.Count})" : "");
     }
 
     public static class Tree
     {
-        public static Dictionary<TKey, Tree<TKey, TTag>> Create<TSrc, TKey, TTag>(
-            IEnumerable<TSrc> links,
-            Func<TSrc, (TKey p, TKey c)> getKeysFunc,
-            Action<TSrc, Tree<TKey, TTag>, Tree<TKey, TTag>> applyLinkFunc)
+        public static Dictionary<TKey, TNode> Create<TKey, TNode, TLink>(
+            [NotNull] IEnumerable<TLink> links,
+            [NotNull] Func<TLink, (TKey parent, TKey child)> getKeysFunc,
+            [NotNull] Func<TKey, TNode> createFunc,
+            [CanBeNull] Action<TLink, TNode, TNode> applyLinkFunc)
+            where TNode : ITree<TNode>
         {
-            var forest = new Dictionary<TKey, Tree<TKey, TTag>>();
+            var forest = new Dictionary<TKey, TNode>();
             foreach (var link in links)
             {
-                var (p, c) = getKeysFunc(link);
-                var pn = forest.GetOrAdd(p, _ => new Tree<TKey, TTag> { Key = p });
-                var cn = forest.GetOrAdd(c, _ => new Tree<TKey, TTag> { Key = c });
-                pn.AddChild(cn);
-
-                applyLinkFunc?.Invoke(link, pn, cn);
-            }
-            return forest;
-        }
-
-        public static Dictionary<TKey, Tree<TKey, TTag>> Create<TUserData, TKey, TTag>(
-            IEnumerable<(TUserData userData, TKey parent, TKey child)> links,
-            Action<TUserData, Tree<TKey, TTag>, Tree<TKey, TTag>> applyLinkFunc)
-        {
-            var forest = new Dictionary<TKey, Tree<TKey, TTag>>();
-            foreach (var (userData, parentKey, childKey) in links)
-            {
-                var parent = forest.GetOrAdd(parentKey, _ => new Tree<TKey, TTag> { Key = parentKey });
-                var child = forest.GetOrAdd(childKey, _ => new Tree<TKey, TTag> { Key = childKey });
+                var (parentKey, childKey) = getKeysFunc(link);
+                var parent = forest.GetOrAdd(parentKey, createFunc);
+                var child = forest.GetOrAdd(childKey, createFunc);
                 parent.AddChild(child);
 
-                applyLinkFunc(userData, parent, child);
+                applyLinkFunc?.Invoke(link, parent, child);
             }
             return forest;
         }
 
-        public static Dictionary<TKey, Tree<TKey>> Create<TKey>(
-            IEnumerable<(TKey parent, TKey child)> links)
+        public class WithTagOperator<TTag>
         {
-            var forest = new Dictionary<TKey, Tree<TKey>>();
-            foreach (var (parentKey, childKey) in links)
-            {
-                var parent = forest.GetOrAdd(parentKey, _ => new Tree<TKey> { Key = parentKey });
-                var child = forest.GetOrAdd(childKey, _ => new Tree<TKey> { Key = childKey });
-                parent.AddChild(child);
-            }
-            return forest;
+            internal static WithTagOperator<TTag> Instance = new WithTagOperator<TTag>();
+
+            public Dictionary<TKey, Tree<TKey, TTag>> Create<TKey, TUserData>(
+                [NotNull] Action<TUserData, Tree<TKey, TTag>, Tree<TKey, TTag>> applyLinkFunc,
+                [NotNull] IEnumerable<(TUserData userData, TKey parent, TKey child)> links) =>
+                Tree.Create(
+                    links, link => (link.parent, link.child), key => new Tree<TKey, TTag> { Key = key },
+                    (link, parent, child) => applyLinkFunc(link.userData, parent, child));
+
+            // ReSharper disable MemberHidesStaticFromOuterClass
+            public Dictionary<TKey, Tree<TKey, TTag>> Create<TKey>([NotNull] IEnumerable<(TKey parent, TKey child)> links) =>
+                Tree.Create(links, link => (link.parent, link.child), key => new Tree<TKey, TTag> { Key = key }, null);
+            public Dictionary<TKey, Tree<TKey, TTag>> Create<TKey>([NotNull] params (TKey parent, TKey child)[] links) =>
+                Create(links.AsEnumerable());
+            public Dictionary<TKey, Tree<TKey, TTag>> Create<TKey>([NotNull] IEnumerable<(TKey parent, TKey[] children)> links) =>
+                Create(links.SelectMany(l => l.children.Select(c => (l.parent, c))));
+            public Dictionary<TKey, Tree<TKey, TTag>> Create<TKey>([NotNull] IEnumerable<(TKey parent, IEnumerable<TKey> children)> links) =>
+                Create(links.SelectMany(l => l.children.Select(c => (l.parent, c))));
+            // ReSharper restore MemberHidesStaticFromOuterClass
         }
 
-        public static Dictionary<TKey, Tree<TKey>> Create<TKey>(params (TKey parent, TKey child)[] links) =>
+        public static WithTagOperator<TTag> WithTag<TTag>() => WithTagOperator<TTag>.Instance;
+
+        public static Dictionary<TKey, Tree<TKey>> Create<TKey>([NotNull] IEnumerable<(TKey parent, TKey child)> links) =>
+            Tree.Create(links, _ => _, key => new Tree<TKey> { Key = key }, null);
+        public static Dictionary<TKey, Tree<TKey>> Create<TKey>([NotNull] params (TKey parent, TKey child)[] links) =>
             Create(links.AsEnumerable());
+
+        public static Dictionary<TKey, Tree<TKey>> Create<TKey>([NotNull] IEnumerable<(TKey parent, TKey[] children)> links) =>
+            Create(links.SelectMany(l => l.children.Select(c => (l.parent, c))));
+        public static Dictionary<TKey, Tree<TKey>> Create<TKey>([NotNull] IEnumerable<(TKey parent, IEnumerable<TKey> children)> links) =>
+            Create(links.SelectMany(l => l.children.Select(c => (l.parent, c))));
     }
 
     public static class TreeExtensions
@@ -118,7 +127,7 @@ namespace Aoc2017
             @this.ChildList ??= new List<T>();
 
         public static void AddChild<T>(this T @this, T child)
-            where T : class, ITree<T>
+            where T : ITree<T>
         {
             if (ReferenceEquals(child.Parent, @this))
                 return;

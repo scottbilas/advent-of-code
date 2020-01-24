@@ -34,7 +34,7 @@ void Main()
     var inputPath = ScriptDir.Combine($"{ScriptDir.FileName}.input.txt");
     var input = inputPath.ReadAllText();
 
-    // --- PART 1 ---
+// --- PART 1 ---
 
     // *SAMPLES*
 
@@ -88,25 +88,14 @@ string Solve1(string text) => Enumerable
         Parse(text).SelectMany(v => v.children))
     .Single();
 
-class Node
-{
-    public int Weight;
-    public List<Node> Children = new List<Node>();
-}
-
 int Solve2(string text)
 {
-    var nodes = new AutoDictionary<string, Node>(_ => new Node());
-    
-    foreach (var item in Parse(text))
-    {
-        var node = nodes[item.parent];
-        node.Weight = item.weight;
-        node.Children.AddRange(item.children.Select(c => nodes[c]));
-    }
+    var parsed = Parse(text);
+    var nodes = Tree.WithTag<int>().Create(parsed.Select(l => (l.parent, l.children)));
+    parsed.ForEach(l => nodes[l.parent].Tag = l.weight);
     
     var fixedWeight = 0;
-    (int self, int children) CalcWeight(Node node)
+    (int self, int children) CalcWeight(Tree<string, int> node)
     {
         var weights = node.Children.Select(CalcWeight);
         var groups = weights.GroupBy(v => v.self + v.children);
@@ -116,11 +105,10 @@ int Solve2(string text)
             fixedWeight = ordered[0].First().self + ordered[1].Key - ordered[0].Key;
         }
         
-        return (node.Weight, weights.Sum(w => w.self + w.children));
+        return (node.Tag, weights.Sum(w => w.self + w.children));
     }
 
-    var root = nodes.Values.Except(nodes.Values.SelectMany(v => v.Children)).Single();
-    CalcWeight(root);
+    CalcWeight(nodes.GetRoot());
     
     return fixedWeight;
 }
