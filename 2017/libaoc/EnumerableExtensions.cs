@@ -78,5 +78,8 @@ namespace Aoc2017
 
         public static int EnqueueRange<T>([NotNull] this Queue<T> @this, params T[] items) =>
             @this.EnqueueRange(items.AsEnumerable());
+
+        public static int RemoveRange<TK, TV>([NotNull] this IDictionary<TK, TV> @this, IEnumerable<TK> keys) =>
+            keys.Count(@this.Remove);
     }
 }
