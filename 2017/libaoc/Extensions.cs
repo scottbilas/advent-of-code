@@ -420,7 +420,20 @@ namespace Aoc2017
         public static IEnumerable<(T a, T b)> Combinations2<T>([NotNull] this IEnumerable<T> @this) =>
             @this.Combinations(2).Select(l => (l[0], l[1]));
 
-        public static IReadOnlyList<T> AsReadOnlyList<T>(this IReadOnlyList<T> source) =>
-            source;
+        public static IReadOnlyList<T> AsReadOnlyList<T>(this IReadOnlyList<T> @this) =>
+            @this;
+
+        public static void Reverse<T>(this IList<T> @this, int offset, int count)
+        {
+            for (var i = 0; i < count / 2; ++i)
+            {
+                var a = offset + i;
+                var b = offset + count - i - 1;
+
+                var tmp = @this[a];
+                @this[a] = @this[b];
+                @this[b] = tmp;
+            }
+        }
     }
 }
