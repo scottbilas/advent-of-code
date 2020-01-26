@@ -187,6 +187,9 @@ namespace Aoc2017
         public static string ToStringFromChars([NotNull] this IEnumerable<char> @this) =>
             new string(@this.ToArray());
 
+        public static string ToStringFromChars([NotNull] this IEnumerable<char> @this, int count) =>
+            new string(@this.Take(count).ToArray());
+
         public static int[] ToDigits([NotNull] this string @this) => @this.Select(c => c - '0').ToArray();
 
         public static string FromDigits([NotNull] this IEnumerable<int> @this, int offset, int count) => FromDigits(@this.Skip(offset).Take(count));

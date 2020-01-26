@@ -1,46 +1,70 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using JetBrains.Annotations;
 
 namespace Aoc2017
 {
-    public static class Ring
+    public static class RingExtensions
     {
-        public static RingArray<T> Array<T>(IEnumerable<T> items) => new RingArray<T>(items);
-        public static RingList<T> List<T>(IEnumerable<T> items) => new RingList<T>(items);
+        public static RingArray<T> ToRingArray<T>(this IEnumerable<T> @this) => new RingArray<T>(@this);
+        public static RingList<T> ToRingList<T>(this IEnumerable<T> @this) => new RingList<T>(@this);
     }
 
     public class RingArray<T> : IList<T>, IReadOnlyList<T>
     {
-        [NotNull] T[] m_Data;
+        [NotNull] public T[] Data;
+        public int Offset;
 
-        public RingArray([NotNull] IEnumerable<T> items) => m_Data = items.ToArray();
-        public RingArray(int count) => m_Data = new T[count];
+        public RingArray([NotNull] IEnumerable<T> items) => Data = items.ToArray();
+        public RingArray(int count) => Data = new T[count];
 
-        public int Length => m_Data.Length;
-        public ref T this[int index] => ref m_Data[this.WrapIndex(index)];
+        public int Length => Data.Length;
+        public ref T this[int index] => ref Data[ResolveIndex(index)];
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)m_Data).GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => m_Data.GetEnumerator();
+        int ResolveIndex(int index) => this.WrapIndex(index + Offset);
 
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() =>
+            Data.Repeat().Skip(ResolveIndex(0)).Take(Length).GetEnumerator();
+
+        // it's an array, so these are all read-only (we still want the interface for better algo reuse via the other members)
+
+        void ICollection<T>.Add(T item) => throw new ReadOnlyException();
+        void ICollection<T>.Clear() => throw new ReadOnlyException();
+        bool ICollection<T>.Remove(T item) => throw new ReadOnlyException();
+        void IList<T>.Insert(int index, T item) => throw new ReadOnlyException();
+        void IList<T>.RemoveAt(int index) => throw new ReadOnlyException();
+
+        // simple forwarders
+
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
         int IReadOnlyCollection<T>.Count => Length;
-
-        void ICollection<T>.Add(T item) => throw new InvalidOperationException();
-        void ICollection<T>.Clear() => throw new InvalidOperationException();
-        bool ICollection<T>.Contains(T item) => m_Data.Contains(item);
-        void ICollection<T>.CopyTo(T[] array, int arrayIndex) => m_Data.CopyTo(array, arrayIndex);
-        bool ICollection<T>.Remove(T item) => throw new InvalidOperationException();
+        bool ICollection<T>.Contains(T item) => Data.Contains(item);
         int ICollection<T>.Count => Length;
         bool ICollection<T>.IsReadOnly => false;
 
-        T IReadOnlyList<T>.this[int index] => m_Data[this.WrapIndex(index)];
+        // index-processing forwarders
 
-        int IList<T>.IndexOf(T item) => m_Data.IndexOf(item);
-        void IList<T>.Insert(int index, T item) => throw new InvalidOperationException();
-        void IList<T>.RemoveAt(int index) => throw new InvalidOperationException();
-        T IList<T>.this[int index] { get => m_Data[this.WrapIndex(index)]; set => m_Data[this.WrapIndex(index)] = value; }
+        void ICollection<T>.CopyTo(T[] array, int arrayIndex)
+        {
+            var start = ResolveIndex(0);
+            var count = Length - start;
+
+            Array.Copy(Data, start, array, arrayIndex, count);
+            Array.Copy(Data, 0, array, arrayIndex + count, Length - count);
+        }
+
+        T IReadOnlyList<T>.this[int index] => Data[ResolveIndex(index)];
+
+        int IList<T>.IndexOf(T item) => Data.IndexOf(item) - Offset;
+
+        T IList<T>.this[int index]
+        {
+            get => Data[ResolveIndex(index)];
+            set => Data[ResolveIndex(index)] = value;
+        }
     }
 
     public class RingList<T> : IList<T>, IReadOnlyList<T>

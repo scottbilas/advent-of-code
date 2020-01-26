@@ -9,7 +9,7 @@ namespace Aoc2017
     {
         [Test] public void Indexing()
         {
-            var ring = Ring.Array(Arr(1, 2, 3, 4, 5));
+            var ring = Arr(1, 2, 3, 4, 5).ToRingArray();
 
             ring[1] = 6;
             ring[1].ShouldBe(6);
@@ -29,13 +29,50 @@ namespace Aoc2017
             ring[-10].ShouldBe(9);
             ring.ShouldBe(Arr(9, 6, 3, 8, 7));
         }
+
+        [Test] public void Offset()
+        {
+            var ring = Arr(1, 2, 3, 4, 5).ToRingArray();
+            ring.ShouldBe(Arr(1, 2, 3, 4, 5));
+            ring.ToArray().ShouldBe(Arr(1, 2, 3, 4, 5));
+
+            ring.Offset = 2;
+            ring[1] = 6;
+            ring[1].ShouldBe(6);
+            ring.Data.ShouldBe(Arr(1, 2, 3, 6, 5));
+            ring.ShouldBe(Arr(3, 6, 5, 1, 2));
+            ring.ToArray().ShouldBe(Arr(3, 6, 5, 1, 2));
+
+            ring.Offset = -2;
+            ring[9] = 7;
+            ring[9].ShouldBe(7);
+            ring[4].ShouldBe(7);
+            ring.Data.ShouldBe(Arr(1, 2, 7, 6, 5));
+            ring.ShouldBe(Arr(6, 5, 1, 2, 7));
+            ring.ToArray().ShouldBe(Arr(6, 5, 1, 2, 7));
+
+            ring.Offset = 8;
+            ring[-2] = 8;
+            ring[-2].ShouldBe(8);
+            ring[3].ShouldBe(8);
+            ring.Data.ShouldBe(Arr(1, 8, 7, 6, 5));
+            ring.ShouldBe(Arr(6, 5, 1, 8, 7));
+            ring.ToArray().ShouldBe(Arr(6, 5, 1, 8, 7));
+
+            ring.Offset = 3;
+            ring[-10] = 9;
+            ring[-10].ShouldBe(9);
+            ring.Data.ShouldBe(Arr(1, 8, 7, 9, 5));
+            ring.ShouldBe(Arr(9, 5, 1, 8, 7));
+            ring.ToArray().ShouldBe(Arr(9, 5, 1, 8, 7));
+        }
     }
 
-    class RingTests
+    class RingListTests
     {
         [Test] public void RemoveAt()
         {
-            var ring = Ring.List(Arr(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+            var ring = Arr(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).ToRingList();
 
             ring.RemoveAt(1);
             ring.ToArray().ShouldBe(Arr(1, 3, 4, 5, 6, 7, 8, 9, 10));
@@ -52,7 +89,7 @@ namespace Aoc2017
 
         [Test] public void Insert()
         {
-            var ring = Ring.List(Arr(1, 2, 3, 4, 5));
+            var ring = Arr(1, 2, 3, 4, 5).ToRingList();
 
             ring.Insert(1, 6);
             ring.ToArray().ShouldBe(Arr(1, 6, 2, 3, 4, 5));
