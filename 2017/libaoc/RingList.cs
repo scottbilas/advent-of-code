@@ -20,13 +20,7 @@ namespace Aoc2017
         public RingArray(int count) => m_Data = new T[count];
 
         public int Length => m_Data.Length;
-        public ref T this[int index] => ref m_Data[Wrap(index)];
-
-        public int Wrap(int index)
-        {
-            index %= Length;
-            return index >= 0 ? index : index + Length;
-        }
+        public ref T this[int index] => ref m_Data[this.WrapIndex(index)];
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => ((IEnumerable<T>)m_Data).GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => m_Data.GetEnumerator();
@@ -41,12 +35,12 @@ namespace Aoc2017
         int ICollection<T>.Count => Length;
         bool ICollection<T>.IsReadOnly => false;
 
-        T IReadOnlyList<T>.this[int index] => m_Data[Wrap(index)];
+        T IReadOnlyList<T>.this[int index] => m_Data[this.WrapIndex(index)];
 
         int IList<T>.IndexOf(T item) => m_Data.IndexOf(item);
         void IList<T>.Insert(int index, T item) => throw new InvalidOperationException();
         void IList<T>.RemoveAt(int index) => throw new InvalidOperationException();
-        T IList<T>.this[int index] { get => m_Data[Wrap(index)]; set => m_Data[Wrap(index)] = value; }
+        T IList<T>.this[int index] { get => m_Data[this.WrapIndex(index)]; set => m_Data[this.WrapIndex(index)] = value; }
     }
 
     public class RingList<T> : IList<T>, IReadOnlyList<T>
@@ -77,21 +71,15 @@ namespace Aoc2017
         // wrapped forwarders
 
         public void Insert(int index, T item) =>
-            m_Data.Insert(Wrap(index), item);
+            m_Data.Insert(this.WrapIndex(index), item);
 
         public void RemoveAt(int index) =>
-            m_Data.RemoveAt(Wrap(index));
+            m_Data.RemoveAt(this.WrapIndex(index));
 
         public T this[int index]
         {
-            get => m_Data[Wrap(index)];
-            set => m_Data[Wrap(index)] = value;
-        }
-
-        public int Wrap(int index)
-        {
-            index %= Count;
-            return index >= 0 ? index : index + Count;
+            get => m_Data[this.WrapIndex(index)];
+            set => m_Data[this.WrapIndex(index)] = value;
         }
     }
 }

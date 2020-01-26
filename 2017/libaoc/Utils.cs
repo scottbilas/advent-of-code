@@ -20,6 +20,19 @@ namespace Aoc2017
             right = temp;
         }
 
+        public static int WrapIndex(int index, int max)
+        {
+            index %= max;
+            return index >= 0 ? index : (index + max);
+        }
+
+        public static int BounceIndex(int index, int max)
+        {
+            var period = (max * 2) - 2;
+            index = Math.Abs(index) % period;
+            return index < max ? index : period - index;
+        }
+
         static byte[] k_On = { 0, 0, 0 };
 
         public static string OcrSmallText(Int2 size, Func<Int2, bool> isSet)

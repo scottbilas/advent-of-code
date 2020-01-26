@@ -43,7 +43,7 @@ namespace Aoc2017
 			    yield break;
 
 		    foreach (var child in @this.Children)
-			    foreach (var n in SelectTree(child))
+			    foreach (var n in SelectTree(child, shouldRecurse))
 				    yield return n;
 	    }
 

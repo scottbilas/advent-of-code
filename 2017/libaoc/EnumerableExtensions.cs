@@ -24,7 +24,7 @@ namespace Aoc2017
             return -1;
         }
 
-        public static bool IsValidIndex([NotNull] this ICollection @this, int index) =>
+        public static bool IsValidIndex<T>([NotNull] this ICollection<T> @this, int index) =>
             index >= 0 && index < @this.Count;
 
         public static IEnumerable<T> Except<T>([NotNull] this IEnumerable<T> @this, T value) =>
@@ -39,6 +39,21 @@ namespace Aoc2017
                 @this.RemoveRange(newCount, oldCount - newCount);
 
             return oldCount;
+        }
+
+        public static int EnsureSize<T>([NotNull] this List<T> @this, int minimumCount)
+        {
+            var oldCount = @this.Count;
+            if (oldCount < minimumCount)
+                @this.AddRange(minimumCount - oldCount);
+
+            return oldCount;
+        }
+
+        public static void ExpandAndSetAt<T>([NotNull] this List<T> @this, int index, T value)
+        {
+            @this.EnsureSize(index + 1);
+            @this[index] = value;
         }
 
         public static int AddRange<T>([NotNull] this ICollection<T> @this, IEnumerable<T> itemsToAdd)
@@ -81,5 +96,11 @@ namespace Aoc2017
 
         public static int RemoveRange<TK, TV>([NotNull] this IDictionary<TK, TV> @this, IEnumerable<TK> keys) =>
             keys.Count(@this.Remove);
+
+        public static int WrapIndex<T>([NotNull] this ICollection<T> @this, int index) =>
+            Utils.WrapIndex(index, @this.Count);
+
+        public static int BounceIndex<T>([NotNull] this ICollection<T> @this, int index) =>
+            Utils.BounceIndex(index, @this.Count);
     }
 }

@@ -266,6 +266,9 @@ namespace Aoc2017
         public static IEnumerable<T> SelectAdjacentWithDiagonals<T>(this Int2 @this, Func<Int2, T> selector) =>
             @this.SelectAdjacentWithDiagonals().Select(selector);
 
+        public static Dictionary<TKey, TValue> ToDictionary<TSource, TKey, TValue>([NotNull] this IEnumerable<TSource> @this, Func<TSource, TKey> keySelector, TValue value) =>
+            @this.ToDictionary(keySelector, _ => value);
+
         /// <summary>Convert a `Dictionary` to an `AutoDictionary` and assign it the given default-get delegate</summary>
         public static AutoDictionary<TKey, TValue> ToAutoDictionary<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, Func<TKey, TValue> getDefault) =>
             new AutoDictionary<TKey, TValue>(@this, getDefault);
