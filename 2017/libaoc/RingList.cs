@@ -81,7 +81,7 @@ namespace Aoc2017
 
         // simple forwarders
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)m_Data).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => m_Data.GetEnumerator();
         public IEnumerator<T> GetEnumerator() => m_Data.GetEnumerator();
         bool ICollection<T>.IsReadOnly => ((ICollection<T>)m_Data).IsReadOnly;
         public void Add(T item) => m_Data.Add(item);
