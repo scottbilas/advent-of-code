@@ -25,12 +25,33 @@ namespace Aoc2017
                 : new [] { @this };
         }
 
-        public static char[,] ToGrid([NotNull] this string @this, bool trim = true)
+        public static char[,] ParseGrid([NotNull] this string @this, char defaultFill, int border)
+        {
+            var lines = @this
+                .SelectLines(false)
+                .SkipWhile(l => l.Trim().IsEmpty())
+                .TakeWhile(l => l.Trim().Any())
+                .Select(l => l.TrimEnd())
+                .ToList();
+
+            var skip = lines.Min(l => l.Length - l.TrimStart().Length);
+            var grid = new char[
+                    lines.Select(l => l.Length).Max() - skip + border * 2,
+                    lines.Count + border * 2]
+                .Fill(defaultFill);
+
+            for (var y = 0; y < lines.Count; ++y)
+                for (var x = skip; x < lines[y].Length; ++x)
+                    grid[x - skip + border, y + border] = lines[y][x];
+
+            return grid;
+        }
+
+        public static char[,] ParseRectGrid([NotNull] this string @this, bool trim = true)
         {
             var lines = @this
                 .Trim()
-                .Split('\n')
-                .Select(l => trim ? l.Trim() : l)
+                .SelectLines(trim)
                 .ToList();
 
             if (lines.Any(l => l.Length != lines[0].Length))

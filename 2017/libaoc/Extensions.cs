@@ -302,6 +302,9 @@ namespace Aoc2017
         public static T GetAt<T>(this T[,] @this, in Int2 pos) => @this[pos.X, pos.Y];
         public static T SetAt<T>(this T[,] @this, in Int2 pos, T value) => @this[pos.X, pos.Y] = value;
 
+        public static T GetAt<T>(this T[,] @this, in Int2 pos, Dir dir) => @this.GetAt(dir.GetMove(pos));
+        public static T SetAt<T>(this T[,] @this, in Int2 pos, Dir dir, T value) => @this.SetAt(dir.GetMove(pos), value);
+
         public static Int2 ReduceFraction(this Int2 @this)
         {
             if (@this.X == 0)

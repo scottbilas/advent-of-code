@@ -10,7 +10,7 @@ namespace Aoc2017
         [Test]
         public void TextToGrid_WithSingleLine_ReturnsSingleRowGrid()
         {
-            var grid = "abc".ToGrid();
+            var grid = "abc".ParseRectGrid();
             grid.GetDimensions().ShouldBe(new Int2(3, 1));
             grid[0, 0].ShouldBe('a');
             grid[1, 0].ShouldBe('b');
@@ -25,7 +25,7 @@ namespace Aoc2017
                 fghij
                 klmno
                 pqrst
-                uvwxy".ToGrid();
+                uvwxy".ParseRectGrid();
             grid.SelectBorderCells().SelectXy().ShouldBe(ignoreOrder: true, expected: Arr(
                 (0, 0, 'a'), (1, 0, 'b'), (2, 0, 'c'), (3, 0, 'd'), (4, 0, 'e'),
                 (0, 1, 'f'),                                        (4, 1, 'j'),
@@ -48,7 +48,7 @@ namespace Aoc2017
                 fghij
                 klmno
                 pqrst
-                uvwxy".ToGrid();
+                uvwxy".ParseRectGrid();
             grid.SelectCells(grid.GetRect().Deflate(1)).SelectXy().ShouldBe(ignoreOrder: true, expected: Arr(
                              (1, 1, 'g'), (2, 1, 'h'), (3, 1, 'i'),
                              (1, 2, 'l'), (2, 2, 'm'), (3, 2, 'n'),
@@ -63,7 +63,7 @@ namespace Aoc2017
                 fghij
                 klmno
                 pqrst
-                uvwxy".ToGrid();
+                uvwxy".ParseRectGrid();
             grid.SelectCells(grid.GetRect().Deflate(1, 2)).SelectXy().ShouldBe(ignoreOrder: true, expected: Arr(
                 (1, 2, 'l'), (2, 2, 'm'), (3, 2, 'n')));
         }

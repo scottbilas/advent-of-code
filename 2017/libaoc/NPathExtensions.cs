@@ -13,7 +13,6 @@ namespace Aoc2017
         public static IEnumerable<int> ReadAllInts(this NPath @this) => @this.ReadAllText().SelectInts();
         public static IEnumerable<BigInteger> ReadAllBigInts(this NPath @this) => @this.ReadAllText().SelectBigInts();
         public static IEnumerable<float> ReadAllFloats(this NPath @this) => @this.ReadAllText().SelectFloats();
-        public static char[,] ReadGrid(this NPath @this) => @this.ReadAllText().ToGrid();
 
         public static NPath WriteAllBytes(this NPath @this, byte[] data)
         {
