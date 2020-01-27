@@ -63,26 +63,25 @@ void Main()
     Solve2(input).Dump().ShouldBe(17450);
 }
 
-(string word, int steps) Solve(string gridText)
+IEnumerable<char> Solve(string gridText)
 {
     var grid = gridText.ParseGrid(' ', 1);
     var pos = grid.SelectCells().First(c => c.cell == '|').pos;
-    var letters = new StringBuilder();
-    var dir = Dir.S;
 
-    for (var steps = 0;; ++steps)
+    for (var dir = Dir.S;; pos += dir.GetMove())
     {
         var c = grid.GetAt(pos);
-        if (c.IsAsciiLetter())
-            letters.Append(c);
-        else if (c == '+')
+        if (c == '+')
             dir = dir.GetContinues().Single(d => grid.GetAt(pos, d) != ' ');
         else if (c == ' ')
-            return (letters.ToString(), steps);
-            
-        pos += dir.GetMove();
+            yield break;
+
+        yield return c;
     }
 }
 
-string Solve1(string gridText) => Solve(gridText).word;
-int Solve2(string gridText) => Solve(gridText).steps;
+string Solve1(string gridText) =>
+    Solve(gridText).Where(c => c.IsAsciiLetter()).ToStringFromChars();
+
+int Solve2(string gridText) =>
+    Solve(gridText).Count();
