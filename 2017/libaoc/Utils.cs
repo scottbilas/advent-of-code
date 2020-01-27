@@ -9,7 +9,7 @@ using static Aoc2017.MiscStatics;
 
 namespace Aoc2017
 {
-    public sealed class Void { }
+    public sealed class Unit { }
 
     public static partial class Utils
     {

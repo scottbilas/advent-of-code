@@ -14,7 +14,7 @@ namespace Aoc2017
     {
         [Test] public void SelectTree_WithSingleNodeTree_ReturnsSelf()
         {
-            var root = new Tree<Void>();
+            var root = new Tree<Unit>();
             var tree = root.SelectTree().ToArray();
 
             tree.ShouldBe(Arr(root));
