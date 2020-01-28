@@ -1,4 +1,5 @@
 <Query Kind="Program">
+  <Output>DataGrids</Output>
   <Reference Relative="..\..\..\temp\bin\libaoc2017\Debug\netstandard2.1\libaoc2017.dll">C:\proj\advent-of-code\temp\bin\libaoc2017\Debug\netstandard2.1\libaoc2017.dll</Reference>
   <Reference Relative="..\..\..\temp\bin\libaoc2017\Debug\netstandard2.1\libutils.dll">C:\proj\advent-of-code\temp\bin\libaoc2017\Debug\netstandard2.1\libutils.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\netstandard.dll</Reference>
@@ -61,7 +62,7 @@ void Main()
 
     // *PROBLEM*
 
-    Solve2(input).Dump();//.ShouldBe(306);
+    Solve2(input).Dump().ShouldBe(420);
 }
 
 (Int3 p, Int3 v, Int3 a)[] Parse(string particleText) =>
