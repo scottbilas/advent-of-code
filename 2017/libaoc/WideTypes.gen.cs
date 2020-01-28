@@ -46,15 +46,8 @@ namespace Aoc2017
         public override bool Equals(object obj) =>
             !ReferenceEquals(obj, null) && obj is Int2 other && Equals(other);
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = X;
-                hashCode = (hashCode * 397) ^ Y;
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() =>
+            HashCode.Combine(X, Y);
 
         public static Bool2 operator ==(in Int2 left, in Int2 right) =>
             new Bool2(left.X == right.X, left.Y == right.Y);
@@ -65,8 +58,8 @@ namespace Aoc2017
         public object ToDump() => ToString(); // linqpad
 
         static readonly Int2 k_Zero = new Int2(0), k_One = new Int2(1);
-        static readonly Int2 k_MaxValue = new Int2(Int32.MaxValue, Int32.MaxValue);
-        static readonly Int2 k_MinValue = new Int2(Int32.MinValue, Int32.MinValue);
+        static readonly Int2 k_MaxValue = new Int2(int.MaxValue, int.MaxValue);
+        static readonly Int2 k_MinValue = new Int2(int.MinValue, int.MinValue);
 
         public static ref readonly Int2 Zero => ref k_Zero;
         public static ref readonly Int2 One => ref k_One;
@@ -163,16 +156,8 @@ namespace Aoc2017
         public override bool Equals(object obj) =>
             !ReferenceEquals(obj, null) && obj is Int3 other && Equals(other);
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = X;
-                hashCode = (hashCode * 397) ^ Y;
-                hashCode = (hashCode * 397) ^ Z;
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() =>
+            HashCode.Combine(X, Y, Z);
 
         public static Bool3 operator ==(in Int3 left, in Int3 right) =>
             new Bool3(left.X == right.X, left.Y == right.Y, left.Z == right.Z);
@@ -183,8 +168,8 @@ namespace Aoc2017
         public object ToDump() => ToString(); // linqpad
 
         static readonly Int3 k_Zero = new Int3(0), k_One = new Int3(1);
-        static readonly Int3 k_MaxValue = new Int3(Int32.MaxValue, Int32.MaxValue, Int32.MaxValue);
-        static readonly Int3 k_MinValue = new Int3(Int32.MinValue, Int32.MinValue, Int32.MinValue);
+        static readonly Int3 k_MaxValue = new Int3(int.MaxValue, int.MaxValue, int.MaxValue);
+        static readonly Int3 k_MinValue = new Int3(int.MinValue, int.MinValue, int.MinValue);
 
         public static ref readonly Int3 Zero => ref k_Zero;
         public static ref readonly Int3 One => ref k_One;
@@ -281,17 +266,8 @@ namespace Aoc2017
         public override bool Equals(object obj) =>
             !ReferenceEquals(obj, null) && obj is Int4 other && Equals(other);
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = X;
-                hashCode = (hashCode * 397) ^ Y;
-                hashCode = (hashCode * 397) ^ Z;
-                hashCode = (hashCode * 397) ^ W;
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() =>
+            HashCode.Combine(X, Y, Z, W);
 
         public static Bool4 operator ==(in Int4 left, in Int4 right) =>
             new Bool4(left.X == right.X, left.Y == right.Y, left.Z == right.Z, left.W == right.W);
@@ -302,8 +278,8 @@ namespace Aoc2017
         public object ToDump() => ToString(); // linqpad
 
         static readonly Int4 k_Zero = new Int4(0), k_One = new Int4(1);
-        static readonly Int4 k_MaxValue = new Int4(Int32.MaxValue, Int32.MaxValue, Int32.MaxValue, Int32.MaxValue);
-        static readonly Int4 k_MinValue = new Int4(Int32.MinValue, Int32.MinValue, Int32.MinValue, Int32.MinValue);
+        static readonly Int4 k_MaxValue = new Int4(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
+        static readonly Int4 k_MinValue = new Int4(int.MinValue, int.MinValue, int.MinValue, int.MinValue);
 
         public static ref readonly Int4 Zero => ref k_Zero;
         public static ref readonly Int4 One => ref k_One;
@@ -359,6 +335,336 @@ namespace Aoc2017
         public static Bool4 operator >=(in Int4 a, int b) =>
             new Bool4(a.X >= b, a.Y >= b, a.Z >= b, a.W >= b);
         public static Bool4 operator >=(int a, in Int4 b) =>
+            new Bool4(a >= b.X, a >= b.Y, a >= b.Z, a >= b.W);
+    }
+
+    public struct Long2 : IEquatable<Long2>
+    {
+        public long X, Y;
+
+        public Long2(long x, long y) =>
+            (X, Y) = (x, y);
+        public Long2(long v) =>
+            (X, Y) = (v, v);
+        public Long2(IEnumerable<long> xy) =>
+            (X, Y) = xy.First2();
+        public Long2((long, long) xy) =>
+            (X, Y) = xy;
+
+        public unsafe long this[int index]
+        {
+            get
+            {
+                if (index < 0 || index > 1)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (long* i = &X) { return i[index]; }
+            }
+            set
+            {
+                if (index < 0 || index > 1)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (long* i = &X) { i[index] = value; }
+            }
+        }
+
+        public void Deconstruct(out long x, out long y) =>
+            (x, y) = (X, Y);
+
+        public bool Equals(Long2 other) =>
+            X == other.X && Y == other.Y;
+
+        public override bool Equals(object obj) =>
+            !ReferenceEquals(obj, null) && obj is Long2 other && Equals(other);
+
+        public override int GetHashCode() =>
+            HashCode.Combine(X, Y);
+
+        public static Bool2 operator ==(in Long2 left, in Long2 right) =>
+            new Bool2(left.X == right.X, left.Y == right.Y);
+        public static Bool2 operator !=(in Long2 left, in Long2 right) =>
+            new Bool2(left.X != right.X, left.Y != right.Y);
+
+        public override string ToString() => $"{X}, {Y}";
+        public object ToDump() => ToString(); // linqpad
+
+        static readonly Long2 k_Zero = new Long2(0), k_One = new Long2(1);
+        static readonly Long2 k_MaxValue = new Long2(long.MaxValue, long.MaxValue);
+        static readonly Long2 k_MinValue = new Long2(long.MinValue, long.MinValue);
+
+        public static ref readonly Long2 Zero => ref k_Zero;
+        public static ref readonly Long2 One => ref k_One;
+        public static ref readonly Long2 MaxValue => ref k_MaxValue;
+        public static ref readonly Long2 MinValue => ref k_MinValue;
+
+        public bool IsZero => Equals(Zero);
+        public bool IsOne  => Equals(One);
+
+        public static Long2 operator-(in Long2 i) =>
+            new Long2(-i.X, -i.Y);
+
+        public static Long2 operator +(in Long2 a, in Long2 b) =>
+            new Long2(a.X + b.X, a.Y + b.Y);
+        public static Long2 operator +(in Long2 a, long d) =>
+            new Long2(a.X + d, a.Y + d);
+        public static Long2 operator -(in Long2 a, in Long2 b) =>
+            new Long2(a.X - b.X, a.Y - b.Y);
+        public static Long2 operator -(in Long2 a, long d) =>
+            new Long2(a.X - d, a.Y - d);
+        public static Long2 operator *(in Long2 a, in Long2 b) =>
+            new Long2(a.X * b.X, a.Y * b.Y);
+        public static Long2 operator *(in Long2 a, long d) =>
+            new Long2(a.X * d, a.Y * d);
+        public static Long2 operator /(in Long2 a, in Long2 b) =>
+            new Long2(a.X / b.X, a.Y / b.Y);
+        public static Long2 operator /(in Long2 a, long d) =>
+            new Long2(a.X / d, a.Y / d);
+
+        public static Bool2 operator <(in Long2 a, in Long2 b) =>
+            new Bool2(a.X < b.X, a.Y < b.Y);
+        public static Bool2 operator <(in Long2 a, long b) =>
+            new Bool2(a.X < b, a.Y < b);
+        public static Bool2 operator <(long a, in Long2 b) =>
+            new Bool2(a < b.X, a < b.Y);
+
+        public static Bool2 operator <=(in Long2 a, in Long2 b) =>
+            new Bool2(a.X <= b.X, a.Y <= b.Y);
+        public static Bool2 operator <=(in Long2 a, long b) =>
+            new Bool2(a.X <= b, a.Y <= b);
+        public static Bool2 operator <=(long a, in Long2 b) =>
+            new Bool2(a <= b.X, a <= b.Y);
+
+        public static Bool2 operator >(in Long2 a, in Long2 b) =>
+            new Bool2(a.X > b.X, a.Y > b.Y);
+        public static Bool2 operator >(in Long2 a, long b) =>
+            new Bool2(a.X > b, a.Y > b);
+        public static Bool2 operator >(long a, in Long2 b) =>
+            new Bool2(a > b.X, a > b.Y);
+
+        public static Bool2 operator >=(in Long2 a, in Long2 b) =>
+            new Bool2(a.X >= b.X, a.Y >= b.Y);
+        public static Bool2 operator >=(in Long2 a, long b) =>
+            new Bool2(a.X >= b, a.Y >= b);
+        public static Bool2 operator >=(long a, in Long2 b) =>
+            new Bool2(a >= b.X, a >= b.Y);
+    }
+
+    public struct Long3 : IEquatable<Long3>
+    {
+        public long X, Y, Z;
+
+        public Long3(long x, long y, long z) =>
+            (X, Y, Z) = (x, y, z);
+        public Long3(long v) =>
+            (X, Y, Z) = (v, v, v);
+        public Long3(IEnumerable<long> xyz) =>
+            (X, Y, Z) = xyz.First3();
+        public Long3((long, long, long) xyz) =>
+            (X, Y, Z) = xyz;
+
+        public unsafe long this[int index]
+        {
+            get
+            {
+                if (index < 0 || index > 2)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (long* i = &X) { return i[index]; }
+            }
+            set
+            {
+                if (index < 0 || index > 2)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (long* i = &X) { i[index] = value; }
+            }
+        }
+
+        public void Deconstruct(out long x, out long y, out long z) =>
+            (x, y, z) = (X, Y, Z);
+
+        public bool Equals(Long3 other) =>
+            X == other.X && Y == other.Y && Z == other.Z;
+
+        public override bool Equals(object obj) =>
+            !ReferenceEquals(obj, null) && obj is Long3 other && Equals(other);
+
+        public override int GetHashCode() =>
+            HashCode.Combine(X, Y, Z);
+
+        public static Bool3 operator ==(in Long3 left, in Long3 right) =>
+            new Bool3(left.X == right.X, left.Y == right.Y, left.Z == right.Z);
+        public static Bool3 operator !=(in Long3 left, in Long3 right) =>
+            new Bool3(left.X != right.X, left.Y != right.Y, left.Z != right.Z);
+
+        public override string ToString() => $"{X}, {Y}, {Z}";
+        public object ToDump() => ToString(); // linqpad
+
+        static readonly Long3 k_Zero = new Long3(0), k_One = new Long3(1);
+        static readonly Long3 k_MaxValue = new Long3(long.MaxValue, long.MaxValue, long.MaxValue);
+        static readonly Long3 k_MinValue = new Long3(long.MinValue, long.MinValue, long.MinValue);
+
+        public static ref readonly Long3 Zero => ref k_Zero;
+        public static ref readonly Long3 One => ref k_One;
+        public static ref readonly Long3 MaxValue => ref k_MaxValue;
+        public static ref readonly Long3 MinValue => ref k_MinValue;
+
+        public bool IsZero => Equals(Zero);
+        public bool IsOne  => Equals(One);
+
+        public static Long3 operator-(in Long3 i) =>
+            new Long3(-i.X, -i.Y, -i.Z);
+
+        public static Long3 operator +(in Long3 a, in Long3 b) =>
+            new Long3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+        public static Long3 operator +(in Long3 a, long d) =>
+            new Long3(a.X + d, a.Y + d, a.Z + d);
+        public static Long3 operator -(in Long3 a, in Long3 b) =>
+            new Long3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+        public static Long3 operator -(in Long3 a, long d) =>
+            new Long3(a.X - d, a.Y - d, a.Z - d);
+        public static Long3 operator *(in Long3 a, in Long3 b) =>
+            new Long3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
+        public static Long3 operator *(in Long3 a, long d) =>
+            new Long3(a.X * d, a.Y * d, a.Z * d);
+        public static Long3 operator /(in Long3 a, in Long3 b) =>
+            new Long3(a.X / b.X, a.Y / b.Y, a.Z / b.Z);
+        public static Long3 operator /(in Long3 a, long d) =>
+            new Long3(a.X / d, a.Y / d, a.Z / d);
+
+        public static Bool3 operator <(in Long3 a, in Long3 b) =>
+            new Bool3(a.X < b.X, a.Y < b.Y, a.Z < b.Z);
+        public static Bool3 operator <(in Long3 a, long b) =>
+            new Bool3(a.X < b, a.Y < b, a.Z < b);
+        public static Bool3 operator <(long a, in Long3 b) =>
+            new Bool3(a < b.X, a < b.Y, a < b.Z);
+
+        public static Bool3 operator <=(in Long3 a, in Long3 b) =>
+            new Bool3(a.X <= b.X, a.Y <= b.Y, a.Z <= b.Z);
+        public static Bool3 operator <=(in Long3 a, long b) =>
+            new Bool3(a.X <= b, a.Y <= b, a.Z <= b);
+        public static Bool3 operator <=(long a, in Long3 b) =>
+            new Bool3(a <= b.X, a <= b.Y, a <= b.Z);
+
+        public static Bool3 operator >(in Long3 a, in Long3 b) =>
+            new Bool3(a.X > b.X, a.Y > b.Y, a.Z > b.Z);
+        public static Bool3 operator >(in Long3 a, long b) =>
+            new Bool3(a.X > b, a.Y > b, a.Z > b);
+        public static Bool3 operator >(long a, in Long3 b) =>
+            new Bool3(a > b.X, a > b.Y, a > b.Z);
+
+        public static Bool3 operator >=(in Long3 a, in Long3 b) =>
+            new Bool3(a.X >= b.X, a.Y >= b.Y, a.Z >= b.Z);
+        public static Bool3 operator >=(in Long3 a, long b) =>
+            new Bool3(a.X >= b, a.Y >= b, a.Z >= b);
+        public static Bool3 operator >=(long a, in Long3 b) =>
+            new Bool3(a >= b.X, a >= b.Y, a >= b.Z);
+    }
+
+    public struct Long4 : IEquatable<Long4>
+    {
+        public long X, Y, Z, W;
+
+        public Long4(long x, long y, long z, long w) =>
+            (X, Y, Z, W) = (x, y, z, w);
+        public Long4(long v) =>
+            (X, Y, Z, W) = (v, v, v, v);
+        public Long4(IEnumerable<long> xyzw) =>
+            (X, Y, Z, W) = xyzw.First4();
+        public Long4((long, long, long, long) xyzw) =>
+            (X, Y, Z, W) = xyzw;
+
+        public unsafe long this[int index]
+        {
+            get
+            {
+                if (index < 0 || index > 3)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (long* i = &X) { return i[index]; }
+            }
+            set
+            {
+                if (index < 0 || index > 3)
+                    throw new ArgumentOutOfRangeException(nameof(index));
+                fixed (long* i = &X) { i[index] = value; }
+            }
+        }
+
+        public void Deconstruct(out long x, out long y, out long z, out long w) =>
+            (x, y, z, w) = (X, Y, Z, W);
+
+        public bool Equals(Long4 other) =>
+            X == other.X && Y == other.Y && Z == other.Z && W == other.W;
+
+        public override bool Equals(object obj) =>
+            !ReferenceEquals(obj, null) && obj is Long4 other && Equals(other);
+
+        public override int GetHashCode() =>
+            HashCode.Combine(X, Y, Z, W);
+
+        public static Bool4 operator ==(in Long4 left, in Long4 right) =>
+            new Bool4(left.X == right.X, left.Y == right.Y, left.Z == right.Z, left.W == right.W);
+        public static Bool4 operator !=(in Long4 left, in Long4 right) =>
+            new Bool4(left.X != right.X, left.Y != right.Y, left.Z != right.Z, left.W != right.W);
+
+        public override string ToString() => $"{X}, {Y}, {Z}, {W}";
+        public object ToDump() => ToString(); // linqpad
+
+        static readonly Long4 k_Zero = new Long4(0), k_One = new Long4(1);
+        static readonly Long4 k_MaxValue = new Long4(long.MaxValue, long.MaxValue, long.MaxValue, long.MaxValue);
+        static readonly Long4 k_MinValue = new Long4(long.MinValue, long.MinValue, long.MinValue, long.MinValue);
+
+        public static ref readonly Long4 Zero => ref k_Zero;
+        public static ref readonly Long4 One => ref k_One;
+        public static ref readonly Long4 MaxValue => ref k_MaxValue;
+        public static ref readonly Long4 MinValue => ref k_MinValue;
+
+        public bool IsZero => Equals(Zero);
+        public bool IsOne  => Equals(One);
+
+        public static Long4 operator-(in Long4 i) =>
+            new Long4(-i.X, -i.Y, -i.Z, -i.W);
+
+        public static Long4 operator +(in Long4 a, in Long4 b) =>
+            new Long4(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
+        public static Long4 operator +(in Long4 a, long d) =>
+            new Long4(a.X + d, a.Y + d, a.Z + d, a.W + d);
+        public static Long4 operator -(in Long4 a, in Long4 b) =>
+            new Long4(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
+        public static Long4 operator -(in Long4 a, long d) =>
+            new Long4(a.X - d, a.Y - d, a.Z - d, a.W - d);
+        public static Long4 operator *(in Long4 a, in Long4 b) =>
+            new Long4(a.X * b.X, a.Y * b.Y, a.Z * b.Z, a.W * b.W);
+        public static Long4 operator *(in Long4 a, long d) =>
+            new Long4(a.X * d, a.Y * d, a.Z * d, a.W * d);
+        public static Long4 operator /(in Long4 a, in Long4 b) =>
+            new Long4(a.X / b.X, a.Y / b.Y, a.Z / b.Z, a.W / b.W);
+        public static Long4 operator /(in Long4 a, long d) =>
+            new Long4(a.X / d, a.Y / d, a.Z / d, a.W / d);
+
+        public static Bool4 operator <(in Long4 a, in Long4 b) =>
+            new Bool4(a.X < b.X, a.Y < b.Y, a.Z < b.Z, a.W < b.W);
+        public static Bool4 operator <(in Long4 a, long b) =>
+            new Bool4(a.X < b, a.Y < b, a.Z < b, a.W < b);
+        public static Bool4 operator <(long a, in Long4 b) =>
+            new Bool4(a < b.X, a < b.Y, a < b.Z, a < b.W);
+
+        public static Bool4 operator <=(in Long4 a, in Long4 b) =>
+            new Bool4(a.X <= b.X, a.Y <= b.Y, a.Z <= b.Z, a.W <= b.W);
+        public static Bool4 operator <=(in Long4 a, long b) =>
+            new Bool4(a.X <= b, a.Y <= b, a.Z <= b, a.W <= b);
+        public static Bool4 operator <=(long a, in Long4 b) =>
+            new Bool4(a <= b.X, a <= b.Y, a <= b.Z, a <= b.W);
+
+        public static Bool4 operator >(in Long4 a, in Long4 b) =>
+            new Bool4(a.X > b.X, a.Y > b.Y, a.Z > b.Z, a.W > b.W);
+        public static Bool4 operator >(in Long4 a, long b) =>
+            new Bool4(a.X > b, a.Y > b, a.Z > b, a.W > b);
+        public static Bool4 operator >(long a, in Long4 b) =>
+            new Bool4(a > b.X, a > b.Y, a > b.Z, a > b.W);
+
+        public static Bool4 operator >=(in Long4 a, in Long4 b) =>
+            new Bool4(a.X >= b.X, a.Y >= b.Y, a.Z >= b.Z, a.W >= b.W);
+        public static Bool4 operator >=(in Long4 a, long b) =>
+            new Bool4(a.X >= b, a.Y >= b, a.Z >= b, a.W >= b);
+        public static Bool4 operator >=(long a, in Long4 b) =>
             new Bool4(a >= b.X, a >= b.Y, a >= b.Z, a >= b.W);
     }
 
@@ -594,15 +900,15 @@ namespace Aoc2017
         public static Int2 Midpoint(in Int2 a, in Int2 b) =>
             new Int2(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2);
         public static Int2 Midpoint(in Int2 a) =>
-            Midpoint(Int2.Zero, a);
+            Midpoint(a, Int2.Zero);
         public static Int3 Midpoint(in Int3 a, in Int3 b) =>
             new Int3(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2, a.Z + (b.Z - a.Z) / 2);
         public static Int3 Midpoint(in Int3 a) =>
-            Midpoint(Int3.Zero, a);
+            Midpoint(a, Int3.Zero);
         public static Int4 Midpoint(in Int4 a, in Int4 b) =>
             new Int4(a.X + (b.X - a.X) / 2, a.Y + (b.Y - a.Y) / 2, a.Z + (b.Z - a.Z) / 2, a.W + (b.W - a.W) / 2);
         public static Int4 Midpoint(in Int4 a) =>
-            Midpoint(Int4.Zero, a);
+            Midpoint(a, Int4.Zero);
     }
 
     public static partial class Extensions

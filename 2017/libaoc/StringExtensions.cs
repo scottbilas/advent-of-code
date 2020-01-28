@@ -159,6 +159,10 @@ namespace Aoc2017
             .SelectMatches(@"[-+]?\d+")
             .Select(m => int.Parse(m.Value));
 
+        public static IEnumerable<long> SelectLongs([NotNull] this string @this) => @this
+            .SelectMatches(@"[-+]?\d+")
+            .Select(m => long.Parse(m.Value));
+
         public static int[] Ints([NotNull] this string @this) => @this
             .SelectInts().ToArray();
 
@@ -189,6 +193,30 @@ namespace Aoc2017
 
         public static Int4[] Int4s([NotNull] this string @this) => @this
             .SelectInt4s().ToArray();
+
+        public static IEnumerable<Long2> SelectLong2s([NotNull] this string @this) => @this
+            .SelectLongs()
+            .Batch2()
+            .Select(v => new Long2(v));
+
+        public static Long2[] Long2s([NotNull] this string @this) => @this
+            .SelectLong2s().ToArray();
+
+        public static IEnumerable<Long3> SelectLong3s([NotNull] this string @this) => @this
+            .SelectLongs()
+            .Batch3()
+            .Select(v => new Long3(v));
+
+        public static Long3[] Long3s([NotNull] this string @this) => @this
+            .SelectLong3s().ToArray();
+
+        public static IEnumerable<Long4> SelectLong4s([NotNull] this string @this) => @this
+            .SelectLongs()
+            .Batch4()
+            .Select(v => new Long4(v));
+
+        public static Long4[] Long4s([NotNull] this string @this) => @this
+            .SelectLong4s().ToArray();
 
         public static IEnumerable<float> SelectFloats([NotNull] this string @this) => @this
             .SelectMatches(@"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
