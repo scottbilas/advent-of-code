@@ -8,20 +8,20 @@ namespace Unity.Coding.Utils
     [PublicAPI]
     public static class EnumUtility
     {
-        // about `where T : struct, IComparable, IConvertible, IFormattable`
-        //
-        // this is how we try to detect enums, since c# doesn't let us `where T : Enum`. works ok, not perfect.
+        public static int GetCount<T>()
+            where T : struct, Enum
+            => GetNames<T>().Count;
 
         public static IReadOnlyList<string> GetNames<T>()
-            where T : struct, IComparable, IConvertible, IFormattable
+            where T : struct, Enum
             => s_NameCache.GetValueOr(typeof(T)) ?? (s_NameCache[typeof(T)] = Enum.GetNames(typeof(T)));
 
         public static IReadOnlyList<string> GetLowercaseNames<T>()
-            where T : struct, IComparable, IConvertible, IFormattable
+            where T : struct, Enum
             => GetOrAddLowerNameCache(typeof(T));
 
         public static IReadOnlyList<T> GetValues<T>()
-            where T : struct, IComparable, IConvertible, IFormattable
+            where T : struct, Enum
         {
             var found =
                 s_ValueCache.GetValueOr(typeof(T))
@@ -30,19 +30,19 @@ namespace Unity.Coding.Utils
         }
 
         public static T TryParseNoCase<T>(string enumName, T defaultValue = default)
-            where T : struct, IComparable, IConvertible, IFormattable
+            where T : struct, Enum
             => Enum.TryParse(enumName, true, out T value) ? value : defaultValue;
 
         public static T TryParse<T>(string enumName, T defaultValue = default)
-            where T : struct, IComparable, IConvertible, IFormattable
+            where T : struct, Enum
             => Enum.TryParse(enumName, false, out T value) ? value : defaultValue;
 
         public static T? TryParseNoCaseOr<T>(string enumName)
-            where T : struct, IComparable, IConvertible, IFormattable
+            where T : struct, Enum
             => Enum.TryParse(enumName, true, out T value) ? (T?)value : null;
 
         public static T? TryParseOr<T>(string enumName)
-            where T : struct, IComparable, IConvertible, IFormattable
+            where T : struct, Enum
             => Enum.TryParse(enumName, false, out T value) ? (T?)value : null;
 
         static IReadOnlyList<string> GetNameCache(Type enumType)

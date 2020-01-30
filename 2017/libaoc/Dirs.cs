@@ -29,6 +29,8 @@ namespace Aoc2017
         public static Dir GetReverse(this Dir @this) => s_Dirs[(int)@this].reverse;
         public static Dir[] GetContinues(this Dir @this) => s_Dirs[(int)@this].continues;
         public static Dir[] GetOthers(this Dir @this) => s_Dirs[(int)@this].others;
+        public static Dir TurnRight(this Dir @this) => (Dir)Utils.WrapIndex((int)@this + 1, 4);
+        public static Dir TurnLeft(this Dir @this) => (Dir)Utils.WrapIndex((int)@this - 1, 4);
         public static Dir ParseDir(this string @this) => s_Dirs.First(v => v.name == @this).dir;
     }
 }

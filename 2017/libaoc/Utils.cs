@@ -175,4 +175,37 @@ namespace Aoc2017
         public static void Minimize(ref int a, int b) => a = Math.Min(a, b);
         public static void Maximize(ref int a, int b) => a = Math.Max(a, b);
     }
+
+    public static class UtilsExtensions
+    {
+        public static T Offset<T>(this T @this, int offset)
+            where T : struct, Enum
+        {
+            // needs newer .net to get 'unsafe'
+            /*var index = Unsafe.As<T, int>(ref @this) + offset;
+            if (index < 0 || index >= EnumUtility.GetCount<T>())
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            return Unsafe.As<int, T>(ref index);*/
+
+            var index = (int)(object)@this + offset;
+            if (index < 0 || index >= EnumUtility.GetCount<T>())
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            // ReSharper disable once PossibleInvalidCastException
+            return (T)(object)index;
+        }
+
+        public static T OffsetWrapped<T>(this T @this, int offset)
+            where T : struct, Enum
+        {
+            // needs newer .net to get 'unsafe'
+            /*var index = Unsafe.As<T, int>(ref @this) + offset;
+            index = Utils.WrapIndex(index, EnumUtility.GetCount<T>());
+            return Unsafe.As<int, T>(ref index);*/
+
+            var index = (int)(object)@this + offset;
+            index = Utils.WrapIndex(index, EnumUtility.GetCount<T>());
+            // ReSharper disable once PossibleInvalidCastException
+            return (T)(object)index;
+        }
+    }
 }
