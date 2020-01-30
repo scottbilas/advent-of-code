@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace Aoc2017
@@ -8,6 +9,8 @@ namespace Aoc2017
     {
         public Int2 TopLeft, BottomRight;
 
+        public static RectInt2 FromSize(int size) =>
+            new RectInt2 { BottomRight = new Int2(size) };
         public static RectInt2 FromSize(Int2 size) =>
             new RectInt2 { BottomRight = size };
 
@@ -70,6 +73,9 @@ namespace Aoc2017
                 for (var x = @this.Left; x < @this.Right; ++x)
                     yield return new Int2(x, y);
         }
+
+        public static IEnumerable<T> SelectCells<T>(this RectInt2 @this, Func<Int2, T> selector) =>
+            @this.SelectCoords().Select(selector);
 
         // TODO: move all this stuff to a IVector or something and write algorithms against the interface using where T : struct, IVector2 etc.
         public static IEnumerable<Int2> SelectBorderCoords(this Int2 @this, Int2 border) =>

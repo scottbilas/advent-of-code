@@ -55,6 +55,22 @@ namespace Unity.Coding.Utils
         public static TValue GetOrAdd<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, TKey key, TValue defaultValue = default)
             => @this.GetOrAdd(key, _ => defaultValue);
 
+        public static IDictionary<TKey, TValue> AddRange<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, [NotNull] IEnumerable<(TKey key, TValue value)> items)
+        {
+            foreach (var (key, value) in items)
+                @this.Add(key, value);
+
+            return @this;
+        }
+
+        public static IDictionary<TKey, TValue> AddRangeOverride<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, [NotNull] IEnumerable<(TKey key, TValue value)> items)
+        {
+            foreach (var (key, value) in items)
+                @this[key] = value;
+
+            return @this;
+        }
+
         public static IDictionary<TKey, TValue> AddRangeOverride<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> @this, [NotNull] IDictionary<TKey, TValue> other)
         {
             foreach (var item in other)
