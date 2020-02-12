@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-input = open('day4.input.txt').readlines()
+def getinput(): return open('day4.input.txt').readlines()
+
 
 ### PART 1
 
@@ -32,15 +33,31 @@ assert solve1([
 
 # problem
 
-s1 = solve1(input)
+s1 = solve1(getinput())
 print(s1)
 assert s1 == 245102
 
 
 ### PART 2
 
+def decrypt(room):
+    name, id = re.match('(.*)-(\d+)', room).groups()
+    id, decrypted, aoff = int(id), '', ord('a')
+
+    return id, ''.join([
+        chr((ord(i) + id - aoff) % 26 + aoff)
+        if i.isalpha() else ' ' for i in name])
+
+def solve2(rooms): return next(
+    d for d in [decrypt(r) for r in rooms]
+    if 'north' in d[1])[0]
 
 # samples
 
+assert decrypt('qzmt-zixmtkozy-ivhz-343')[1] == 'very encrypted name'
 
 # problem
+
+s2 = solve2(getinput())
+print(s2)
+assert s2 == 324

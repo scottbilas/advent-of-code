@@ -16,8 +16,6 @@ Of the real rooms from the list above, the sum of their sector IDs is 1514.
 What is the sum of the sector IDs of the real rooms?
 
 Your puzzle answer was 245102.
-
-The first half of this puzzle is complete! It provides one gold star: *
 --- Part Two ---
 
 With all the decoy data out of the way, it's time to decrypt this list and get moving.
@@ -30,7 +28,12 @@ For example, the real name for qzmt-zixmtkozy-ivhz-343 is very encrypted name.
 
 What is the sector ID of the room where North Pole objects are stored?
 
-Although it hasn't changed, you can still get your puzzle input.
+Your puzzle answer was 324.
 
-Answer:
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should return to your Advent calendar and try another puzzle.
+
+If you still want to see it, you can get your puzzle input.
+
 You can also [Shareon Twitter Mastodon] this puzzle.
