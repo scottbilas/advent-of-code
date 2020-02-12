@@ -42,7 +42,16 @@ As you can see, this display technology is extremely powerful, and will soon dom
 
 There seems to be an intermediate check of the voltage used by the display: after you swipe your card, if the screen did work, how many pixels should be lit?
 
-To begin, get your puzzle input.
+Your puzzle answer was 119.
+
+The first half of this puzzle is complete! It provides one gold star: *
+--- Part Two ---
+
+You notice that the screen is only capable of displaying capital letters; in the font it uses, each letter is 5 pixels wide and 6 tall.
+
+After you swipe your card, what code is the screen trying to display?
+
+Although it hasn't changed, you can still get your puzzle input.
 
 Answer:
 You can also [Shareon Twitter Mastodon] this puzzle.
