@@ -14,8 +14,6 @@ For example:
 How many IPs in your puzzle input support TLS?
 
 Your puzzle answer was 110.
-
-The first half of this puzzle is complete! It provides one gold star: *
 --- Part Two ---
 
 You would also like to know which IPs support SSL (super-secret listening).
@@ -31,7 +29,12 @@ For example:
 
 How many IPs in your puzzle input support SSL?
 
-Although it hasn't changed, you can still get your puzzle input.
+Your puzzle answer was 242.
 
-Answer:
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should return to your Advent calendar and try another puzzle.
+
+If you still want to see it, you can get your puzzle input.
+
 You can also [Shareon Twitter Mastodon] this puzzle.
