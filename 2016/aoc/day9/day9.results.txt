@@ -18,8 +18,6 @@ For example:
 What is the decompressed length of the file (your puzzle input)? Don't count whitespace.
 
 Your puzzle answer was 107035.
-
-The first half of this puzzle is complete! It provides one gold star: *
 --- Part Two ---
 
 Apparently, the file actually uses version two of the format.
@@ -37,7 +35,12 @@ Unfortunately, the computer you brought probably doesn't have enough memory to a
 
 What is the decompressed length of the file using this improved format?
 
-Although it hasn't changed, you can still get your puzzle input.
+Your puzzle answer was 11451628995.
 
-Answer:
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should return to your Advent calendar and try another puzzle.
+
+If you still want to see it, you can get your puzzle input.
+
 You can also [Shareon Twitter Mastodon] this puzzle.
