@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
-input = open('day8.input.txt').read().splitlines()
+def getinput(): return open('day8.input.txt').read().splitlines()
 
+import re, pytesseract
+from PIL import Image, ImageOps
 
-### PART 1
-
-import re
-
-def solve1(cx, cy, instrs):
+def solve(cx, cy, instrs):
     grid = [['.'] * cx for _ in range(cy)]
     for instr in instrs:
         nums = [int(v) for v in re.findall('\d+', instr)]
@@ -26,7 +24,13 @@ def solve1(cx, cy, instrs):
             copy = [grid[y][x] for x in range(cx)]
             for x in range(cx):
                 grid[y][x] = copy[(x - step) % cx]
-    return sum(sum(1 for x in y if x == '#') for y in grid)
+    return grid
+
+
+### PART 1
+
+def solve1(cx, cy, instrs):
+    return sum(sum(1 for x in y if x == '#') for y in solve(cx, cy, instrs))
 
 # samples
 
@@ -39,15 +43,25 @@ assert solve1(7, 3, [
 
 # problem
 
-s1 = solve1(50, 6, input)
+s1 = solve1(50, 6, getinput())
 print(s1)
 assert s1 == 119
 
 
 ### PART 2
 
+def solve2(cx, cy, instrs):
+    grid = solve(cx, cy, instrs)
 
-# samples
+    # render black on white, which tesseract likes better
+    img = Image.frombytes('L', (cx, cy), bytes(
+        (255 if grid[y][x] == '.' else 0) for y in range(cy) for x in range(cx)))
 
+    # tesseract also needs bigger text and a border
+    img = ImageOps.expand(img.resize((cx * 4, cy * 4)), 20, 255)
 
-# problem
+    return pytesseract.image_to_string(img)
+
+s2 = solve2(50, 6, getinput())
+print(s2)
+assert s2 == 'ZFHFSFOGPO'
