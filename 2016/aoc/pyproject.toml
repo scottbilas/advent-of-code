@@ -1,0 +1,11 @@
+[tool.poetry]
+name = "scobi-aoc2016"
+version = "1.0"
+description = ""
+authors = ["Scott Bilas"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pipe = "^1.6.0"
+Pillow = "^7.0.0"
+pytesseract = "^0.3.2"
