@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 
-inputData = open('day10.input.txt').read()
-
-
-### PART 1
+def getinput(): return open('day10.input.txt').read()
 
 import re
 from collections import defaultdict
 
-def solve1(a, b, instrs):
+def solve(instrs, check):
 
     bots = defaultdict(lambda:[])
 
@@ -19,11 +16,19 @@ def solve1(a, b, instrs):
         for m in re.finditer('(\w+ \d+).*?(\w+ \d+).*?(\w+ \d+)', instrs):
             src = bots[m.group(1)]
             if len(src) == 2:
-                if src == [a, b] or src == [b, a]:
-                    return int(m.group(1).split()[1])
                 bots[m.group(2)].append(min(src))
                 bots[m.group(3)].append(max(src))
+                result = check(bots, m.group(1))
+                if result is not None:
+                    return result
                 src.clear()
+
+
+### PART 1
+
+def solve1(a, b, instrs):
+    return solve(instrs, lambda bots, name:
+        int(name.split()[1]) if sorted(bots[name]) == sorted([a, b]) else None)
 
 # samples
 
@@ -38,15 +43,24 @@ assert solve1(5, 2, """
 
 # problem
 
-s1 = solve1(61, 17, inputData)
+s1 = solve1(61, 17, getinput())
 print(s1)
 assert s1 == 141
 
 
 ### PART 2
 
+from iteration_utilities import flatten
+from functools import reduce
 
-# samples
+def solve2(instrs):
 
+    def check(bots, _):
+        nums = list(flatten([bots[f'output {i}'] for i in range(3)]))
+        return reduce(lambda a,b: a*b, nums) if len(nums) == 3 else None
 
-# problem
+    return solve(instrs, check)
+
+s2 = solve2(getinput())
+print(s2)
+assert s2 == 1209
