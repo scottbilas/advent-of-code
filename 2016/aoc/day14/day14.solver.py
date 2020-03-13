@@ -2,16 +2,19 @@
 
 def getinput(): return open('day14.input.txt').read().strip()
 
-
-### PART 1
-
 import hashlib, itertools, re
 
-def solve1(salt):
+def solve(salt, repeat):
+
+    def hashstr(s):
+        return hashlib.md5(s.encode('utf-8')).hexdigest()
 
     class HashDict(dict):
         def __missing__(self, key):
-            self[key] = hash = hashlib.md5((salt + str(key)).encode('utf-8')).hexdigest()
+            hash = hashstr(salt + str(key))
+            for i in range(repeat):
+                hash = hashstr(hash)
+            self[key] = hash
             return hash
 
     hashed, found = HashDict(), 0
@@ -26,6 +29,11 @@ def solve1(salt):
                         return index
                     break
 
+
+### PART 1
+
+def solve1(salt): return solve(salt, 0)
+
 # samples
 
 assert solve1('abc') == 22728
@@ -39,8 +47,14 @@ assert s1 == 25427
 
 ### PART 2
 
-#def solve2(favorite): return solve(favorite, None, 50)
+def solve2(salt): return solve(salt, 2016)
 
-#s2 = solve2(int(getinput()))
-#print(s2)
-#assert s2 == 124
+# samples
+
+assert solve2('abc') == 22551
+
+# problem
+
+s2 = solve2(getinput())
+print(s2)
+assert s2 == 22045
