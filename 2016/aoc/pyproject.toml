@@ -10,3 +10,6 @@ pipe = "^1.6.0"
 Pillow = "^7.0.0"
 pytesseract = "^0.3.2"
 iteration_utilities = "^0.10.1"
+
+[tool.poetry.dev-dependencies]
+pudb = "^2019.2"
