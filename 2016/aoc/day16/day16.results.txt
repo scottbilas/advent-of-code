@@ -48,7 +48,17 @@ In this example, the correct checksum would therefore be 01100.
 
 The first disk you have to fill has length 272. Using the initial state in your puzzle input, what is the correct checksum?
 
-Your puzzle input is 10010000000110000.
+Your puzzle answer was 10010110010011110.
+--- Part Two ---
 
-Answer:
+The second disk you have to fill has length 35651584. Again using the initial state in your puzzle input, what is the correct checksum for this disk?
+
+Your puzzle answer was 01101011101100011.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should return to your Advent calendar and try another puzzle.
+
+Your puzzle input was 10010000000110000.
+
 You can also [Shareon Twitter Mastodon] this puzzle.
