@@ -2,32 +2,41 @@
 
 def getinput(): return open('day16.input.txt').read().strip()
 
-def step(a):
-    return a + ['0'] + ['1' if c == '0' else '0' for c in a[::-1]]
+def tobits(text):
+    return [c == '1' for c in text]
 
-def generate(str, count):
-    str = [c for c in str]
-    while len(str) < count:
-        str = step(str)
-    return str[:count]
+def frombits(bits):
+    return ''.join('1' if b else '0' for b in bits)
 
-def checksum(str):
-    while len(str) % 2 == 0:
-        str = [str[i*2] == str[i*2+1] for i in range(len(str)//2)]
-    return ''.join('1' if c else '0' for c in str)
+def step(bits):
+    return bits + [False] + [not c for c in bits[::-1]]
 
-def solve(text, count): return checksum(generate(text, count))
+def generate(bits, count):
+    while len(bits) < count:
+        bits = step(bits)
+    return bits[:count]
+
+def checksum(bits):
+    while len(bits) % 2 == 0:
+        bits = [c[0] == c[1] for c in zip(bits[::2], bits[1::2])]
+    return bits
+
+def solve(text, target):
+    return frombits(checksum(generate(tobits(text), target)))
 
 # tests
 
-def t_step(str): return ''.join(step(list(str)))
-assert t_step('1') == '100'
+def t_step(text): return frombits(step(tobits(text)))
+
 assert t_step('1') == '100'
 assert t_step('0') == '001'
 assert t_step('11111') == '11111000000'
 assert t_step('111100001010') == '1111000010100101011110000'
 
-assert checksum('110010110100') == '100'
+def t_checksum(text): return frombits(checksum(tobits(text)))
+
+assert t_checksum('110010110100') == '100'
+assert t_checksum('10000011110010000111') == '01100'
 
 
 ### PART 1
@@ -44,8 +53,6 @@ assert s1 == '10010110010011110'
 
 
 ### PART 2
-
-# 1m21 originally
 
 s2 = solve(getinput(), 35651584)
 print(s2)
