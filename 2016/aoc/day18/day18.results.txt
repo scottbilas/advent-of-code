@@ -50,7 +50,17 @@ In ten rows, this larger example has 38 safe tiles.
 
 Starting with the map in your puzzle input, in a total of 40 rows (including the starting row), how many safe tiles are there?
 
-To begin, get your puzzle input.
+Your puzzle answer was 1982.
+--- Part Two ---
 
-Answer:
+How many safe tiles are there in a total of 400000 rows?
+
+Your puzzle answer was 20005203.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+At this point, you should return to your Advent calendar and try another puzzle.
+
+If you still want to see it, you can get your puzzle input.
+
 You can also [Shareon Twitter Mastodon] this puzzle.
