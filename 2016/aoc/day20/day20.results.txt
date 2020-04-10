@@ -1,20 +1,69 @@
 --- Day 20: Firewall Rules ---
 
-You'd like to set up a small hidden computer here so you can use it to get back into the network later. However, the corporate firewall only allows communication with certain external IP addresses.
+   You'd like to set up a small hidden computer here so you can use it to get
+   back into the network later. However, the corporate firewall only allows
+   communication with certain external [16]IP addresses.
 
-You've retrieved the list of blocked IPs from the firewall, but the list seems to be messy and poorly maintained, and it's not clear which IPs are allowed. Also, rather than being written in dot-decimal notation, they are written as plain 32-bit integers, which can have any value from 0 through 4294967295, inclusive.
+   You've retrieved the list of blocked IPs from the firewall, but the list
+   seems to be messy and poorly maintained, and it's not clear which IPs are
+   allowed. Also, rather than being written in [17]dot-decimal notation, they
+   are written as plain [18]32-bit integers, which can have any value from 0
+   through 4294967295, inclusive.
 
-For example, suppose only the values 0 through 9 were valid, and that you retrieved the following blacklist:
+   For example, suppose only the values 0 through 9 were valid, and that you
+   retrieved the following blacklist:
 
-5-8
-0-2
-4-7
+ 5-8
+ 0-2
+ 4-7
 
-The blacklist specifies ranges of IPs (inclusive of both the start and end value) that are not allowed. Then, the only IPs that this firewall allows are 3 and 9, since those are the only numbers not in any range.
+   The blacklist specifies ranges of IPs (inclusive of both the start and end
+   value) that are not allowed. Then, the only IPs that this firewall allows
+   are 3 and 9, since those are the only numbers not in any range.
 
-Given the list of blocked IPs you retrieved from the firewall (your puzzle input), what is the lowest-valued IP that is not blocked?
+   Given the list of blocked IPs you retrieved from the firewall (your puzzle
+   input), what is the lowest-valued IP that is not blocked?
 
-To begin, get your puzzle input.
+   Your puzzle answer was 19449262.
 
-Answer:
-You can also [Shareon Twitter Mastodon] this puzzle.
+--- Part Two ---
+
+   How many IPs are allowed by the blacklist?
+
+   Your puzzle answer was 119.
+
+   Both parts of this puzzle are complete! They provide two gold stars: **
+
+   At this point, you should [19]return to your Advent calendar and try another
+   puzzle.
+
+   If you still want to see it, you can [20]get your puzzle input.
+
+   You can also [Shareon [21]Twitter [22]Mastodon] this puzzle.
+
+References
+
+   Visible links
+   1. https://adventofcode.com/
+   2. https://adventofcode.com/2016/about
+   3. https://adventofcode.com/2016/events
+   4. https://teespring.com/adventofcode-2019
+   5. https://adventofcode.com/2016/settings
+   6. https://adventofcode.com/2016/auth/logout
+   7. Advent of Code Supporter
+	https://adventofcode.com/2016/support
+   8. https://adventofcode.com/2016
+   9. https://adventofcode.com/2016
+  10. https://adventofcode.com/2016/support
+  11. https://adventofcode.com/2016/sponsors
+  12. https://adventofcode.com/2016/leaderboard
+  13. https://adventofcode.com/2016/stats
+  14. https://adventofcode.com/2016/sponsors
+  15. http://www.aandkrentals.net/
+  16. https://en.wikipedia.org/wiki/IPv4#Addressing
+  17. https://en.wikipedia.org/wiki/Dot-decimal_notation
+  18. https://en.wikipedia.org/wiki/32-bit
+  19. https://adventofcode.com/2016
+  20. https://adventofcode.com/2016/day/20/input
+  21. https://twitter.com/intent/tweet?text=I%27ve+completed+%22Firewall+Rules%22+%2D+Day+20+%2D+Advent+of+Code+2016&url=https%3A%2F%2Fadventofcode%2Ecom%2F2016%2Fday%2F20&related=ericwastl&hashtags=AdventOfCode
+  22. javascript:void(0);
