@@ -1,33 +1,80 @@
 --- Day 24: Air Duct Spelunking ---
 
-You've finally met your match; the doors that provide access to the roof are locked tight, and all of the controls and related electronics are inaccessible. You simply can't reach them.
+   You've finally met your match; the doors that provide access to the roof are locked tight, and all of the controls
+   and related electronics are inaccessible. You simply can't reach them.
 
-The robot that cleans the air ducts, however, can.
+   The robot that cleans the air ducts, however, can.
 
-It's not a very fast little robot, but you reconfigure it to be able to interface with some of the exposed wires that have been routed through the HVAC system. If you can direct it to each of those locations, you should be able to bypass the security controls.
+   It's not a very fast little robot, but you reconfigure it to be able to interface with some of the exposed wires
+   that have been routed through the [16]HVAC system. If you can direct it to each of those locations, you should be
+   able to bypass the security controls.
 
-You extract the duct layout for this area from some blueprints you acquired and create a map with the relevant locations marked (your puzzle input). 0 is your current location, from which the cleaning robot embarks; the other numbers are (in no particular order) the locations the robot needs to visit at least once each. Walls are marked as #, and open passages are marked as .. Numbers behave like open passages.
+   You extract the duct layout for this area from some blueprints you acquired and create a map with the relevant
+   locations marked (your puzzle input). 0 is your current location, from which the cleaning robot embarks; the other
+   numbers are (in no particular order) the locations the robot needs to visit at least once each. Walls are marked as
+   #, and open passages are marked as .. Numbers behave like open passages.
 
-For example, suppose you have a map like the following:
+   For example, suppose you have a map like the following:
 
-###########
-#0.1.....2#
-#.#######.#
-#4.......3#
-###########
+ ###########
+ #0.1.....2#
+ #.#######.#
+ #4.......3#
+ ###########
 
-To reach all of the points of interest as quickly as possible, you would have the robot take the following path:
+   To reach all of the points of interest as quickly as possible, you would have the robot take the following path:
 
-    0 to 4 (2 steps)
-    4 to 1 (4 steps; it can't move diagonally)
-    1 to 2 (6 steps)
-    2 to 3 (2 steps)
+     • 0 to 4 (2 steps)
+     • 4 to 1 (4 steps; it can't move diagonally)
+     • 1 to 2 (6 steps)
+     • 2 to 3 (2 steps)
 
-Since the robot isn't very fast, you need to find it the shortest route. This path is the fewest steps (in the above example, a total of 14) required to start at 0 and then visit every other location at least once.
+   Since the robot isn't very fast, you need to find it the shortest route. This path is the fewest steps (in the above
+   example, a total of 14) required to start at 0 and then visit every other location at least once.
 
-Given your actual map, and starting from location 0, what is the fewest number of steps required to visit every non-0 number marked on the map at least once?
+   Given your actual map, and starting from location 0, what is the fewest number of steps required to visit every
+   non-0 number marked on the map at least once?
 
-To begin, get your puzzle input.
+   Your puzzle answer was 428.
 
-Answer:
-You can also [Shareon Twitter Mastodon] this puzzle.
+--- Part Two ---
+
+   Of course, if you leave the cleaning robot somewhere weird, someone is bound to notice.
+
+   What is the fewest number of steps required to start at 0, visit every non-0 number marked on the map at least once,
+   and then return to 0?
+
+   Your puzzle answer was 680.
+
+   Both parts of this puzzle are complete! They provide two gold stars: **
+
+   At this point, you should [17]return to your Advent calendar and try another puzzle.
+
+   If you still want to see it, you can [18]get your puzzle input.
+
+   You can also [Shareon [19]Twitter [20]Mastodon] this puzzle.
+
+References
+
+   Visible links
+   1. https://adventofcode.com/
+   2. https://adventofcode.com/2016/about
+   3. https://adventofcode.com/2016/events
+   4. https://teespring.com/adventofcode-2019
+   5. https://adventofcode.com/2016/settings
+   6. https://adventofcode.com/2016/auth/logout
+   7. Advent of Code Supporter
+	https://adventofcode.com/2016/support
+   8. https://adventofcode.com/2016
+   9. https://adventofcode.com/2016
+  10. https://adventofcode.com/2016/support
+  11. https://adventofcode.com/2016/sponsors
+  12. https://adventofcode.com/2016/leaderboard
+  13. https://adventofcode.com/2016/stats
+  14. https://adventofcode.com/2016/sponsors
+  15. http://www.aandkrentals.net/
+  16. https://en.wikipedia.org/wiki/HVAC
+  17. https://adventofcode.com/2016
+  18. https://adventofcode.com/2016/day/24/input
+  19. https://twitter.com/intent/tweet?text=I%27ve+completed+%22Air+Duct+Spelunking%22+%2D+Day+24+%2D+Advent+of+Code+2016&url=https%3A%2F%2Fadventofcode%2Ecom%2F2016%2Fday%2F24&related=ericwastl&hashtags=AdventOfCode
+  20. javascript:void(0);
