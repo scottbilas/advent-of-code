@@ -1,0 +1,36 @@
+a = 12 # 7 is part1
+
+       # init: a=0; b=11; c=0; d=12
+0      cpy a b    # b = a
+1      dec b      # --b
+2      cpy a d    # d = a
+3      cpy 0 a    # a = 0
+
+       <<<
+4      cpy b c    # c = b      <--+
+5      inc a      # ++a        <+ |
+6      dec c      # --c         | |
+7      jnz c -2   # if c goto 5 ^ |
+8      dec d      # --d           |
+9      jnz d -5   # if d goto 4 --^
+10     dec b      # --b
+11     cpy b c    # c = b
+12     cpy c d    # d = c
+13     dec d      # --d         <+
+14     inc c      # ++c          |
+15     jnz d -2   # if d goto 13 ^
+       ---
+       a += b * d
+       c = 2 * --b
+       >>>
+
+16     tgl c
+17     cpy -16 c
+18     jnz 1 c
+19     cpy 86 c
+20     jnz 77 d
+21     inc a
+22     inc d
+23     jnz d -2
+24     inc c
+25     jnz c -5
