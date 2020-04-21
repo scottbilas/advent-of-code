@@ -1,0 +1,32 @@
+     # init: a=<attempt>
+
+0    cpy a d    # d = a                             # vv
+1    cpy 9 c    # c = 9                             #
+2    cpy 282 b  # b = 282    <--\                   #
+3    inc d      # ++d        <\ |                   #
+4    dec b      # --b         | |                   #
+5    jnz b -2   # if b goto 3 ^ |                   #
+6    dec c      # --c           |                   #
+7    jnz c -5   # if c goto 2 >-/                   # d = a + 282 * 9
+8    cpy d a    # a = d       <-----------------\   # a = d
+9    jnz 0 0    #             <--------------\  |   # while True:
+10   cpy a b    # b = a                      |  |   #
+11   cpy 0 a    # a = 0                      |  |   #     a, b, c = 0, a, 2
+12   cpy 2 c    # c = 2       <-----------\  |  |   #     while b:
+13   jnz b 2    # if b goto 15   v   <-\  |  |  |   #         --b
+14   jnz 1 6    # else goto 20 >-+--\  |  |  |  |   #         --c
+15   dec b      # --b         <--/  |  |  |  |  |   #         if c==0:
+16   dec c      # --c               |  |  |  |  |   #             ++a
+17   jnz c -4   # if c goto 13 >----+--/  |  |  |   #             c = 2
+18   inc a      # ++a               |     |  |  |   #
+19   jnz 1 -7   # goto 12      >----+-----/  |  |   #
+20   cpy 2 b    # b = 2       <-----/        |  |   #     b = 2
+21   jnz c 2    # if c goto 23   v   <-\     |  |   #
+22   jnz 1 4    # else goto 26 >-+--\  |     |  |   #
+23   dec b      # --b         <--/  |  |     |  |   #
+24   dec c      # --c               |  |     |  |   #
+25   jnz 1 -4   # goto 21     >-----+--/     |  |   #
+26   jnz 0 0    #             <-----/        |  |   #
+27   out b      # print b                    |  |   #     print b - c
+28   jnz a -19  # if a goto 9 >--------------/  |   #     if a==0: a = d
+29   jnz 1 -21  # else goto 8 >-----------------/   #
