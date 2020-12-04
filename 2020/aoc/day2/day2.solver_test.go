@@ -1,21 +1,20 @@
 package main
 
 import (
-	"io/ioutil"
 	"regexp"
-	"strconv"
 	"strings"
 	"testing"
 )
 
-var sample = `
+import . "scottbilas/advent-of-code/2020/libaoc"
+
+var sample = parse(NormalizeSample(`
 	1-3 a: abcde
 	1-3 b: cdefg
 	2-9 c: ccccccccc
-	`
+	`))
 
-var file, _ = ioutil.ReadFile("day2.input.txt")
-var input = string(file)
+var input = parse(ReadInputFile())
 
 type line struct {
 	p0    int
@@ -25,12 +24,13 @@ type line struct {
 }
 
 func parse(source string) []line {
-	matches := regexp.MustCompile(`(\d+)-(\d+) ([a-z]): ([a-z]+)`).FindAllStringSubmatch(source, -1)
+	matches := regexp.
+		MustCompile(`(\d+)-(\d+) ([a-z]): ([a-z]+)`).
+		FindAllStringSubmatch(source, -1)
+
 	lines := make([]line, len(matches))
 	for i, item := range matches {
-		p0, _ := strconv.Atoi(item[1])
-		p1, _ := strconv.Atoi(item[2])
-		lines[i] = line{p0, p1, item[3], item[4]}
+		lines[i] = line{ParseInt(item[1]), ParseInt(item[2]), item[3], item[4]}
 	}
 
 	return lines
@@ -38,61 +38,41 @@ func parse(source string) []line {
 
 // PART 1
 
-func solve1(input string) int {
+func solve1(lines []line) int {
 	valid := 0
-	for _, line := range parse(input) {
+	for _, line := range lines {
 		found := strings.Count(line.pwd, line.match)
-		if found >= line.p0 && found <= line.p1 {
-			valid++
-		}
+		valid += ToInt(found >= line.p0 && found <= line.p1)
 	}
 	return valid
 }
 
-// samples
+func Test_Part1(t *testing.T) {
+	t.Run("Sample", func(t *testing.T) {
+		AssertEqual(t, solve1(sample), 2)
+	})
 
-func TestSample1(t *testing.T) {
-	got, expected := solve1(sample), 2
-	if got != expected {
-		t.Error("Expected", expected, "got", got)
-	}
-}
-
-// problem
-
-func TestSolve1(t *testing.T) {
-	got, expected := solve1(input), 628
-	if got != expected {
-		t.Error("Expected", expected, "got", got)
-	}
+	t.Run("Problem", func(t *testing.T) {
+		AssertEqual(t, solve1(input), 628)
+	})
 }
 
 // PART 2
 
-func solve2(input string) int {
+func solve2(lines []line) int {
 	valid := 0
-	for _, line := range parse(input) {
-		if (line.pwd[line.p0-1] == line.match[0]) != (line.pwd[line.p1-1] == line.match[0]) {
-			valid++
-		}
+	for _, line := range lines {
+		valid += ToInt((line.pwd[line.p0-1] == line.match[0]) != (line.pwd[line.p1-1] == line.match[0]))
 	}
 	return valid
 }
 
-// samples
+func Test_Part2(t *testing.T) {
+	t.Run("Sample", func(t *testing.T) {
+		AssertEqual(t, solve2(sample), 1)
+	})
 
-func TestSample2(t *testing.T) {
-	got, expected := solve2(sample), 1
-	if got != expected {
-		t.Error("Expected", expected, "got", got)
-	}
-}
-
-// problem
-
-func TestSolve2(t *testing.T) {
-	got, expected := solve2(input), 705
-	if got != expected {
-		t.Error("Expected", expected, "got", got)
-	}
+	t.Run("Problem", func(t *testing.T) {
+		AssertEqual(t, solve2(input), 705)
+	})
 }

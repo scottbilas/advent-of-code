@@ -1,24 +1,7 @@
 package main
 
-import (
-	"bufio"
-	"os"
-	"strconv"
-	"testing"
-)
-
-func ReadInts(path string) []int {
-	file, _ := os.Open(path)
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanWords)
-
-	var result []int
-	for scanner.Scan() {
-		x, _ := strconv.Atoi(scanner.Text())
-		result = append(result, x)
-	}
-	return result
-}
+import "testing"
+import . "scottbilas/advent-of-code/2020/libaoc"
 
 var sample = []int{
 	1721,
@@ -28,71 +11,50 @@ var sample = []int{
 	675,
 	1456}
 
-var input = ReadInts("day1.input.txt")
+var input = ParseInts(ReadInputFile())
 
 // PART 1
 
-func solve1(input []int) int {
+func solve1(nums []int) int {
 	for i1 := 0; ; i1++ {
-		for i0 := i1 + 1; i0 < len(input); i0++ {
-			if input[i1]+input[i0] == 2020 {
-				return input[i1] * input[i0]
+		for i0 := i1 + 1; i0 < len(nums); i0++ {
+			if nums[i1]+nums[i0] == 2020 {
+				return nums[i1] * nums[i0]
 			}
 		}
 	}
 }
 
-// samples
+func Test_Part1(t *testing.T) {
+	t.Run("Sample", func(t *testing.T) {
+		AssertEqual(t, solve1(sample), 514579)
+	})
 
-func TestSample1(t *testing.T) {
-	got, expected := solve1(sample), 514579
-	if got != expected {
-		t.Error("Expected", expected, "got", got)
-	}
-}
-
-// problem
-
-func TestSolve1(t *testing.T) {
-	got, expected := solve1(input), 1003971
-	if got != expected {
-		t.Error("Expected", expected, "got", got)
-	}
+	t.Run("Problem", func(t *testing.T) {
+		AssertEqual(t, solve1(input), 1003971)
+	})
 }
 
 // PART 2
 
-func solve2(input []int) int {
-
-	// easy optimization opportunities:
-	//   * remove i0 and replace with reverse lookup map
-	//   * sort input so we can stop i1 when i2+i1 >= 2020
-
+func solve2(nums []int) int {
 	for i2 := 0; ; i2++ {
-		for i1 := i2 + 1; i1 < len(input); i1++ {
-			for i0 := i1 + 1; i0 < len(input); i0++ {
-				if input[i2]+input[i1]+input[i0] == 2020 {
-					return input[i2] * input[i1] * input[i0]
+		for i1 := i2 + 1; i1 < len(nums); i1++ {
+			for i0 := i1 + 1; i0 < len(nums); i0++ {
+				if nums[i2]+nums[i1]+nums[i0] == 2020 {
+					return nums[i2] * nums[i1] * nums[i0]
 				}
 			}
 		}
 	}
 }
 
-// samples
+func Test_Part2(t *testing.T) {
+	t.Run("Sample", func(t *testing.T) {
+		AssertEqual(t, solve2(sample), 241861950)
+	})
 
-func TestSample2(t *testing.T) {
-	got, expected := solve2(sample), 241861950
-	if got != expected {
-		t.Error("Expected", expected, "got", got)
-	}
-}
-
-// problem
-
-func TestSolve2(t *testing.T) {
-	got, expected := solve2(input), 84035952
-	if got != expected {
-		t.Error("Expected", expected, "got", got)
-	}
+	t.Run("Problem", func(t *testing.T) {
+		AssertEqual(t, solve2(input), 84035952)
+	})
 }
