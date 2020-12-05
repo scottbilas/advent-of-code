@@ -39,3 +39,12 @@ func ToInt(b bool) int {
 		return 0
 	}
 }
+
+func DivMod(num, denom int) (quo, rem int) {
+	return num / denom, num % denom
+}
+
+func DivCeil(num, denom int) int {
+	quo, rem := DivMod(num, denom)
+	return quo + rem
+}
