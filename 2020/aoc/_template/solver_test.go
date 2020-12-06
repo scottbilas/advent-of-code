@@ -6,10 +6,10 @@ import (
 
 import . "scottbilas/advent-of-code/2020/libaoc"
 
-var input = ReadInputFile()
-
 var sample = NormalizeSample(`
 	`)
+
+var input = ReadInputFile()
 
 // PART 1
 

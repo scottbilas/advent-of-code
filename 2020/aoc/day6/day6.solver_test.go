@@ -7,8 +7,6 @@ import (
 
 import . "scottbilas/advent-of-code/2020/libaoc"
 
-var input = ParseBlocks(ReadInputFile())
-
 var sample = ParseBlocks(NormalizeSample(`
 	abc
 
@@ -26,6 +24,8 @@ var sample = ParseBlocks(NormalizeSample(`
 
 	b
 	`))
+
+var input = ParseBlocks(ReadInputFile())
 
 func countChars(text string) map[rune]int {
 	uniqs := make(map[rune]int)
