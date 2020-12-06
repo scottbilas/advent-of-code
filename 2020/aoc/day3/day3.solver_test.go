@@ -52,13 +52,8 @@ func solve(board []string, slopes []Slope) int {
 var slopes1 = []Slope{{3, 1}}
 
 func Test_Part1(t *testing.T) {
-	t.Run("Sample", func(t *testing.T) {
-		AssertEqual(t, solve(sample, slopes1), 7)
-	})
-
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve(input, slopes1), 230)
-	})
+	AssertEqualSub("Sample", t, solve(sample, slopes1), 7)
+	AssertEqualSub("Problem", t, solve(input, slopes1), 230)
 }
 
 // PART 2
@@ -71,11 +66,6 @@ var slopes2 = []Slope{
 	{1, 2}}
 
 func Test_Part2(t *testing.T) {
-	t.Run("Sample", func(t *testing.T) {
-		AssertEqual(t, solve(sample, slopes2), 336)
-	})
-
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve(input, slopes2), 9533698720)
-	})
+	AssertEqualSub("Sample", t, solve(sample, slopes2), 336)
+	AssertEqualSub("Problem", t, solve(input, slopes2), 9533698720)
 }

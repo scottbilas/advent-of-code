@@ -16,6 +16,12 @@ func AssertEqual(t *testing.T, got interface{}, expected interface{}) {
 	}
 }
 
+func AssertEqualSub(testName string, t *testing.T, got interface{}, expected interface{}) {
+	t.Run(testName, func(t *testing.T) {
+		AssertEqual(t, got, expected)
+	})
+}
+
 func AssertPanic(t *testing.T, f func()) {
 	t.Helper()
 	defer func() {

@@ -48,13 +48,8 @@ func solve1(lines []line) int {
 }
 
 func Test_Part1(t *testing.T) {
-	t.Run("Sample", func(t *testing.T) {
-		AssertEqual(t, solve1(sample), 2)
-	})
-
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve1(input), 628)
-	})
+	AssertEqualSub("Sample", t, solve1(sample), 2)
+	AssertEqualSub("Problem", t, solve1(input), 628)
 }
 
 // PART 2
@@ -68,11 +63,6 @@ func solve2(lines []line) int {
 }
 
 func Test_Part2(t *testing.T) {
-	t.Run("Sample", func(t *testing.T) {
-		AssertEqual(t, solve2(sample), 1)
-	})
-
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve2(input), 705)
-	})
+	AssertEqualSub("Sample", t, solve2(sample), 1)
+	AssertEqualSub("Problem", t, solve2(input), 705)
 }

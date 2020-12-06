@@ -70,11 +70,6 @@ func solve2(blocks []string) int {
 }
 
 func Test_Part2(t *testing.T) {
-	t.Run("Sample", func(t *testing.T) {
-		AssertEqual(t, solve2(sample), 6)
-	})
-
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve2(input), 3435)
-	})
+	AssertEqualSub("Sample", t, solve2(sample), 6)
+	AssertEqualSub("Problem", t, solve2(input), 3435)
 }

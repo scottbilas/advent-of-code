@@ -37,13 +37,8 @@ func Test_Part1(t *testing.T) {
 		iyr:2011 ecl:brn hgt:59in
 		`)
 
-	t.Run("Sample", func(t *testing.T) {
-		AssertEqual(t, solve1(sample1), 2)
-	})
-
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve1(input), 196)
-	})
+	AssertEqualSub("Sample", t, solve1(sample1), 2)
+	AssertEqualSub("Problem", t, solve1(input), 196)
 }
 
 // PART 2
@@ -111,9 +106,7 @@ func Test_Part2(t *testing.T) {
 		pid:3556412378 byr:2007
 		`)
 
-	t.Run("Sample (Invalid)", func(t *testing.T) {
-		AssertEqual(t, solve2(invalid), 0)
-	})
+	AssertEqualSub("Sample (Invalid)", t, solve2(invalid), 0)
 
 	var valid = ParseBlocks(`
 		pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
@@ -130,11 +123,6 @@ func Test_Part2(t *testing.T) {
 		iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
 		`)
 
-	t.Run("Sample (Valid)", func(t *testing.T) {
-		AssertEqual(t, solve2(valid), 4)
-	})
-
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve2(input), 114)
-	})
+	AssertEqualSub("Sample (Valid)", t, solve2(valid), 4)
+	AssertEqualSub("Problem", t, solve2(input), 114)
 }

@@ -48,9 +48,7 @@ func Test_Part1(t *testing.T) {
 		AssertEqual(t, getSeatId("BBFFBBFRLL"), 820)
 	})
 
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve1(input), 832)
-	})
+	AssertEqualSub("Problem", t, solve1(input), 832)
 }
 
 func solve2(tickets []string) int {
@@ -69,7 +67,5 @@ func solve2(tickets []string) int {
 }
 
 func Test_Part2(t *testing.T) {
-	t.Run("Problem", func(t *testing.T) {
-		AssertEqual(t, solve2(input), 517)
-	})
+	AssertEqualSub("Problem", t, solve2(input), 517)
 }
