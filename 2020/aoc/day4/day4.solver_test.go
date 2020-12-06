@@ -8,11 +8,7 @@ import (
 
 import . "scottbilas/advent-of-code/2020/libaoc"
 
-var input = parse(ReadInputFile())
-
-func parse(source string) []string {
-	return strings.Split(source, "\n\n")
-}
+var input = ParseBlocks(ReadInputFile())
 
 // PART 1
 
@@ -25,7 +21,7 @@ func solve1(blocks []string) int {
 }
 
 func Test_Part1(t *testing.T) {
-	var sample1 = parse(`
+	var sample1 = ParseBlocks(`
 		ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
 		byr:1937 iyr:2017 cid:147 hgt:183cm
 
@@ -99,7 +95,7 @@ func solve2(blocks []string) int {
 
 func Test_Part2(t *testing.T) {
 
-	var invalid = parse(`
+	var invalid = ParseBlocks(`
 		eyr:1972 cid:100
 		hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
 
@@ -119,7 +115,7 @@ func Test_Part2(t *testing.T) {
 		AssertEqual(t, solve2(invalid), 0)
 	})
 
-	var valid = parse(`
+	var valid = ParseBlocks(`
 		pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
 		hcl:#623a2f
 

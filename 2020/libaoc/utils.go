@@ -32,6 +32,14 @@ func ParseInts(text string) []int {
 	return result
 }
 
+func ParseBlocks(text string) []string {
+	blocks := strings.Split(text, "\n\n")
+	for i := 0; i < len(blocks); i++ {
+		blocks[i] = strings.TrimSpace(blocks[i])
+	}
+	return blocks
+}
+
 func ToInt(b bool) int {
 	if b {
 		return 1
