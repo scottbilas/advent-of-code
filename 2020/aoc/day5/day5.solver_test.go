@@ -51,6 +51,8 @@ func Test_Part1(t *testing.T) {
 	AssertEqualSub("Problem", t, solve1(input), 832)
 }
 
+// PART 2
+
 func solve2(tickets []string) int {
 	ids := make([]int, 0)
 	for _, ticket := range tickets {

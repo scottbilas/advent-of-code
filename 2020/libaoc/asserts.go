@@ -17,7 +17,9 @@ func AssertEqual(t *testing.T, got interface{}, expected interface{}) {
 }
 
 func AssertEqualSub(testName string, t *testing.T, got interface{}, expected interface{}) {
+	t.Helper()
 	t.Run(testName, func(t *testing.T) {
+		t.Helper()
 		AssertEqual(t, got, expected)
 	})
 }

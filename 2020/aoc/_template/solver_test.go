@@ -14,8 +14,7 @@ var input = ReadInputFile()
 // PART 1
 
 func solve1(source string) int {
-	total := -1
-	return total
+	return len(source)
 }
 
 func Test_Part1(t *testing.T) {
@@ -23,9 +22,10 @@ func Test_Part1(t *testing.T) {
 	AssertEqualSub("Problem", t, solve1(input), -1)
 }
 
+// PART 2
+
 func solve2(source string) int {
-	total := -1
-	return total
+	return len(source)
 }
 
 func Test_Part2(t *testing.T) {

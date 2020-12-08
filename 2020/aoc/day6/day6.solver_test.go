@@ -57,6 +57,8 @@ func Test_Part1(t *testing.T) {
 	})
 }
 
+// PART 2
+
 func solve2(blocks []string) int {
 	total := 0
 	for _, block := range blocks {

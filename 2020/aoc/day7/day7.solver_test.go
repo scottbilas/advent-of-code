@@ -96,6 +96,8 @@ func Test_Part1(t *testing.T) {
 	AssertEqualSub("Problem", t, solve1(input), 335)
 }
 
+// PART 2
+
 func solve2(constraints []Constraint) int {
 	resolved, unresolved := make(map[string]int), make(map[string]Constraint)
 	for _, constraint := range constraints {
