@@ -23,7 +23,7 @@ func Test_Part1(t *testing.T) {
 }
 
 // PART 2
-
+/*
 func solve2(source string) int {
 	return len(source)
 }
@@ -32,3 +32,4 @@ func Test_Part2(t *testing.T) {
 	AssertEqualSub("Sample", t, solve2(sample), -1)
 	AssertEqualSub("Problem", t, solve2(input), -1)
 }
+*/
