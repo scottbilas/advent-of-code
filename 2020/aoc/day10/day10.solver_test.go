@@ -87,9 +87,7 @@ func solve2(nums []int) int {
 		if nums[i]-nums[i-1] == 1 {
 			ones++
 		} else {
-			if run := map[int]int{4: 7, 3: 4, 2: 2}[ones]; run != 0 {
-				combos *= run
-			}
+			combos *= map[int]int{4: 7, 3: 4, 2: 2, 1: 1, 0: 1}[ones]
 			ones = 0
 		}
 	}
