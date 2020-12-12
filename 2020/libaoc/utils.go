@@ -48,6 +48,21 @@ func ToInt(b bool) int {
 	}
 }
 
+func AbsInt(i int) int {
+	if i < 0 {
+		return -i
+	}
+	return i
+}
+
+func Manhattan(x0, y0, x1, y1 int) int {
+	return AbsInt(x0-x1) + AbsInt(y0-y1)
+}
+
+func ManhattanZero(x, y int) int {
+	return AbsInt(x) + AbsInt(y)
+}
+
 func DivMod(num, denom int) (quo, rem int) {
 	return num / denom, num % denom
 }
