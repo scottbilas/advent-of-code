@@ -20,11 +20,11 @@ var input = strings.Fields(ReadInputFile())
 // PART 1
 
 func solve1(instrs []string) int {
-	x, y, dir := 0, 0, 90
+	x, y, dir := 0, 0, 1
 	for _, instr := range instrs {
 		cmd, dist := instr[0], ParseInt(instr[1:])
 		if cmd == 'F' {
-			cmd = map[int]byte{0: 'N', 90: 'E', 180: 'S', 270: 'W'}[dir]
+			cmd = "NESW"[dir]
 		}
 		switch cmd {
 		case 'N':
@@ -36,9 +36,10 @@ func solve1(instrs []string) int {
 		case 'W':
 			x -= dist
 		case 'L':
-			dir = (dir - dist + 360) % 360
+			dist = -dist
+			fallthrough
 		case 'R':
-			dir = (dir + dist) % 360
+			dir = (dir + dist/90 + 4) % 4
 		}
 	}
 	return ManhattanZero(x, y)
