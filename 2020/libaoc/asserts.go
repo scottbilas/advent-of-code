@@ -1,6 +1,7 @@
 package libaoc
 
 import (
+	"github.com/go-test/deep"
 	"log"
 	"reflect"
 	"testing"
@@ -11,8 +12,8 @@ func AssertEqual(t *testing.T, got interface{}, expected interface{}) {
 	if reflect.TypeOf(got) != reflect.TypeOf(expected) {
 		log.Panicf("Incompatible types '%v' and '%v'", reflect.TypeOf(got), reflect.TypeOf(expected))
 	}
-	if got != expected {
-		t.Errorf("Expected '%v', got '%v'", expected, got)
+	if diff := deep.Equal(got, expected); diff != nil {
+		t.Error(diff)
 	}
 }
 
