@@ -38,3 +38,21 @@ func Test_Atoi(t *testing.T) {
 		AssertPanic(t, func() { ParseInt("abc") })
 	})
 }
+
+func Test_ParseInts(t *testing.T) {
+	t.Run("WithEmpty_ReturnsNothing", func(t *testing.T) {
+		AssertEqual(t, ParseInts(""), []int{})
+	})
+	t.Run("WithNoNumbers_ReturnsNothing", func(t *testing.T) {
+		AssertEqual(t, ParseInts("abc\ndef"), []int{})
+	})
+	t.Run("WithOnlyNumbers_ReturnsParsedInts", func(t *testing.T) {
+		AssertEqual(t, ParseInts("1 +2 -3 4"), []int{1, 2, -3, 4})
+	})
+	t.Run("WithMixedNumbers_ReturnsParsedInts", func(t *testing.T) {
+		AssertEqual(t, ParseInts("abc1x+2\nghi-3,,,4\t"), []int{1, 2, -3, 4})
+	})
+	t.Run("WithInvalidNumbers_Panics", func(t *testing.T) {
+		AssertPanic(t, func() { ParseInts("324781269431287689712649812364912384x9372410471430792170421703478") })
+	})
+}

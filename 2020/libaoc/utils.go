@@ -1,12 +1,17 @@
 package libaoc
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 )
 
+func parseInt(text string) (int, error) {
+	return strconv.Atoi(strings.TrimSpace(text))
+}
+
 func ParseInt(text string) int {
-	i, err := strconv.Atoi(text)
+	i, err := parseInt(text)
 	if err != nil {
 		panic(err)
 	}
@@ -14,15 +19,17 @@ func ParseInt(text string) int {
 }
 
 func ParseIntSafe(text string, defValue int) int {
-	i, err := strconv.Atoi(text)
+	i, err := parseInt(text)
 	if err != nil {
 		i = defValue
 	}
 	return i
 }
 
+var parseIntsRx = regexp.MustCompile(`[-+]?\d+`)
+
 func ParseInts(text string) []int {
-	matches := strings.Fields(text)
+	matches := parseIntsRx.FindAllString(text, -1)
 	result := make([]int, len(matches))
 
 	for i := 0; i < len(matches); i++ {
