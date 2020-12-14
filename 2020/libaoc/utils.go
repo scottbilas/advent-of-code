@@ -1,6 +1,7 @@
 package libaoc
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -45,6 +46,14 @@ func ParseBlocks(text string) []string {
 
 func ParseLines(text string) []string {
 	return strings.Split(strings.TrimSpace(text), "\n")
+}
+
+func SplitTrim2(text string, sep string) (string, string) {
+	parts := strings.Split(text, sep)
+	if len(parts) != 2 {
+		panic(fmt.Sprintf("Split expected 2 splits, got %d", len(parts)))
+	}
+	return strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
 }
 
 func ToInt(b bool) int {
