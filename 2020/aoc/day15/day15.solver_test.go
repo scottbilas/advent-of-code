@@ -7,29 +7,26 @@ import (
 import . "scottbilas/advent-of-code/2020/libaoc"
 
 func solve(nums []int, cycles int) int {
-	hist := make([]struct{ a, b int }, cycles+1)
-	last, turn := 1, 1
+	hist := make([]int, cycles)
+	turn := 1
 
-	for ; turn <= len(nums); turn++ {
-		last = nums[turn-1]
-		hist[last].b = turn
+	for ; turn < len(nums); turn++ {
+		hist[nums[turn-1]] = turn
 	}
+
+	spoken := nums[turn-1]
+	turn++
 
 	for ; turn <= cycles; turn++ {
-		if hist[last].a == 0 {
-			if hist[last].b == 0 {
-				hist[last].b = turn
-			}
-			last = 0
-		} else {
-			last = hist[last].b - hist[last].a
+		next := hist[spoken]
+		if next != 0 {
+			next = turn - 1 - next
 		}
-
-		hist[last].a = hist[last].b
-		hist[last].b = turn
+		hist[spoken] = turn - 1
+		spoken = next
 	}
 
-	return last
+	return spoken
 }
 
 // PART 1
