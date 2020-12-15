@@ -21,6 +21,11 @@ func AssertEqualSub(testName string, t *testing.T, got interface{}, expected int
 	t.Helper()
 	t.Run(testName, func(t *testing.T) {
 		t.Helper()
+		if gotFunc, ok := got.(func() interface{}); ok {
+			got = gotFunc()
+		} else if gotFunc, ok := got.(func() int); ok {
+			got = gotFunc()
+		}
 		AssertEqual(t, got, expected)
 	})
 }
