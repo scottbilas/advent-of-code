@@ -44,14 +44,30 @@ func ParseBlocks(text string) []string {
 	return strings.Split(strings.TrimSpace(text), "\n\n")
 }
 
+func ParseBlocks2(text string) (a, b string) {
+	blocks := strings.Split(strings.TrimSpace(text), "\n\n")
+	if len(blocks) != 2 {
+		panic(fmt.Sprintf("Expected 2 blocks, got %d", len(blocks)))
+	}
+	return blocks[0], blocks[1]
+}
+
 func ParseLines(text string) []string {
 	return strings.Split(strings.TrimSpace(text), "\n")
+}
+
+func SplitTrim(text string, sep string) []string {
+	parts := strings.Split(text, sep)
+	for i := 0; i < len(parts); i++ {
+		parts[i] = strings.TrimSpace(parts[i])
+	}
+	return parts
 }
 
 func SplitTrim2(text string, sep string) (string, string) {
 	parts := strings.Split(text, sep)
 	if len(parts) != 2 {
-		panic(fmt.Sprintf("Split expected 2 splits, got %d", len(parts)))
+		panic(fmt.Sprintf("Expected 2 splits, got %d", len(parts)))
 	}
 	return strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
 }
