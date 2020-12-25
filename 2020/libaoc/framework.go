@@ -23,13 +23,21 @@ func NormalizeSample(text string) string {
 	return text
 }
 
-func ReadInputFile() string {
-	filename := fmt.Sprintf(GetDay() + ".input.txt")
+func ReadDayFile(name string) string {
+	filename := fmt.Sprintf(GetDay() + "." + name + ".txt")
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 	return string(file)
+}
+
+func ReadSampleFile() string {
+	return ReadDayFile("sample")
+}
+
+func ReadInputFile() string {
+	return ReadDayFile("input")
 }
 
 func GetDay() string {
