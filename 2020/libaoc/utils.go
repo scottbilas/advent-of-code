@@ -134,3 +134,20 @@ func DivCeil(num, denom int) int {
 	quo, rem := DivMod(num, denom)
 	return quo + rem
 }
+
+func HashInit() uint64 {
+	return 14695981039346656037
+}
+
+func HashInt(h uint64, num int) uint64 {
+	return uint64(num) ^ (h * uint64(1099511628211))
+}
+
+func HashInts(h uint64, nums []int) uint64 {
+	for _, num := range nums {
+		h = HashInt(h, num)
+	}
+	return h
+}
+
+func UNUSED(_ ...interface{}) {}
