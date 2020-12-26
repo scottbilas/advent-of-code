@@ -13,7 +13,7 @@ func solve1(public [2]int) int {
 	for i, card := 1, 1; ; i++ {
 		if card = (card * 7) % 20201227; card == public[0] {
 			key := 1
-			for j := 0; j < j; j++ {
+			for j := 0; j < i; j++ {
 				key *= public[1]
 				key %= 20201227
 			}
