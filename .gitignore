@@ -1,3 +1,6 @@
 packages
 obj
 bin
+
+.fake
+.ionide
