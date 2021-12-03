@@ -1,0 +1,12 @@
+[tool.poetry]
+name = "aoc2021"
+version = "0.1.0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ipykernel = "^6.6.0"
+jupyter = "^1.0.0"
+nbconvert = "^6.3.0"
+matplotlib = "^3.5.0"
