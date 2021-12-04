@@ -35,7 +35,7 @@ try {
     nbmerge @tempnbs > $merged
     Remove-Item $tempnbs
 
-    iee jupyter nbconvert --to pdf $merged 'Advent of Code 2021.pdf'
+    iee jupyter nbconvert --to pdf $merged
     Remove-Item $merged
 }
 finally {
