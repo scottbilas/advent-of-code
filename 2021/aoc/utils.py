@@ -1,6 +1,8 @@
+import math
 import re
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import itertools as iter
 
 from os.path import exists
 dark = not exists('lightmode')
@@ -8,15 +10,19 @@ dark = not exists('lightmode')
 def check(result, expected):
     assert result == expected, f"result: '{result}'', expected: '{expected}'"
 
-def check1(result1):
+def _check(result, index):
     global _results
-    check(str(result1), _results[0])
-    print(f"Part 1 Result: {result1}")
+    print(f"Part {index+1} Result: {result}")
+    if _results:
+        check(str(result), _results[index])
+    else:
+        print("NO VALIDATED RESULT YET")
+
+def check1(result1):
+    _check(result1, 0)
 
 def check2(result2):
-    global _results
-    check(str(result2), _results[1])
-    print(f"Part 2 Result: {result2}")
+    _check(result2, 1)
 
 def plotStyle(extra=None):
     if extra:
