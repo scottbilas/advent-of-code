@@ -1,9 +1,9 @@
 import math
-import re
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import itertools as iter
-
+import numpy as np
+import re
+from dataclasses import dataclass
 from os.path import exists
 dark = not exists('lightmode')
 
