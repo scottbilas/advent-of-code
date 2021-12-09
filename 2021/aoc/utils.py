@@ -7,6 +7,7 @@ import re
 import sys
 from dataclasses import dataclass
 from os.path import exists
+from functools import reduce
 dark = not exists('lightmode')
 
 def check(result, expected):
