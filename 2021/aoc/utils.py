@@ -27,6 +27,18 @@ def check1(result1):
 def check2(result2):
     _check(result2, 1)
 
+def flatten(l):
+    if len(l) == 1:
+        if type(l[0]) == list:
+            result = flatten(l[0])
+        else:
+            result = l
+    elif type(l[0]) == list:
+        result = flatten(l[0]) + flatten(l[1:])
+    else:
+        result = [l[0]] + flatten(l[1:])
+    return result
+
 def plotStyle(extra=None):
     if extra:
         for k, v in extra.items():
