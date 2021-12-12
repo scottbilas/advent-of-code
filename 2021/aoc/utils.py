@@ -52,7 +52,7 @@ def plotInvertY(titleY):
     mpl.rcParams['xtick.labelbottom'] = False
     plt.gca().invert_yaxis()
 
-def initDay(day):
+def initDay(day, resultsSpec=None):
     if dark:
         plt.style.use('dark_background')
 
@@ -73,6 +73,23 @@ def initDay(day):
         mpl.rcParams['xtick.color'] = '#abacad'
         mpl.rcParams['ytick.color'] = '#abacad'
 
+    inputText = open(f"{day}.input.txt").read().replace('\r\n', '\n')
+
+    resultsText = open(f"{day}.results.txt").read().replace('\r\n', '\n')
+
     global _results
-    _results = re.findall('Your puzzle answer was (\S+)\.', open(f"{day}.results.txt").read())
-    return open(f"{day}.input.txt").read()
+    _results = re.findall('Your puzzle answer was (\S+)\.', resultsText)
+
+    if not resultsSpec:
+        return inputText
+
+    results = [inputText]
+    end = 0
+    for spec in resultsSpec:
+        begin = resultsText.index(spec, end) + len(spec)
+        while resultsText[begin].isspace():
+            begin += 1
+        end = resultsText.index('\n\n', begin)
+        results.append(resultsText[begin:end])
+
+    return tuple(results)
