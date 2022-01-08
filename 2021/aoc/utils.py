@@ -1,8 +1,8 @@
 import itertools
+import json
 import math
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import numpy as np
 import re
 import sys
 from dataclasses import dataclass
@@ -10,7 +10,14 @@ from os.path import exists
 from functools import reduce
 dark = not exists('lightmode')
 
+# CHECKS
+
 def check(result, expected):
+    if isinstance(expected, str):
+        expected = expected.strip()
+    if isinstance(result, str):
+        result = result.strip()
+
     assert result == expected, f"result: '{result}'', expected: '{expected}'"
 
 def _check(result, index):
@@ -26,6 +33,8 @@ def check1(result1):
 
 def check2(result2):
     _check(result2, 1)
+
+# GENERAL UTILS
 
 def flatten(l):
     if len(l) == 1:
@@ -52,7 +61,9 @@ def plotInvertY(titleY):
     mpl.rcParams['xtick.labelbottom'] = False
     plt.gca().invert_yaxis()
 
-def initDay(day, resultsSpec=None):
+# PROBLEM SETUP AND PARSING
+
+def initDay(day):
     if dark:
         plt.style.use('dark_background')
 
@@ -73,23 +84,27 @@ def initDay(day, resultsSpec=None):
         mpl.rcParams['xtick.color'] = '#abacad'
         mpl.rcParams['ytick.color'] = '#abacad'
 
-    inputText = open(f"{day}.input.txt").read().replace('\r\n', '\n')
-
     resultsText = open(f"{day}.results.txt").read().replace('\r\n', '\n')
 
     global _results
     _results = re.findall('Your puzzle answer was (\S+)\.', resultsText)
 
-    if not resultsSpec:
-        return inputText
+    global _cells
+    _cells = json.load(open(f"{day}.solver.ipynb"))['cells']
 
-    results = [inputText]
-    end = 0
-    for spec in resultsSpec:
-        begin = resultsText.index(spec, end) + len(spec)
-        while resultsText[begin].isspace():
-            begin += 1
-        end = resultsText.index('\n\n', begin)
-        results.append(resultsText[begin:end])
+    return open(f"{day}.input.txt").read().replace('\r\n', '\n')
 
-    return tuple(results)
+def getMarkdown(pattern):
+    for cell in _cells:
+        if cell['cell_type'] == 'markdown':
+            matched, seeking = [], True
+            for line in cell['source']:
+                if seeking:
+                    if re.search(pattern, line):
+                        seeking = False
+                else:
+                    if line and not line[0].isspace():
+                        return '\n'.join(matched).strip()
+                    matched.append(line.strip())
+
+    raise KeyError(f"Didn't find {pattern}")
