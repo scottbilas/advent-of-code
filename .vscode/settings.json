@@ -3,5 +3,11 @@
     "python.linting.enabled": true,
     "cSpell.words": [
         "libaoc"
-    ]
+    ],
+    "workbench.colorCustomizations": {
+        "editorRuler.foreground": "#242424",
+        "activityBar.background": "#173229",
+        "titleBar.activeBackground": "#204739",
+        "titleBar.activeForeground": "#F7FBFA"
+    }
 }

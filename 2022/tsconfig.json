@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "CommonJS",
+
+        "noUnusedParameters": true,
+
+        "baseUrl": "./",
+        "moduleResolution": "node",
+        "forceConsistentCasingInFileNames": true,
+        "outDir": "../../temp/2022/js",
+        "sourceMap": true
+    },
+    "include": ["aoc/*"]
+}
