@@ -1,6 +1,26 @@
 {
+    "eslintConfig": {
+        "root": true,
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": { "project": ["./tsconfig.json"] },
+        "plugins": ["@typescript-eslint"],
+        "ignorePatterns": [
+            "hacking.ts"
+        ],
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended"
+        ]
+    },
+    "jest": {
+        "preset": "ts-jest",
+        "testEnvironment": "node"
+    },
     "devDependencies": {
         "@types/node": "^18.11.10",
+        "@typescript-eslint/eslint-plugin": "^5.45.0",
+        "@typescript-eslint/parser": "^5.45.0",
+        "eslint": "^8.29.0",
         "typescript": "^4.9.3"
     },
     "dependencies": {
