@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs'
+import { range } from 'linq-to-typescript'
 const day = 4
 
 function parse(text: string) {
@@ -16,33 +17,16 @@ const sample = parse(`
 
 const input = parse(readFileSync(`aoc/day${day}.input.txt`, 'utf-8'))
 
-function contained(range): boolean {
-    return (
-        range[0] >= range[2] && range[1] <= range[3] ||
-        range[2] >= range[0] && range[3] <= range[1])
-}
-
-function intersects(range): boolean {
-    return (
-        range[0] >= range[2] && range[0] <= range[3] ||
-        range[1] >= range[2] && range[1] <= range[3])
-}
-
-function solve(ranges, predicate) {
-    let total = 0
-    for (let i = 0; i < ranges.length; i += 4) {
-        if (predicate(ranges.slice(i, i+4)))
-            ++total
-    }
-    return total
-}
-
 function solve1(ranges) {
-    return solve(ranges, contained)
+    return range(0, ranges.length/4)
+        .select(i => ranges.slice(i*4, i*4+4))
+        .count(r => r[2] >= r[0] && r[3] <= r[1] || r[0] >= r[2] && r[1] <= r[3])
 }
 
 function solve2(ranges) {
-    return solve(ranges, range => intersects(range) || contained(range))
+    return range(0, ranges.length/4)
+        .select(i => ranges.slice(i*4, i*4+4))
+        .count(r => r[1] >= r[2] && r[0] <= r[3])
 }
 
 test(`Day ${day}.1 Sample`, () => { expect(solve1(sample)).toBe(2); });
