@@ -1,39 +1,31 @@
-import * as fs from 'fs'
-import { range } from 'linq-to-typescript'
+import _ = require('lodash')
+import u = require('./utils')
+
 const day = 2
 
-function parse(text) {
-    return text.trim().split(/\s+/g)
-}
-
-const sample = parse(`
+const sample = u.parseWords(`
     A Y
     B X
     C Z`)
 
-const input = parse(fs.readFileSync(`aoc/day${day}.input.txt`, 'utf-8'))
+const input = u.parseWords(u.getProblemInput(day))
 
-function solve(moves, predicate) {
-    return range(0, moves.length/2)
-        .select(i => predicate(moves[i*2], moves[i*2+1]))
-        .sum()
-}
+const solve = (moves, predicate) => _.chain(moves)
+    .chunk(2)
+    .map(move => predicate(move[0], move[1]))
+    .sum().value()
 
-function solve1(moves) {
-    return solve(moves, (them, me) =>
-        ({ XA: 3, YB: 3, ZC: 3, XC: 6, YA: 6, ZB: 6 }[me + them] ?? 0) +
-        { X: 1, Y: 2, Z: 3 }[me])
-}
+const solve1 = (moves) => solve(moves, (them, me) =>
+    ({ XA: 3, YB: 3, ZC: 3, XC: 6, YA: 6, ZB: 6 }[me + them] ?? 0) +
+    { X: 1, Y: 2, Z: 3 }[me])
 
-function solve2(moves) {
-    return solve(moves, (them, end) => (
-        { X: 0, Y: 3, Z: 6 }[end] +
-        { A: 1, B: 2, C: 3 }[{
-            Y: them,
-            X: { A: 'C', B: 'A', C: 'B' }[them],
-            Z: { A: 'B', B: 'C', C: 'A' }[them]
-        }[end]]))
-}
+const solve2 = (moves) => solve(moves, (them, end) => (
+    { X: 0, Y: 3, Z: 6 }[end] +
+    { A: 1, B: 2, C: 3 }[{
+        Y: them,
+        X: { A: 'C', B: 'A', C: 'B' }[them],
+        Z: { A: 'B', B: 'C', C: 'A' }[them]
+    }[end]]))
 
 test(`Day ${day}.1 Sample`, () => { expect(solve1(sample)).toBe(15); });
 test(`Day ${day}.1 Problem`, () => { expect(solve1(input)).toBe(17189); });

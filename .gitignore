@@ -2,3 +2,6 @@ packages
 obj
 bin
 node_modules
+temp
+
+**/*.unity/Library
