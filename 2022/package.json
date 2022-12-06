@@ -16,6 +16,9 @@
         "preset": "ts-jest",
         "testEnvironment": "node"
     },
+    "cspell": {
+        "ignorePaths": ["**/**"]
+    },
     "devDependencies": {
         "@types/node": "^18.11.11",
         "@typescript-eslint/eslint-plugin": "^5.45.0",
