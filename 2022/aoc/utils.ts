@@ -36,6 +36,16 @@ export function parseBlocks(text: string): string[] {
     return text.replace(/\r/g, '').split(/\n\n/)
 }
 
+export function parseGrid(text: string): [string, number, number] {
+    let lines = text.trim().split('\n').map(l => l.trim())
+    return [lines.join(''), lines[0].length, lines.length]
+}
+
+export function parseNumGrid(text: string): [number[], number, number] {
+    let lines = text.trim().split('\n').map(l => l.trim())
+    return [lines.join('').split('').map(Number), lines[0].length, lines.length]
+}
+
 export function arrayOfArrays(count: number) {
     return Array(count).fill(0).map(_ => [])
 }
