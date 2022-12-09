@@ -1,4 +1,3 @@
-import _ = require('lodash')
 import u = require('./utils')
 
 const day = 9
@@ -30,12 +29,12 @@ function solve(text, len) {
     let used = new Set(['0,0'])
     let moves = u.parseWords(text)
 
-    for (let imove = 0; imove < moves.length; imove += 2) {
-        let [dir, dist] = [moves[imove], +moves[imove+1]]
+    for (let move of moves.chunk(2)) {
+        let [dir, dist] = [move[0], +move[1]]
 
         for (let istep = 0; istep < dist; istep++) {
-            rope[0].x += {L: -1, R: 1}[dir] ?? 0
-            rope[0].y += {U: -1, D: 1}[dir] ?? 0
+            rope.first().x += {L: -1, R: 1}[dir] ?? 0
+            rope.first().y += {U: -1, D: 1}[dir] ?? 0
 
             for (let irope = 1; irope < rope.length; irope++) {
                 let [h, t] = [rope[irope-1], rope[irope]]
@@ -46,7 +45,7 @@ function solve(text, len) {
                 }
             }
 
-            used.add(rope.at(-1).x + ',' + rope.at(-1).y)
+            used.add(rope.last().x + ',' + rope.last().y)
         }
     }
 

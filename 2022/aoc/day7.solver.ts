@@ -1,4 +1,3 @@
-import _ = require('lodash')
 import u = require('./utils')
 
 const day = 7
@@ -41,38 +40,37 @@ class Dir {
 function dirSizes(text) {
 
     let cwd = [new Dir('/')]
-    for (let m of text.matchAll(/cd (?<cd>\S+)|dir (?<dir>\S+)|(?<size>\d+)/g)) {
-        if (m.groups.cd == '/') {
+    for (let m of text.matchAll(/cd (?<cd>\S+)|(?<size>\d+)/g)) {
+        if (m.groups.cd == '/')
             cwd = cwd.slice(-1)
-        } else if (m.groups.cd == '..') {
+        else if (m.groups.cd == '..')
             cwd.shift()
-        } else if (m.groups.cd) {
-            cwd.unshift(cwd[0].dirs.find(d => d.name == m.groups.cd))
-        } else if (m.groups.dir) {
-            cwd[0].dirs.push(new Dir(m.groups.dir))
-        } else {
+        else if (m.groups.cd)
+            cwd.unshift(cwd[0].dirs.findOrPush(
+                d => d.name == m.groups.cd,
+                () => new Dir(m.groups.cd)))
+        else
             cwd[0].size += +m.groups.size
-        }
     }
 
     let sizes = []
     function calc(dir: Dir): number {
-        let total = _.sum(dir.dirs.map(calc)) + dir.size
+        let total = dir.dirs.map(calc).sum() + dir.size
         sizes.push(total)
         return total
     }
 
-    calc(cwd.at(-1))
+    calc(cwd.last())
     return sizes
 }
 
-const solve1 = text => _
-    .sum(dirSizes(text)
-    .filter(x => x <= 100000))
+const solve1 = text => dirSizes(text)
+    .filter(x => x <= 100000)
+    .sum()
 
 function solve2(text) {
     let sizes = dirSizes(text).sort((a, b) => a - b)
-    const needed = 30000000 - (70000000 - sizes.at(-1))
+    const needed = 30000000 - (70000000 - sizes.last())
     return sizes.find(x => x >= needed)
 }
 

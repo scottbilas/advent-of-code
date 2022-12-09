@@ -1,4 +1,3 @@
-import _ = require('lodash')
 import u = require('./utils')
 
 const day = 8
@@ -38,10 +37,10 @@ function solve(text, pred) {
 }
 
 const solve1 = text => solve(text, (visible, walk) =>
-    visible + (_.sum(walk.map(w => w[0])) ? 1 : 0))
+    visible + (walk.map(w => w[0])).any())
 
 const solve2 = text => solve(text, (max, walk) =>
-    Math.max(max, walk.reduce((t, i) => t * i[1], 1)))
+    Math.max(max, walk.map(w => w[1]).product()))
 
 u.test(`Day ${day}.1 Sample`,  () => solve1(sample),     21);
 u.test(`Day ${day}.1 Problem`, () => solve1(input),    1538);

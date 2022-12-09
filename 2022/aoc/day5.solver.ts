@@ -1,4 +1,3 @@
-import _ = require('lodash')
 import u = require('./utils')
 
 const day = 5
@@ -43,11 +42,11 @@ function solve(text, op) {
         stacks[to-1].push(...op(chunk))
     }
 
-    return stacks.map(s => _.last(s)).join('')
+    return stacks.map(s => s.last()).join('')
 }
 
 const solve1 = text => solve(text, a => a.reverse())
-const solve2 = text => solve(text, _.identity)
+const solve2 = text => solve(text, a => a)
 
 u.test(`Day ${day}.1 Sample`,  () => solve1(sample),       'CMZ')
 u.test(`Day ${day}.1 Problem`, () => solve1(input),  'HBTMTBSDC')

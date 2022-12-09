@@ -1,4 +1,3 @@
-import _ = require('lodash')
 import u = require('./utils')
 
 const day = 2
@@ -10,10 +9,10 @@ const sample = u.parseWords(`
 
 const input = u.parseWords(u.getProblemInput(day))
 
-const solve = (moves, predicate) => _.chain(moves)
+const solve = (moves, predicate) => moves
     .chunk(2)
     .map(move => predicate(move[0], move[1]))
-    .sum().value()
+    .sum()
 
 const solve1 = (moves) => solve(moves, (them, me) =>
     ({ XA: 3, YB: 3, ZC: 3, XC: 6, YA: 6, ZB: 6 }[me + them] ?? 0) +

@@ -1,4 +1,3 @@
-import _ = require('lodash')
 import u = require('./utils')
 
 const day = 1
@@ -21,8 +20,8 @@ const sample = `
 
 const input = u.getProblemInput(day)
 
-const solve = (text, count) => _(u.parseBlocks(text))
-    .map(block => _.sum(u.parseNums(block)))
+const solve = (text, count) => u.parseBlocks(text)
+    .map(block => u.parseNums(block).sum())
     .sort((a, b) => b - a)
     .take(count)
     .sum()

@@ -1,4 +1,3 @@
-import _ = require('lodash')
 import u = require('./utils')
 
 const day = 4
@@ -13,7 +12,7 @@ const sample = `
 
 const input = u.getProblemInput(day)
 
-const solve = (text, op) => _.chunk(u.parseNums(text), 4).filter(op).length
+const solve = (text, op) => u.parseNums(text).chunk(4).filter(op).length
 const solve1 = (text) => solve(text, r => r[2] >= r[0] && r[3] <= r[1] || r[0] >= r[2] && r[1] <= r[3])
 const solve2 = (text) => solve(text, r => r[1] >= r[2] && r[0] <= r[3])
 
