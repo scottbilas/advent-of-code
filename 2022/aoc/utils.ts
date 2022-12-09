@@ -46,6 +46,10 @@ export function parseNumGrid(text: string): [number[], number, number] {
     return [lines.join('').split('').map(Number), lines[0].length, lines.length]
 }
 
+export function minmax(value: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, value))
+}
+
 export function arrayOfArrays(count: number) {
     return Array(count).fill(0).map(_ => [])
 }
