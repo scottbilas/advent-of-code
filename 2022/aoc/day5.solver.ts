@@ -49,7 +49,7 @@ function solve(text, op) {
 const solve1 = text => solve(text, a => a.reverse())
 const solve2 = text => solve(text, _.identity)
 
-test(`Day ${day}.1 Sample`, () => { expect(solve1(sample)).toBe('CMZ'); });
-test(`Day ${day}.1 Problem`, () => { expect(solve1(input)).toBe('HBTMTBSDC'); });
-test(`Day ${day}.2 Sample`, () => { expect(solve2(sample)).toBe('MCD'); });
-test(`Day ${day}.2 Problem`, () => { expect(solve2(input)).toBe('PQTJRSHWS'); });
+u.test(`Day ${day}.1 Sample`,  () => solve1(sample),       'CMZ')
+u.test(`Day ${day}.1 Problem`, () => solve1(input),  'HBTMTBSDC')
+u.test(`Day ${day}.2 Sample`,  () => solve2(sample),       'MCD')
+u.test(`Day ${day}.2 Problem`, () => solve2(input),  'PQTJRSHWS')

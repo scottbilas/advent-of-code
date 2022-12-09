@@ -36,7 +36,7 @@ const solve2 = rucksacks => _.chain(rucksacks)
     .chunk(3).map(solve)
     .sum().value()
 
-test(`Day ${day}.1 Sample`, () => { expect(solve1(sample)).toBe(157); });
-test(`Day ${day}.1 Problem`, () => { expect(solve1(input)).toBe(7848); });
-test(`Day ${day}.2 Sample`, () => { expect(solve2(sample)).toBe(70); });
-test(`Day ${day}.2 Problem`, () => { expect(solve2(input)).toBe(2616); });
+u.test(`Day ${day}.1 Sample`,  () => solve1(sample),  157)
+u.test(`Day ${day}.1 Problem`, () => solve1(input),  7848)
+u.test(`Day ${day}.2 Sample`,  () => solve2(sample),   70)
+u.test(`Day ${day}.2 Problem`, () => solve2(input),  2616)

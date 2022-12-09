@@ -30,7 +30,7 @@ const solve = (text, count) => _(u.parseBlocks(text))
 const solve1 = text => solve(text, 1)
 const solve2 = text => solve(text, 3)
 
-test(`Day ${day}.1 Sample`, () => { expect(solve1(sample)).toBe(24000); });
-test(`Day ${day}.1 Problem`, () => { expect(solve1(input)).toBe(69177); });
-test(`Day ${day}.2 Sample`, () => { expect(solve2(sample)).toBe(45000); });
-test(`Day ${day}.2 Problem`, () => { expect(solve2(input)).toBe(207456); });
+u.test(`Day ${day}.1 Sample`,  () => solve1(sample),  24000)
+u.test(`Day ${day}.1 Problem`, () => solve1(input),   69177)
+u.test(`Day ${day}.2 Sample`,  () => solve2(sample),  45000)
+u.test(`Day ${day}.2 Problem`, () => solve2(input),  207456)

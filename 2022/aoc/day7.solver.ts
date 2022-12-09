@@ -76,7 +76,7 @@ function solve2(text) {
     return sizes.find(x => x >= needed)
 }
 
-test(`Day ${day}.1 Sample`, () => { expect(solve1(sample)).toBe(95437); });
-test(`Day ${day}.1 Problem`, () => { expect(solve1(input)).toBe(1454188); });
-test(`Day ${day}.2 Sample`, () => { expect(solve2(sample)).toBe(24933642); });
-test(`Day ${day}.2 Problem`, () => { expect(solve2(input)).toBe(4183246); });
+u.test(`Day ${day}.1 Sample`,  () => solve1(sample),    95437)
+u.test(`Day ${day}.1 Problem`, () => solve1(input),   1454188)
+u.test(`Day ${day}.2 Sample`,  () => solve2(sample), 24933642)
+u.test(`Day ${day}.2 Problem`, () => solve2(input),   4183246)

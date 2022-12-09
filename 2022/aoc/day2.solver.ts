@@ -27,7 +27,7 @@ const solve2 = (moves) => solve(moves, (them, end) => (
         Z: { A: 'B', B: 'C', C: 'A' }[them]
     }[end]]))
 
-test(`Day ${day}.1 Sample`, () => { expect(solve1(sample)).toBe(15); });
-test(`Day ${day}.1 Problem`, () => { expect(solve1(input)).toBe(17189); });
-test(`Day ${day}.2 Sample`, () => { expect(solve2(sample)).toBe(12); });
-test(`Day ${day}.2 Problem`, () => { expect(solve2(input)).toBe(13490); });
+u.test(`Day ${day}.1 Sample`,  () => solve1(sample),    15)
+u.test(`Day ${day}.1 Problem`, () => solve1(input),  17189)
+u.test(`Day ${day}.2 Sample`,  () => solve2(sample),    12)
+u.test(`Day ${day}.2 Problem`, () => solve2(input),  13490)

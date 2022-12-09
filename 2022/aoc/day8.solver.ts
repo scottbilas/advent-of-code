@@ -43,7 +43,7 @@ const solve1 = text => solve(text, (visible, walk) =>
 const solve2 = text => solve(text, (max, walk) =>
     Math.max(max, walk.reduce((t, i) => t * i[1], 1)))
 
-u.test(`Day ${day}.1 Sample`,  () => solve1(sample), 21);
-u.test(`Day ${day}.1 Problem`, () => solve1(input),  1538);
-u.test(`Day ${day}.2 Sample`,  () => solve2(sample), 8);
+u.test(`Day ${day}.1 Sample`,  () => solve1(sample),     21);
+u.test(`Day ${day}.1 Problem`, () => solve1(input),    1538);
+u.test(`Day ${day}.2 Sample`,  () => solve2(sample),      8);
 u.test(`Day ${day}.2 Problem`, () => solve2(input),  496125);

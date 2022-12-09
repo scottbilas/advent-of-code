@@ -56,8 +56,8 @@ function solve(text, len) {
 const solve1 = text => solve(text, 2)
 const solve2 = text => solve(text, 10)
 
-u.test(`Day ${day}.1 Sample 1`, () => solve1(sample1), 13);
-u.test(`Day ${day}.1 Problem`,  () => solve1(input),   6037);
-u.test(`Day ${day}.2 Sample 1`, () => solve2(sample1), 1);
-u.test(`Day ${day}.2 Sample 2`, () => solve2(sample2), 36);
-u.test(`Day ${day}.2 Problem`,  () => solve2(input),   2485);
+u.test(`Day ${day}.1 Sample 1`, () => solve1(sample1),   13)
+u.test(`Day ${day}.1 Problem`,  () => solve1(input),   6037)
+u.test(`Day ${day}.2 Sample 1`, () => solve2(sample1),    1)
+u.test(`Day ${day}.2 Sample 2`, () => solve2(sample2),   36)
+u.test(`Day ${day}.2 Problem`,  () => solve2(input),   2485)
