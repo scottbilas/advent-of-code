@@ -7,7 +7,12 @@
         "moduleResolution": "node",
         "forceConsistentCasingInFileNames": true,
         "outDir": "../temp/2022/js",
-        "sourceMap": true
+        "sourceMap": true,
+
+//        "strict": true,
+        "noImplicitReturns": true,
+//        "noImplicitAny": true,
+        "noImplicitThis": true,
     },
     "include": ["aoc/*"]
 }

@@ -26,6 +26,8 @@
     "dependencies": {
         "@types/lodash": "^4.14.191",
         "lodash": "^4.17.21",
+        "mathjs": "^11.5.0",
+        "prime-factorization": "^2.0.1",
         "ts-lodash": "^4.0.11"
     }
 }
