@@ -9,9 +9,6 @@
         "outDir": "../temp/2022/js",
         "sourceMap": true,
 
-//        "strict": true,
-        "noImplicitReturns": true,
-//        "noImplicitAny": true,
         "noImplicitThis": true,
     },
     "include": ["aoc/*"]
