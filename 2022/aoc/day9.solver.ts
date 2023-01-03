@@ -1,4 +1,4 @@
-import u = require('./utils')
+import { check, getProblemInput, minmax, parseWords } from './utils'
 
 const day = 9
 
@@ -22,12 +22,12 @@ const sample2 = `
     L 25
     U 20`
 
-const input = u.getProblemInput(day)
+const input = getProblemInput(day)
 
 function solve(text, len) {
     let rope = Array(len).fill(0).map(_ => ({x: 0, y: 0}))
     let used = new Set(['0,0'])
-    let moves = u.parseWords(text)
+    let moves = parseWords(text)
 
     for (let move of moves.chunk(2)) {
         let [dir, dist] = [move[0], +move[1]]
@@ -40,8 +40,8 @@ function solve(text, len) {
                 let [h, t] = [rope[irope-1], rope[irope]]
                 let [dx, dy] = [h.x-t.x, h.y-t.y]
                 if (Math.abs(dx) >= 2 || Math.abs(dy) >= 2) {
-                    t.x += u.minmax(dx, -1, 1)
-                    t.y += u.minmax(dy, -1, 1)
+                    t.x += minmax(dx, -1, 1)
+                    t.y += minmax(dy, -1, 1)
                 }
             }
 
@@ -55,8 +55,8 @@ function solve(text, len) {
 const solve1 = text => solve(text, 2)
 const solve2 = text => solve(text, 10)
 
-u.test(`Day ${day}.1 Sample 1`, () => solve1(sample1),   13)
-u.test(`Day ${day}.1 Problem`,  () => solve1(input),   6037)
-u.test(`Day ${day}.2 Sample 1`, () => solve2(sample1),    1)
-u.test(`Day ${day}.2 Sample 2`, () => solve2(sample2),   36)
-u.test(`Day ${day}.2 Problem`,  () => solve2(input),   2485)
+check(`Day ${day}.1 Sample 1`, () => solve1(sample1),   13)
+check(`Day ${day}.1 Problem`,  () => solve1(input),   6037)
+check(`Day ${day}.2 Sample 1`, () => solve2(sample1),    1)
+check(`Day ${day}.2 Sample 2`, () => solve2(sample2),   36)
+check(`Day ${day}.2 Problem`,  () => solve2(input),   2485)

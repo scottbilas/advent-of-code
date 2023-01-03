@@ -1,13 +1,13 @@
-import u = require('./utils')
+import { check, getProblemInput, parseWords } from './utils'
 
 const day = 2
 
-const sample = u.parseWords(`
+const sample = parseWords(`
     A Y
     B X
     C Z`)
 
-const input = u.parseWords(u.getProblemInput(day))
+const input = parseWords(getProblemInput(day))
 
 const solve = (moves, predicate) => moves
     .chunk(2)
@@ -26,7 +26,7 @@ const solve2 = (moves) => solve(moves, (them, end) => (
         Z: { A: 'B', B: 'C', C: 'A' }[them]
     }[end]]))
 
-u.test(`Day ${day}.1 Sample`,  () => solve1(sample),    15)
-u.test(`Day ${day}.1 Problem`, () => solve1(input),  17189)
-u.test(`Day ${day}.2 Sample`,  () => solve2(sample),    12)
-u.test(`Day ${day}.2 Problem`, () => solve2(input),  13490)
+check(`Day ${day}.1 Sample`,  () => solve1(sample),    15)
+check(`Day ${day}.1 Problem`, () => solve1(input),  17189)
+check(`Day ${day}.2 Sample`,  () => solve2(sample),    12)
+check(`Day ${day}.2 Problem`, () => solve2(input),  13490)

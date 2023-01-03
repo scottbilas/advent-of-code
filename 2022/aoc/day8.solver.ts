@@ -1,4 +1,4 @@
-import u = require('./utils')
+import { check, getProblemInput, parseNumGrid } from './utils'
 
 const day = 8
 
@@ -9,17 +9,17 @@ const sample = `
     33549
     35390`
 
-const input = u.getProblemInput(day)
+const input = getProblemInput(day)
 
 function solve(text, pred) {
 
-    let [grid, cx, cy] = u.parseNumGrid(text)
+    let grid = parseNumGrid(text)
 
     function test(sx, sy, dx, dy) {
         let see = 0
-        for (let [x, y] = [sx+dx, sy+dy]; x>=0 && x<cx && y>=0 && y<cy; x+=dx, y+=dy) {
+        for (let [x, y] = [sx+dx, sy+dy]; x>=0 && x<grid.cx && y>=0 && y<grid.cy; x+=dx, y+=dy) {
             ++see
-            if (grid[y*cx+x] >= grid[sy*cx+sx])
+            if (grid.get2(x, y) >= grid.get2(sx, sy))
                 return [false, see]
         }
         return [true, see]
@@ -27,8 +27,8 @@ function solve(text, pred) {
 
     let result = 0
 
-    for (let y = 0; y < cy; ++y)
-        for (let x = 0; x < cx; ++x)
+    for (let y = 0; y < grid.cy; ++y)
+        for (let x = 0; x < grid.cx; ++x)
             result = pred(result, [
                 test(x, y, 1, 0), test(x, y, -1,  0),
                 test(x, y, 0, 1), test(x, y,  0, -1)])
@@ -37,12 +37,11 @@ function solve(text, pred) {
 }
 
 const solve1 = text => solve(text, (visible, walk) =>
-    visible + (walk.map(w => w[0])).any())
-
+    visible + (walk.map(w => w[0]).sum() > 0))
 const solve2 = text => solve(text, (max, walk) =>
     Math.max(max, walk.map(w => w[1]).product()))
 
-u.test(`Day ${day}.1 Sample`,  () => solve1(sample),     21);
-u.test(`Day ${day}.1 Problem`, () => solve1(input),    1538);
-u.test(`Day ${day}.2 Sample`,  () => solve2(sample),      8);
-u.test(`Day ${day}.2 Problem`, () => solve2(input),  496125);
+check(`Day ${day}.1 Sample`,  () => solve1(sample),     21);
+check(`Day ${day}.1 Problem`, () => solve1(input),    1538);
+check(`Day ${day}.2 Sample`,  () => solve2(sample),      8);
+check(`Day ${day}.2 Problem`, () => solve2(input),  496125);

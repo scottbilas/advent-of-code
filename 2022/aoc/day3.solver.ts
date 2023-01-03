@@ -1,9 +1,9 @@
+import { check, getProblemInput, parseWords } from './utils'
 import _ = require('lodash')
-import u = require('./utils')
 
 const day = 3
 
-const sample = u.parseWords(`
+const sample = parseWords(`
     vJrwpWtwJgWrhcsFMMfFFhFp
     jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
     PmmdzqPrVvPwwTWBwg
@@ -11,7 +11,7 @@ const sample = u.parseWords(`
     ttgJtRGJQctTZtZT
     CrZsJsPPZsGzwwsLwLmpwMDw`)
 
-const input = u.parseWords(u.getProblemInput(day))
+const input = parseWords(getProblemInput(day))
 
 function solve(hunks: string[]) {
     const match = _.chain(hunks)
@@ -36,7 +36,7 @@ const solve2 = rucksacks => _.chain(rucksacks)
     .chunk(3).map(solve)
     .sum().value()
 
-u.test(`Day ${day}.1 Sample`,  () => solve1(sample),  157)
-u.test(`Day ${day}.1 Problem`, () => solve1(input),  7848)
-u.test(`Day ${day}.2 Sample`,  () => solve2(sample),   70)
-u.test(`Day ${day}.2 Problem`, () => solve2(input),  2616)
+check(`Day ${day}.1 Sample`,  () => solve1(sample),  157)
+check(`Day ${day}.1 Problem`, () => solve1(input),  7848)
+check(`Day ${day}.2 Sample`,  () => solve2(sample),   70)
+check(`Day ${day}.2 Problem`, () => solve2(input),  2616)

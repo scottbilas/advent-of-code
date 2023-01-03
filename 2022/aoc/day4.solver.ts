@@ -1,4 +1,4 @@
-import u = require('./utils')
+import { check, getProblemInput, parseNumbers } from './utils'
 
 const day = 4
 
@@ -10,13 +10,13 @@ const sample = `
     6-6,4-6
     2-6,4-8`
 
-const input = u.getProblemInput(day)
+const input = getProblemInput(day)
 
-const solve = (text, op) => u.parseNums(text).chunk(4).filter(op).length
+const solve = (text, op) => parseNumbers(text, true).chunk(4).filter(op).length
 const solve1 = (text) => solve(text, r => r[2] >= r[0] && r[3] <= r[1] || r[0] >= r[2] && r[1] <= r[3])
 const solve2 = (text) => solve(text, r => r[1] >= r[2] && r[0] <= r[3])
 
-u.test(`Day ${day}.1 Sample`,  () => solve1(sample),   2)
-u.test(`Day ${day}.1 Problem`, () => solve1(input),  540)
-u.test(`Day ${day}.2 Sample`,  () => solve2(sample),   4)
-u.test(`Day ${day}.2 Problem`, () => solve2(input),  872)
+check(`Day ${day}.1 Sample`,  () => solve1(sample),   2)
+check(`Day ${day}.1 Problem`, () => solve1(input),  540)
+check(`Day ${day}.2 Sample`,  () => solve2(sample),   4)
+check(`Day ${day}.2 Problem`, () => solve2(input),  872)

@@ -1,4 +1,4 @@
-import u = require('./utils')
+import { check, getProblemInput } from './utils'
 
 const day = 7
 
@@ -27,7 +27,7 @@ const sample = `
     5626152 d.ext
     7214296 k`
 
-const input = u.getProblemInput(day)
+const input = getProblemInput(day)
 
 class Dir {
     name: string
@@ -74,7 +74,7 @@ function solve2(text) {
     return sizes.find(x => x >= needed)
 }
 
-u.test(`Day ${day}.1 Sample`,  () => solve1(sample),    95437)
-u.test(`Day ${day}.1 Problem`, () => solve1(input),   1454188)
-u.test(`Day ${day}.2 Sample`,  () => solve2(sample), 24933642)
-u.test(`Day ${day}.2 Problem`, () => solve2(input),   4183246)
+check(`Day ${day}.1 Sample`,  () => solve1(sample),    95437)
+check(`Day ${day}.1 Problem`, () => solve1(input),   1454188)
+check(`Day ${day}.2 Sample`,  () => solve2(sample), 24933642)
+check(`Day ${day}.2 Problem`, () => solve2(input),   4183246)

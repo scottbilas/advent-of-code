@@ -3,7 +3,7 @@ import * as math from 'mathjs'
 
 const day = 21
 
-const parse = text => new Map(parseLines(text, true)
+const parse = text => new Map(parseLines(text)
     .map(l => l.match(/\w+|\d+|[-+*/]/g))
     .map(p => [p[0], p.slice(1)]))
 

@@ -40,26 +40,25 @@ export function parseWords(text: string): string[] {
     return text.match(/\S+/g)
 }
 
-export function parseBlocks(text: string, needsCleanWhitespace: boolean = false): string[] {
-    if (needsCleanWhitespace)
-        text = cleanWhitespace(text)
-    return text.replace(/\r/g, '').split(/\n\n/)
+export function parseBlocks(text: string): string[] {
+    return parseLines(text).join('\n').split(/\n\n/)
 }
 
-export function parseLines(text: string, trim: boolean = false): string[] {
+export function parseLines(text: string): string[] {
+    // fix crlf and get lines
     let lines = text.replace(/\r/g, '').split(/\n/)
-    if (trim)
-        lines = lines.map(l => l.trim())
+
+    // remove leading and trailing blank lines
     let start = 0, end = lines.length
     while (start < end && lines[start].trim() == '') ++start
     while (end >= start && lines[end-1].trim() == '') --end
-    return lines.slice(start, end)
-}
+    lines = lines.slice(start, end)
 
-export function cleanWhitespace(text: string): string {
-    let lines = parseLines(text)
+    // calculate overall indent
     let indent = lines.filter(l => l.length).map(l => l.match(/^ */)[0].length).min()
-    return lines.map(l => l.slice(indent)).join('\n')
+
+    // remove indent
+    return lines.map(l => l.slice(indent))
 }
 
 export class boolean2 {
@@ -245,9 +244,7 @@ export function parseStringGrid(text: string, parse: (string) => string = (s) =>
     return parseGrid<string>(text, parse)
 }
 
-export function parseNumGrid(text: string, needsCleanWhitespace: boolean = false): Grid<number> {
-    if (needsCleanWhitespace)
-        text = cleanWhitespace(text)
+export function parseNumGrid(text: string): Grid<number> {
     return parseGrid(text, s => +s)
 }
 
