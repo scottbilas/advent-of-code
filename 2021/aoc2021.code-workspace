@@ -6,6 +6,10 @@
 	],
 	"settings": {
 		"python.defaultInterpreterPath": ".venv/scripts/python",
-		"python.terminal.activateEnvInCurrentTerminal": true
+		"python.terminal.activateEnvInCurrentTerminal": true,
+		"cSpell.enableFiletypes": [
+			"!plaintext",
+			"!python"
+		]
 	}
 }
