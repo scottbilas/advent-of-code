@@ -2,8 +2,14 @@
     "eslintConfig": {
         "root": true,
         "parser": "@typescript-eslint/parser",
-        "parserOptions": { "project": ["./tsconfig.json"] },
-        "plugins": ["@typescript-eslint"],
+        "parserOptions": {
+            "project": [
+                "./tsconfig.json"
+            ]
+        },
+        "plugins": [
+            "@typescript-eslint"
+        ],
         "ignorePatterns": [
             "hacking.ts"
         ],
@@ -13,7 +19,9 @@
         ]
     },
     "cspell": {
-        "ignorePaths": ["**/**"]
+        "ignorePaths": [
+            "**/**"
+        ]
     },
     "devDependencies": {
         "@types/node": "^18.11.11",
@@ -28,6 +36,7 @@
         "lodash": "^4.17.21",
         "mathjs": "^11.5.0",
         "prime-factorization": "^2.0.1",
-        "ts-lodash": "^4.0.11"
+        "ts-lodash": "^4.0.11",
+        "tstl": "^2.5.13"
     }
 }
