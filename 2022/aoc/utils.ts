@@ -3,7 +3,7 @@ import { hash, IComparable } from 'tstl'
 
 // test-related
 
-function prettyMs(ms: number) {
+export function prettyMs(ms: number) {
     // TODO: if ms > 1000, show seconds
     return `${ms}ms`
 }
@@ -275,7 +275,7 @@ export class CharGrid { // read-only because underying storage is a string, whic
     constructor(public cells: string, public cx: number, public cy: number) {}
 
     static fromStringGrid(grid: Grid<string>): CharGrid {
-        return new CharGrid(grid.cells.join(''), grid.cx, grid.cy)
+        return new CharGrid(grid.cells.map(s => s[0]).join(''), grid.cx, grid.cy)
     }
 
     get size(): number2 {
