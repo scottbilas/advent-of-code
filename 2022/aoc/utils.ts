@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs'
+import { hash, IComparable } from 'tstl'
 
 // test-related
 
@@ -75,7 +76,7 @@ export class boolean3 {
     get any() { return this.x || this.y || this.z }
 }
 
-export class number2 {
+export class number2 implements IComparable<number2> {
     constructor(public x: number, public y: number) {}
 
     static fromScalar = (scalar: number): number2 => new number2(scalar, scalar)
@@ -84,6 +85,9 @@ export class number2 {
     static fromOffset = (off: number, cx: number): number2 => new number2(off % cx, Math.floor(off / cx))
 
     equals = (other: number2): boolean => this.x == other.x && this.y == other.y
+    less = (other: number2): boolean => this.x < other.x || this.x == other.x && this.y < other.y
+    hashCode = (): number => hash(this.x, this.y)
+
     lt = (other: number2): boolean2 => new boolean2(this.x < other.x, this.y < other.y)
     le = (other: number2): boolean2 => new boolean2(this.x <= other.x, this.y <= other.y)
     gt = (other: number2): boolean2 => new boolean2(this.x > other.x, this.y > other.y)
@@ -101,12 +105,16 @@ export class number2 {
     addX = (x: number): number2 => new number2(this.x + x, this.y)
     addY = (y: number): number2 => new number2(this.x, this.y + y)
     sub = (other: number2): number2 => new number2(this.x - other.x, this.y - other.y)
+    sub2 = (other: [number, number]): number2 => new number2(this.x - other[0], this.y - other[1])
     subS = (other: number): number2 => new number2(this.x - other, this.y - other)
     mul = (other: number2): number2 => new number2(this.x * other.x, this.y * other.y)
+    mul2 = (other: [number, number]): number2 => new number2(this.x * other[0], this.y * other[1])
     mulS = (other: number): number2 => new number2(this.x * other, this.y * other)
     div = (other: number2): number2 => new number2(this.x / other.x, this.y / other.y)
+    div2 = (other: [number, number]): number2 => new number2(this.x / other[0], this.y / other[1])
     divS = (other: number): number2 => new number2(this.x / other, this.y / other)
     mod = (other: number2): number2 => new number2(this.x % other.x, this.y % other.y)
+    mod2 = (other: [number, number]): number2 => new number2(this.x % other[0], this.y % other[1])
     modS = (other: number): number2 => new number2(this.x % other, this.y % other)
 
     neg = (): number2 => new number2(-this.x, -this.y)
@@ -129,14 +137,24 @@ export function parseNumber2s(text: string): number2[] {
     return parseNumbers(text).chunk(2).map(([x, y]) => new number2(x, y))
 }
 
-export class number3 {
+export class number3 implements IComparable<number3> {
     constructor(public x: number, public y: number, public z: number) {}
 
     static fromScalar = (scalar: number): number3 => new number3(scalar, scalar, scalar)
     static fromTuple = (tuple: [number, number, number]): number3 => new number3(tuple[0], tuple[1], tuple[2])
     static fromArray = (array: number[]): number3 => new number3(array[0], array[1], array[2])
 
+    get xy(): number2 { return new number2(this.x, this.y) }
+    get yx(): number2 { return new number2(this.y, this.x) }
+    get xz(): number2 { return new number2(this.x, this.z) }
+    get zx(): number2 { return new number2(this.z, this.x) }
+    get yz(): number2 { return new number2(this.y, this.z) }
+    get zy(): number2 { return new number2(this.z, this.y) }
+
     equals = (other: number3): boolean => this.x == other.x && this.y == other.y && this.z == other.z
+    less = (other: number3): boolean => this.x < other.x || this.x == other.x && (this.y < other.y || this.y == other.y && this.z < other.z)
+    hashCode = (): number => hash(this.x, this.y, this.z)
+
     lt = (other: number3): boolean3 => new boolean3(this.x < other.x, this.y < other.y, this.z < other.z)
     le = (other: number3): boolean3 => new boolean3(this.x <= other.x, this.y <= other.y, this.z <= other.z)
     gt = (other: number3): boolean3 => new boolean3(this.x > other.x, this.y > other.y, this.z > other.z)
@@ -184,6 +202,10 @@ export function parseNumber3s(text: string): number3[] {
 export class Grid<T> {
     constructor(public cells: T[], public cx: number, public cy: number) {}
 
+    clone(): Grid<T> {
+        return new Grid(this.cells.slice(), this.cx, this.cy)
+    }
+
     get size(): number2 {
         return new number2(this.cx, this.cy)
     }
@@ -200,6 +222,14 @@ export class Grid<T> {
         return number2.fromOffset(offset, this.cx)
     }
 
+    offsetAt(pos: number2): number {
+        return pos.toOffset(this.cx)
+    }
+
+    offsetAt2(x: number, y: number): number {
+        return y*this.cx + x
+    }
+
     try(pos: number2): T | undefined {
         if (pos.x < 0 || pos.x >= this.cx || pos.y < 0 || pos.y >= this.cy)
             return undefined
@@ -214,8 +244,19 @@ export class Grid<T> {
         this.cells[pos.toOffset(this.cx)] = value
     }
 
+    set2(x: number, y: number, value: T) {
+        this.cells[y*this.cx+x] = value
+    }
+
     forEach(callback: (cell: T, pos: number2) => void) {
         this.cells.forEach((v, i) => callback(v, number2.fromOffset(i, this.cx)))
+    }
+
+    shrink(border: number = 1): Grid<T> {
+        let cells = Array<T>()
+        for (let i = this.cx; i < this.cells.length - this.cx; i += this.cx)
+            cells.push(...this.cells.slice(i + border, i + this.cx - border))
+        return new Grid<T>(cells, this.cx - (border*2), this.cy - (border*2))
     }
 
     toString(stringize: (cell: T) => string = (v) => v.toString()): string {
@@ -227,6 +268,56 @@ export class Grid<T> {
             out += '\n'
         }
         return out
+    }
+}
+
+export class CharGrid { // read-only because underying storage is a string, which is immutable
+    constructor(public cells: string, public cx: number, public cy: number) {}
+
+    static fromStringGrid(grid: Grid<string>): CharGrid {
+        return new CharGrid(grid.cells.join(''), grid.cx, grid.cy)
+    }
+
+    get size(): number2 {
+        return new number2(this.cx, this.cy)
+    }
+
+    get(pos: number2): string {
+        return this.cells[pos.toOffset(this.cx)]
+    }
+
+    get2(x: number, y: number): string {
+        return this.cells[y*this.cx + x]
+    }
+
+    posAt(offset: number): number2 {
+        return number2.fromOffset(offset, this.cx)
+    }
+
+    offsetAt(pos: number2): number {
+        return pos.toOffset(this.cx)
+    }
+
+    try(pos: number2): string | undefined {
+        if (pos.x < 0 || pos.x >= this.cx || pos.y < 0 || pos.y >= this.cy)
+            return undefined
+        return this.get(pos)
+    }
+
+    inBounds(pos: number2): boolean {
+        return pos.x >= 0 && pos.x < this.cx && pos.y >= 0 && pos.y < this.cy
+    }
+
+    forEach(callback: (cell: string, pos: number2) => void) {
+        for (let i = 0; i < this.cells.length; i++)
+            callback(this.cells[i], number2.fromOffset(i, this.cx))
+    }
+
+    toString(): string {
+        let str = ''
+        for (let y = 0; y < this.cy; y++)
+            str += this.cells.slice(y*this.cx, (y+1)*this.cx) + '\n'
+        return str
     }
 }
 
