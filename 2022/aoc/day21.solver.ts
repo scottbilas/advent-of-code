@@ -72,7 +72,7 @@ function solve2(parsed) {
     return result
 }
 
-check(`Day ${day}.1 Sample`,  () => solve1(sample), 152)
+check(`Day ${day}.1 Sample`,  () => solve1(sample),             152)
 check(`Day ${day}.1 Problem`, () => solve1(input),  309248622142100)
-check(`Day ${day}.2 Sample`,  () => solve2(sample), 301)
-check(`Day ${day}.2 Problem`, () => solve2(input),  3757272361782)
+check(`Day ${day}.2 Sample`,  () => solve2(sample),             301)
+check(`Day ${day}.2 Problem`, () => solve2(input),    3757272361782)

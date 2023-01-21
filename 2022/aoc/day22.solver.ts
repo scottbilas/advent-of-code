@@ -209,7 +209,7 @@ function solve2(text) {
     return score(pos.add(face.origin), dir)
 }
 
-check(`Day ${day}.1 Sample`,  () => solve1(sample), 6032)
-check(`Day ${day}.1 Problem`, () => solve1(input),  77318)
-check(`Day ${day}.2 Sample`,  () => solve2(sample), 5031)
+check(`Day ${day}.1 Sample`,  () => solve1(sample),   6032)
+check(`Day ${day}.1 Problem`, () => solve1(input),   77318)
+check(`Day ${day}.2 Sample`,  () => solve2(sample),   5031)
 check(`Day ${day}.2 Problem`, () => solve2(input),  126017)
