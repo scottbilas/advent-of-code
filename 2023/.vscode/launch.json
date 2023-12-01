@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Current Julia File",
+            "type": "julia",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${fileDirname}",
+        }
+    ],
+}
