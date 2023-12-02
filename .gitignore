@@ -5,3 +5,4 @@ node_modules
 temp
 
 **/*.unity/Library
+**/.vscode/settings.json

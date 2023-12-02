@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 693b5402a62fba142b8fa588cf2722d6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - CubeOn: {fileID: 2020332976612499394, guid: b824b99251ffffc44a7c2571475ba7df, type: 3}
+  - CubeOff: {fileID: 2020332976612499394, guid: b2bdfb358655ffa43a7faa5e9ecffe93, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
