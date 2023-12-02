@@ -1,5 +1,6 @@
 day = 1
 include("utils.jl")
+using Chain
 
 input = getProblemInput()
 
@@ -10,11 +11,11 @@ sample1 = [
     "treb7uchet",
 ]
 
-solve1 = lines ->
-    @pipe lines |>
-    map(l -> replace(l, r"\D+" => ""), _) |>
-    map(l -> parse(Int, l[begin]*l[end]), _) |>
+solve1 = lines -> @chain lines begin
+    replace.(r"\D+" => "")
+    parse.(Int, l[begin]*l[end] for l in _)
     sum
+end
 
 check("Day $day.1 Sample",  () -> solve1(sample1), 142)
 check("Day $day.1 Problem", () -> solve1(input), 54953)
@@ -46,7 +47,7 @@ function solve2(lines)
         return line
     end
 
-    return @pipe lines |> map(fixup, _) |> solve1
+    return @chain lines map(fixup, _) solve1
 end
 
 check("Day $day.2 Sample",  () -> solve2(sample2), 281)

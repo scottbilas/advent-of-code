@@ -1,4 +1,4 @@
-using Pipe, Printf
+using Printf
 
 function prettyMs(seconds)
     if seconds < 1.0
