@@ -25,3 +25,33 @@ end
 function getProblemInput()
     return readlines("day$day.input.txt")
 end
+
+function getSampleLines(text)
+    return map(strip, split(strip(text), '\n'))
+end
+
+function slice_s(arr, range)
+    return arr[range_s(arr, range)]
+end
+
+function range_s(arr, range)
+    start = max(range.start, 1)
+    stop = min(range.stop, length(arr))
+    return start:stop
+end
+
+function validindex(arr, index)
+    return 1 <= index <= length(arr)
+end
+
+function flatten(arr)
+    result = []
+    for item in arr
+        if isa(item, AbstractArray)
+            append!(result, flatten(item))
+        else
+            push!(result, item)
+        end
+    end
+    return result
+end
