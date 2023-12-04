@@ -44,10 +44,10 @@ function solve2(lines)
             end
             c += 1
         end
-        return line
+        line
     end
 
-    return @chain lines map(fixup, _) solve1
+    @chain lines map(fixup, _) solve1
 end
 
 check("Day $day.2 Sample",  () -> solve2(sample2), 281)
