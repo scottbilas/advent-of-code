@@ -26,6 +26,10 @@ function getProblemInput()
     return readlines("day$day.input.txt")
 end
 
+function getProblemSample()
+    return readlines("day$day.sample.txt")
+end
+
 function getSampleLines(text)
     return map(strip, split(strip(text), '\n'))
 end
@@ -54,4 +58,8 @@ function flatten(arr)
         end
     end
     return result
+end
+
+function parseInts(text)
+    map(m -> parse(Int, m.match), eachmatch(r"\d+", text))
 end
