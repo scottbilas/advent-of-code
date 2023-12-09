@@ -23,29 +23,29 @@ function check(name, solver, expected)
 end
 
 function getProblemInput()
-    return readlines("day$day.input.txt")
+    readlines("day$day.input.txt")
 end
 
 function getProblemSample()
-    return readlines("day$day.sample.txt")
+    readlines("day$day.sample.txt")
 end
 
 function getSampleLines(text)
-    return map(strip, split(strip(text), '\n'))
+    map(strip, split(strip(text), '\n'))
 end
 
 function slice_s(arr, range)
-    return arr[range_s(arr, range)]
+    arr[range_s(arr, range)]
 end
 
 function range_s(arr, range)
     start = max(range.start, 1)
     stop = min(range.stop, length(arr))
-    return start:stop
+    start:stop
 end
 
 function validindex(arr, index)
-    return 1 <= index <= length(arr)
+    1 <= index <= length(arr)
 end
 
 function flatten(arr)
@@ -57,9 +57,13 @@ function flatten(arr)
             push!(result, item)
         end
     end
-    return result
+    result
 end
 
 function parseInts(text)
     map(m -> parse(Int, m.match), eachmatch(r"\d+", text))
+end
+
+function wrapIndex(arr, index)
+    (index-1) % length(arr) + 1
 end
