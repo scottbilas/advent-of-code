@@ -61,7 +61,7 @@ function flatten(arr)
 end
 
 function parseInts(text)
-    map(m -> parse(Int, m.match), eachmatch(r"\d+", text))
+    map(m -> parse(Int, m.match), eachmatch(r"-?\d+", text))
 end
 
 function wrapIndex(arr, index)
