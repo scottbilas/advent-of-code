@@ -44,8 +44,12 @@ function range_s(arr, range)
     start:stop
 end
 
-function validindex(arr, index)
+function validIndex(arr, index)
     1 <= index <= length(arr)
+end
+
+function element_s(arr, index, default)
+    validIndex(arr, index) ? arr[index] : default
 end
 
 function flatten(arr)
