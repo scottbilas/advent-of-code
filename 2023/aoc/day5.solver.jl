@@ -17,7 +17,7 @@ function solve(lines, seedRanges)
         end
     end
 
-    jobs = [copy([]) for _ in 1:length(sections)+1]
+    jobs = [[] for _ in 1:length(sections)+1]
     jobs[1] = seedRanges
 
     for isection in eachindex(sections)
