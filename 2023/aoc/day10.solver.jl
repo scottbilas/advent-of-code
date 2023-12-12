@@ -105,15 +105,15 @@ function solve2(lines)
     end
 
     inside, entered, total = false, '.', 0
-    for i in 1:length(solved)-1
-        if solved[i] == 'S'
-            if @match (entered, board[i]) begin
+    for (s, b) in zip(solved, board)
+        if s == 'S'
+            if @match (entered, b) begin
                     (_, 'L'|'|'|'F') => true
                     ('F', '7') => true;
                     ('L', 'J') => true
                     _ => false
                 end
-                entered, inside = board[i], !inside
+                inside, entered = !inside, b
             end
         elseif inside
             total += 1
