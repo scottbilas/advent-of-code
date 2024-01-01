@@ -26,12 +26,33 @@ function getProblemInput()
     readlines("day$day.input.txt")
 end
 
+function getProblemInputText()
+    strip(read("day$day.input.txt", String))
+end
+
 function getProblemSample()
     readlines("day$day.sample.txt")
 end
 
 function getSampleLines(text)
     map(strip, split(strip(text), '\n'))
+end
+
+function parseBlocks(lines)
+    blocks = []
+    block = []
+    for line in lines
+        if isempty(line)
+            push!(blocks, block)
+            block = []
+        else
+            push!(block, line)
+        end
+    end
+    if !isempty(block)
+        push!(blocks, block)
+    end
+    blocks
 end
 
 function slice_s(arr, range)
@@ -68,6 +89,21 @@ function parseInts(text)
     map(m -> parse(Int, m.match), eachmatch(r"-?\d+", text))
 end
 
+function parseGrid(lines, convert = identity)
+    board = [convert(lines[y][x]) for x in eachindex(lines[1]), y in eachindex(lines)]
+    board, size(board)
+end
+
 function wrapIndex(arr, index)
     (index-1) % length(arr) + 1
+end
+
+function printGrid(grid, padCell = 0)
+    cols, rows = size(grid)
+    for y in 1:rows
+        for x in 1:cols
+            print(lpad(grid[x, y], padCell, ' '))
+        end
+        println()
+    end
 end
