@@ -1,4 +1,4 @@
-day =
+day = ?
 include("utils.jl")
 
 input = getProblemInput()
@@ -6,13 +6,11 @@ input = getProblemInput()
 sample = getSampleLines("""
 """)
 
-function solve(lines)
+function solve1(lines)
 end
 
-solve1 = lines -> solve(lines)
-
-check("Day $day.1 Sample",  () -> solve1(sample), 0)
-check("Day $day.1 Problem", () -> solve1(input),  0)
+check("Day $day.1 Sample",  () -> solve1(sample), ?)
+#check("Day $day.1 Problem", () -> solve1(input), -1)
 
 #solve2 = lines -> solve(lines)
 #
