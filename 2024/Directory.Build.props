@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <BaseTempFolder>$(MSBuildThisFileDirectory)..\temp\</BaseTempFolder>
+    <OutputPath>$(BaseTempFolder)bin\$(MSBuildProjectName)\$(Configuration)</OutputPath><!-- don't add trailing \ here -->
+    <BaseIntermediateOutputPath>$(BaseTempFolder)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,7 @@
+# see https://www.jetbrains.com/help/resharper/EditorConfig_Index.html
+
+[*.cs]
+resharper_invoke_as_extension_method_highlighting = none
+resharper_inconsistent_naming_highlighting = none
+resharper_check_namespace_highlighting = none
+resharper_member_can_be_made_static_local_highlighting = none

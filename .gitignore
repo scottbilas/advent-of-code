@@ -3,6 +3,7 @@ obj
 bin
 node_modules
 temp
+.idea
 
 **/*.unity/Library
 **/.vscode/settings.json
