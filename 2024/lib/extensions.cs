@@ -1,12 +1,27 @@
-﻿static class Extensions
+﻿using System.Numerics;
+using System.Text.RegularExpressions;
+
+static class Extensions
 {
+    // Math
+
     public static int Abs(this int @this) => Math.Abs(@this);
 
-    public static IEnumerable<int> SelectInts(this string @this) => @this
+    public static T Multiply<T>(this IEnumerable<T> @this) where T : INumber<T> =>
+        @this.Aggregate(T.One, (a, b) => a * b);
+
+    // Enumerables
+
+    public static IEnumerable<string> GroupValues(this Match @this) =>
+        @this.Groups.Values.Select(g => g.Value);
+
+    public static IEnumerable<int> Ints(this string @this) => @this
         .RegexMatches(@"[-+]?\d+")
         .Select(m => int.Parse(m.Value));
+    public static IEnumerable<int> SelectWhereInts(this IEnumerable<string> @this) => @this
+        .SelectWhere(v => (int.TryParse(v, out var i), i));
 
-    public static List<int> GetInts(this string @this) => @this.SelectInts().ToList();
+    public static List<int> GetInts(this string @this) => @this.Ints().ToList();
 
     public static IEnumerable<T> WhereIndex<T>(this IEnumerable<T> @this, Func<int, bool> predicate) =>
         @this.Where((_, i) => predicate(i));

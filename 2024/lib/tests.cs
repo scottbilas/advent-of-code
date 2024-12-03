@@ -6,7 +6,7 @@ abstract class Fixture
 {
     protected Fixture()
     {
-        Day = GetType().Name.SelectInts().Single();
+        Day = GetType().Name.Ints().Single();
 
         InputDir = Assembly
             .GetExecutingAssembly()

@@ -9,7 +9,7 @@
         .Sum();
 
     IEnumerable<int> Parse(string input, int column) =>
-        input.SelectInts().Stride(2, column - 1);
+        input.Ints().Stride(2, column - 1);
 
     [Test] public void Sample1() => Solve1(SampleInput).ShouldBe(11);
     [Test] public void Sample2() => Solve2(SampleInput).ShouldBe(31);
