@@ -139,8 +139,28 @@ So, in this example, `*5*` bricks can be safely disintegrated.
 
 Figure how the blocks will settle based on the snapshot. Once they've settled, consider disintegrating a single brick; *how many bricks could be safely chosen as the one to get disintegrated?*
 
-To begin, [get your puzzle input](22/input).
+Your puzzle answer was `391`.
+
+The first half of this puzzle is complete! It provides one gold star: \*
+
+\--- Part Two ---
+----------
+
+Disintegrating bricks one at a time isn't going to be fast enough. While it might sound dangerous, what you really need is a *chain reaction*.
+
+You'll need to figure out the best brick to disintegrate. For each brick, determine how many *other bricks would fall* if that brick were disintegrated.
+
+Using the same example as above:
+
+* Disintegrating brick `A` would cause all `*6*` other bricks to fall.
+* Disintegrating brick `F` would cause only `*1*` other brick, `G`, to fall.
+
+Disintegrating any other brick would cause *no other bricks* to fall. So, in this example, the sum of *the number of other bricks that would fall* as a result of disintegrating each brick is `*7*`.
+
+For each brick, determine how many *other bricks* would fall if that brick were disintegrated. *What is the sum of the number of other bricks that would fall?*
 
 Answer:
 
-You can also [Shareon [Twitter](https://twitter.com/intent/tweet?text=%22Sand+Slabs%22+%2D+Day+22+%2D+Advent+of+Code+2023&url=https%3A%2F%2Fadventofcode%2Ecom%2F2023%2Fday%2F22&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
+Although it hasn't changed, you can still [get your puzzle input](22/input).
+
+You can also [Shareon [Twitter](https://twitter.com/intent/tweet?text=I%27ve+completed+Part+One+of+%22Sand+Slabs%22+%2D+Day+22+%2D+Advent+of+Code+2023&url=https%3A%2F%2Fadventofcode%2Ecom%2F2023%2Fday%2F22&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.

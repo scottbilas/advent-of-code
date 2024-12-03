@@ -133,8 +133,19 @@ In the second example, after pushing the button `1000` times, `4250` low pulses 
 
 Consult your module configuration; determine the number of low pulses and high pulses that would be sent after pushing the button `1000` times, waiting for all pulses to be fully handled after each push of the button. *What do you get if you multiply the total number of low pulses sent by the total number of high pulses sent?*
 
-To begin, [get your puzzle input](20/input).
+Your puzzle answer was `794930686`.
+
+The first half of this puzzle is complete! It provides one gold star: \*
+
+\--- Part Two ---
+----------
+
+The final machine responsible for moving the sand down to Island Island has a module attached named `rx`. The machine turns on when a *single low pulse* is sent to `rx`.
+
+Reset all modules to their default states. Waiting for all pulses to be fully handled after each button press, *what is the fewest number of button presses required to deliver a single low pulse to the module named `rx`?*
 
 Answer:
 
-You can also [Shareon [Twitter](https://twitter.com/intent/tweet?text=%22Pulse+Propagation%22+%2D+Day+20+%2D+Advent+of+Code+2023&url=https%3A%2F%2Fadventofcode%2Ecom%2F2023%2Fday%2F20&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
+Although it hasn't changed, you can still [get your puzzle input](20/input).
+
+You can also [Shareon [Twitter](https://twitter.com/intent/tweet?text=I%27ve+completed+Part+One+of+%22Pulse+Propagation%22+%2D+Day+20+%2D+Advent+of+Code+2023&url=https%3A%2F%2Fadventofcode%2Ecom%2F2023%2Fday%2F20&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.

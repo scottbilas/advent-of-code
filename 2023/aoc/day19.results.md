@@ -58,8 +58,25 @@ Ultimately, three parts are *accepted*. Adding up the `x`, `m`, `a`, and `s` rat
 
 Sort through all of the parts you've been given; *what do you get if you add together all of the rating numbers for all of the parts that ultimately get accepted?*
 
-To begin, [get your puzzle input](19/input).
+Your puzzle answer was `382440`.
+
+The first half of this puzzle is complete! It provides one gold star: \*
+
+\--- Part Two ---
+----------
+
+Even with your help, the sorting process *still* isn't fast enough.
+
+One of the Elves comes up with a new plan: rather than sort parts individually through all of these workflows, maybe you can figure out in advance which combinations of ratings will be accepted or rejected.
+
+Each of the four ratings (`x`, `m`, `a`, `s`) can have an integer value ranging from a minimum of `1` to a maximum of `4000`. Of *all possible distinct combinations* of ratings, your job is to figure out which ones will be *accepted*.
+
+In the above example, there are `*167409079868000*` distinct combinations of ratings that will be accepted.
+
+Consider only your list of workflows; the list of part ratings that the Elves wanted you to sort is no longer relevant. *How many distinct combinations of ratings will be accepted by the Elves' workflows?*
 
 Answer:
 
-You can also [Shareon [Twitter](https://twitter.com/intent/tweet?text=%22Aplenty%22+%2D+Day+19+%2D+Advent+of+Code+2023&url=https%3A%2F%2Fadventofcode%2Ecom%2F2023%2Fday%2F19&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
+Although it hasn't changed, you can still [get your puzzle input](19/input).
+
+You can also [Shareon [Twitter](https://twitter.com/intent/tweet?text=I%27ve+completed+Part+One+of+%22Aplenty%22+%2D+Day+19+%2D+Advent+of+Code+2023&url=https%3A%2F%2Fadventofcode%2Ecom%2F2023%2Fday%2F19&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
