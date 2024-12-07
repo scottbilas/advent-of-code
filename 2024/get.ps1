@@ -13,5 +13,8 @@ $base = "$path/day$($Day)"
 & $aoc download -d $Day -y $Year -i "$base.input.txt" -p "$base.results.md" -m -o
 
 if (!(Test-Path "$base.solver.cs")) {
-    Copy-Item "$path/../solver.template" "$base.solver.cs"
+    $code = Get-Content "$path/../solver.template"
+    $code = $code -replace '{{Day}}', $Day
+    $code | Set-Content "$base.solver.cs"
+    "Wrote $base.solver.cs"
 }

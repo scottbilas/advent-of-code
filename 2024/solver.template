@@ -1,4 +1,4 @@
-class Day? : Fixture
+class Day{{Day}} : Fixture
 {
     int Solve1(string input)
     {
@@ -10,9 +10,9 @@ class Day? : Fixture
         return 0;
     }
 
-    [Test] public void Sample1() => Solve1(SampleInput).ShouldBe(0);
-    //[Test] public void Sample2() => Solve2(SampleInput).ShouldBe(0);
+    [Test] public void Sample1() => Solve1(SampleInput).ShouldBe(-1);
+    //[Test] public void Sample2() => Solve2(SampleInput).ShouldBe(-1);
 
-    [Test] public void Part1() => Solve1(Input).ShouldBe(0);
-    //[Test] public void Part2() => Solve2(Input).ShouldBe(0);
+    [Test] public void Part1() => Solve1(Input).ShouldBe(-1);
+    //[Test] public void Part2() => Solve2(Input).ShouldBe(-1);
 }
