@@ -22,11 +22,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Combinatorics" Version="2.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
-    <PackageReference Include="OkTools.Core" Version="1.0.19" />
     <PackageReference Include="Shouldly" Version="4.2.1" />
+    <PackageReference Include="System.Interactive" Version="6.0.1" />
+
+    <!--PackageReference Include="OkTools.Core" Version="1.0.19" /-->
+    <ProjectReference Include="../../OkTools/src/Core/Core.csproj" />
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
