@@ -412,7 +412,7 @@ namespace Unity.Coding.Utils
             if (obj == null)
                 return -1;
 
-            return this.ToString().CompareTo(((NPath)obj).ToString());
+            return ToString().CompareTo(((NPath)obj).ToString());
         }
 
         public static bool operator!=(NPath a, NPath b)
@@ -555,7 +555,7 @@ namespace Unity.Coding.Utils
             if (!IsRelative)
                 return this;
 
-            return NPath.CurrentDirectory.Combine(this);
+            return CurrentDirectory.Combine(this);
         }
 
         NPath CopyWithDeterminedDestination(NPath absoluteDestination, Func<NPath, bool> fileFilter)
