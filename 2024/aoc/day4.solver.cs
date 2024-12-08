@@ -1,6 +1,3 @@
-using static Dir;
-using static Statics;
-
 class Day4 : Fixture
 {
     int Solve1(string input) => With(input.ToGrid(), grid => grid
