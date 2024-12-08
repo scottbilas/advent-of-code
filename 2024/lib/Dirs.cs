@@ -7,7 +7,7 @@ class Dir
     public Dir Next8 = null!, Prev8 = null!;
 
     public static readonly Dir W, NW, N, NE, E, SE, S, SW;
-    public static readonly Dir[] All8, All4;
+    public static readonly Dir[] All8, All4, AllDiag4;
 
     Dir(string name, string niceName, Int2 move) => (Name, NiceName, Move) = (name, niceName, move);
 
@@ -28,6 +28,7 @@ class Dir
         ];
 
         All4 = [ W, N, E, S ];
+        AllDiag4 = [ NW, NE, SE, SW ];
 
         static void Hookup(Dir dir, Dir reverse, Dir next4, Dir next8)
         {
@@ -35,9 +36,9 @@ class Dir
             dir.Reverse.Reverse = dir.Next4.Prev4 = dir.Next8.Prev8 = dir;
         }
 
-        Hookup(W, E, N, NW); Hookup(NW, SE, N,  N);
-        Hookup(N, S, E, NE); Hookup(NE, SW, E,  E);
-        Hookup(E, W, S, SE); Hookup(SE, NW, S,  S);
-        Hookup(S, N, W, SW); Hookup(SW, NE, W,  W);
+        Hookup(W, E, N, NW); Hookup(NW, SE, NE, N);
+        Hookup(N, S, E, NE); Hookup(NE, SW, SE, E);
+        Hookup(E, W, S, SE); Hookup(SE, NW, SW, S);
+        Hookup(S, N, W, SW); Hookup(SW, NE, NW, W);
     }
 }

@@ -18,16 +18,22 @@ static partial class Extensions
         return result.cells;
     }
 
-    public static T[,] ToGrid<T>(this string @this, Func<char, T> selector)
+    public static T[,] ToGrid<T>(this string @this, Func<char, T> selector) =>
+        @this.ToGrid(selector, out var _);
+
+    public static T[,] ToGrid<T>(this string @this, Func<char, T> selector, out Int2 size)
     {
-        var (size, cells) = @this.ParseGrid();
+        var result = @this.ParseGrid();
+        size = result.size;
+
         var grid = new T[size.X, size.Y];
-        foreach (var (coord, value) in cells)
+        foreach (var (coord, value) in result.cells)
             grid[coord.X, coord.Y] = selector(value);
         return grid;
     }
 
     public static char[,] ToGrid(this string @this) => @this.ToGrid(c => c);
+    public static char[,] ToGrid(this string @this, out Int2 size) => @this.ToGrid(c => c, out size);
 
     public static T[,] Copy<T>(this T[,] @this) => (T[,])@this.Clone();
 
