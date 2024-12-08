@@ -1,5 +1,3 @@
-using System;
-
 #if WIP
 
 // the intention here is to provide something similar to ITreeEnumerable, part of an
