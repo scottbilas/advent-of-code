@@ -2,7 +2,7 @@ class Day3 : Fixture
 {
     int Solve1(string input) => input
         .RegexMatches(@"mul\((\d+),(\d+)\)")
-        .Sum(m => m.Ints().Multiply());
+        .Sum(m => m.Ints().Product());
 
     int Solve2(string input) => ("do()"+input)
         .Replace('\n',' ').Split("don't()")

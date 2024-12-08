@@ -17,7 +17,7 @@ class Day2 : Fixture
 
     bool IsSafe2(IReadOnlyList<int> ints) => Enumerable
         .Range(0, ints.Count)
-        .Select(skip => ints.WhereIndex(i => i != skip).ToList())
+        .Select(skip => ints.SelectWhereIndex(i => i != skip).ToList())
         .Any(IsSafe1);
 
     int Solve1(string input) => Solve(input, IsSafe1);

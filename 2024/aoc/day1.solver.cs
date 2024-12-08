@@ -1,15 +1,13 @@
 ﻿class Day1 : Fixture
 {
     int Solve1(string input) => Enumerable
-        .Zip(Parse(input, 1).Ordered(), Parse(input, 2).Ordered())
-        .Sum(v => Math.Abs(v.First - v.Second));
+        .Zip(Parse(input, 1).Ordered(), Parse(input, 2).Ordered()).Sum(v => Math.Abs(v.First - v.Second));
 
-    int Solve2(string input) => Extensions
-        .GroupJoin(Parse(input, 1), Parse(input, 2), (l, r) => l * r.Count())
-        .Sum();
+    int Solve2(string input) => Parse(input, 1)
+        .GroupJoin(Parse(input, 2), (l, r) => l * r.Count()).Sum();
 
     IEnumerable<int> Parse(string input, int column) =>
-        input.Ints().Stride(2, column - 1);
+        input.Ints().SelectStride(2, column - 1);
 
     [Test] public void Sample1() => Solve1(SampleInput).ShouldBe(11);
     [Test] public void Sample2() => Solve2(SampleInput).ShouldBe(31);
