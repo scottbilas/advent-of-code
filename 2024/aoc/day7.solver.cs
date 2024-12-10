@@ -20,7 +20,7 @@ class Day7 : Fixture
         return 0;
     }
 
-    long Solve1(string input) => input.SelectLines().Sum(l => Solve(l, false));
+    long Solve1(string input) => input.SelectLines().AsParallel().Sum(l => Solve(l, false));
     long Solve2(string input) => input.SelectLines().AsParallel().Sum(l => Solve(l, true));
 
     [Test] public void Sample1() => Solve1(SampleInput).ShouldBe(3749);
