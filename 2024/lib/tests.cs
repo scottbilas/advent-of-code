@@ -20,7 +20,7 @@ abstract class Fixture
     protected readonly int Day;
     protected readonly NPath InputDir;
     protected readonly NPath InputFile;
-    protected string Input => InputFile.ReadAllText();
+    protected string Input => InputFile.ReadAllText().Trim();
 
     protected readonly NPath ResultsFile;
     protected NPath Results => ResultsFile.ReadAllText();
