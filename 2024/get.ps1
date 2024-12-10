@@ -10,7 +10,18 @@ $aoc = "$PSScriptRoot/../Tools/aoc-cli/aoc.exe"
 $path = "$PSScriptRoot/aoc"
 $base = "$path/day$($Day)"
 
-& $aoc download -d $Day -y $Year -i "$base.input.txt" -p "$base.results.md" -m -o
+function download($d) {
+    & $aoc download -d $d -y $Year -i "$base.input.txt" -p "$base.results.md" -m -o
+}
+
+if ($Day -eq 0) {
+    foreach ($d in 1..25) {
+        download $d
+    }
+}
+else {
+    download $Day
+}
 
 if (!(Test-Path "$base.solver.cs")) {
     $code = Get-Content "$path/../solver.template"
