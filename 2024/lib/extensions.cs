@@ -27,6 +27,24 @@ static partial class Extensions
         }
     }
 
+    public static IEnumerable<LinkedListNode<T>> Nodes<T>(this LinkedList<T> @this)
+    {
+        for (var node = @this.First; node != null; node = node.Next)
+            yield return node;
+    }
+
+    public static IEnumerable<LinkedListNode<T>> NodesReverse<T>(this LinkedList<T> @this)
+    {
+        for (var node = @this.Last; node != null; node = node.Previous)
+            yield return node;
+    }
+
+    public static IEnumerable<T> Reverse<T>(this LinkedList<T> @this)
+    {
+        for (var node = @this.Last; node != null; node = node.Previous)
+            yield return node.Value;
+    }
+
     // Item Parsing
 
     public static int Int(this string @this) => int.Parse(@this);
