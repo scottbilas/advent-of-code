@@ -2,17 +2,16 @@ class Day6 : Fixture
 {
     (bool loop, IEnumerable<Int2> path) Solve(char[,] grid)
     {
-        var pos = grid.Cells().Single(c => c.cell == '^').pos;
+        var pos = grid.Cells().First(c => c.cell == '^').pos;
         var seen = new HashSet<(Int2 pos, Dir dir)>();
         var loop = true;
 
         for (var dir = N; seen.Add((pos, dir)) && loop;)
         {
             var test = pos + dir.Move;
-            var next = grid.Get(test);
-            if (next == 'X')
+            if (!grid.HasCoord(test))
                 loop = false;
-            else if (next == '#')
+            else if (grid.Get(test) == '#')
                 dir = dir.Next4;
             else
                 pos = test;
@@ -21,7 +20,7 @@ class Day6 : Fixture
         return (loop, seen.Select(v => v.pos).Distinct());
     }
 
-    char[,] Parse(string input) => input.ToGrid().AddBorder('X');
+    char[,] Parse(string input) => input.ToGrid();
 
     int Solve1(string input) => Solve(Parse(input)).path.Count();
 
