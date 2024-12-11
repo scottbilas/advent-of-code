@@ -4,9 +4,9 @@ class Day3 : Fixture
         .RegexMatches(@"mul\((\d+),(\d+)\)")
         .Sum(m => m.Ints().Product());
 
-    int Solve2(string input) => ("do()"+input)
-        .Replace('\n',' ').Split("don't()")
-        .Sum(s => Solve1(s.RegexMatch("do().*").Value));
+    int Solve2(string input) => ("do("+input)
+        .Replace('\n',' ').Split("don't(")
+        .Sum(s => Solve1(s.RegexMatch(@"do\(.*").Value));
 
     [Test] public void Sample1() => Solve1(SampleInput1).ShouldBe(161);
     [Test] public void Sample2() => Solve2(SampleInput2).ShouldBe(48);
