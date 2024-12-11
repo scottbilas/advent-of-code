@@ -6,6 +6,12 @@ static partial class Extensions
 
     public static int Abs(this int @this) => Math.Abs(@this);
 
+    public static int Int(this char @this) => @this switch
+    {
+        >= '0' and <= '9' => @this - '0',
+        _ => throw new InvalidOperationException()
+    };
+
     public static bool HasCoord(this Int2 @this, Int2 coord) =>
         coord >= Int2.Zero == true && coord < @this == true;
 
@@ -44,6 +50,11 @@ static partial class Extensions
         for (var node = @this.Last; node != null; node = node.Previous)
             yield return node.Value;
     }
+
+    public static IEnumerable<IGrouping<T, T>> Grouped<T>(this IEnumerable<T> @this) =>
+        @this.GroupBy(v => v);
+    public static IEnumerable<(T key, int count)> SelectByCount<T>(this IEnumerable<T> @this) =>
+        @this.Grouped().Select(g => (g.Key, g.Count()));
 
     // Item Parsing
 

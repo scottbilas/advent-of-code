@@ -35,6 +35,12 @@ static partial class Extensions
     public static char[,] ToGrid(this string @this) => @this.ToGrid(c => c);
     public static char[,] ToGrid(this string @this, out Int2 size) => @this.ToGrid(c => c, out size);
 
+    public static int[,] ToIntGrid(this string @this) =>
+        @this.ToIntGrid(out var _);
+    public static int[,] ToIntGrid(this string @this, out Int2 size) =>
+        @this.ToGrid(c => c.Int(), out size);
+
+
     public static T[,] Copy<T>(this T[,] @this) => (T[,])@this.Clone();
 
     public static T Get<T>(this T[,] @this, in Int2 pos) => @this[pos.X, pos.Y];
