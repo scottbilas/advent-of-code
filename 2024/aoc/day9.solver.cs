@@ -2,7 +2,7 @@ class Day9 : Fixture
 {
     record struct Entry(int Id, int Len);
     LinkedList<Entry> Parse(string input) =>
-        new(input.Select((c, i) => new Entry(i % 2 == 0 ? i / 2 : -1, c - '0')));
+        new(input.Select((c, i) => new Entry(i % 2 == 0 ? i / 2 : -1, c.Int())));
 
     long Checksum(IEnumerable<Entry> entries)
     {
