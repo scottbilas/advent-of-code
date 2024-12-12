@@ -1,6 +1,7 @@
 class Dir
 {
     public readonly string Name, NiceName;
+    public int Index4, Index8;
     public readonly Int2 Move;
     public Dir Reverse = null!;
     public Dir Next4 = null!, Prev4 = null!;
@@ -40,5 +41,10 @@ class Dir
         Hookup(N, S, E, NE); Hookup(NE, SW, SE, E);
         Hookup(E, W, S, SE); Hookup(SE, NW, SW, S);
         Hookup(S, N, W, SW); Hookup(SW, NE, NW, W);
+
+        for (var i = 0; i < All8.Length; ++i)
+            All8[i].Index8 = i;
+        for (var i = 0; i < All4.Length; ++i)
+            All4[i].Index4 = i;
     }
 }

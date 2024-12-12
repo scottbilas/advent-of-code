@@ -44,6 +44,7 @@ static partial class Extensions
     public static T[,] Copy<T>(this T[,] @this) => (T[,])@this.Clone();
 
     public static T Get<T>(this T[,] @this, in Int2 pos) => @this[pos.X, pos.Y];
+    public static T? SafeGet<T>(this T[,] @this, in Int2 pos) => @this.HasCoord(pos) ? @this[pos.X, pos.Y] : default;
     public static T[,] Set<T>(this T[,] @this, in Int2 pos, T value) { @this[pos.X, pos.Y] = value; return @this; }
 
     public static T[,] Fill<T>(this T[,] @this, T value) =>
