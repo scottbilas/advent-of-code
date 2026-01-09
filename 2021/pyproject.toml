@@ -8,7 +8,7 @@ authors = []
 python = ">=3.10,<3.11"
 ipykernel = "^6.6.0"
 jupyter = "^1.0.0"
-nbconvert = "^6.3.0"
+nbconvert = "^6.5.1"
 matplotlib = "^3.5.0"
 nbmerge = "^0.0.4"
 graphviz = "^0.19.1"
